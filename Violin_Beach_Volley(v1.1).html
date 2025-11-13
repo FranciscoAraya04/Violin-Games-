@@ -1,0 +1,2142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<script>
+const version = '1.1';
+</script>
+<title>Violin Beach Kombat (v<script>document.write(version)</script>)</title>
+<style>
+  :root{
+    --bg:#0a2540;
+    --sand:#f5e2a8;
+    --sea:#5ec3e6;
+    --line:#222;
+    --net:#555;
+    --hud:#ffffff;
+    --hudShadow:#00000055;
+    --btn:#1f7aec;
+    --btnText:#fff;
+  }
+  html,body{height:100%;margin:0;background:#0b1420;color:#eee;font-family:system-ui,Segoe UI,Roboto,Arial}
+  .wrap{display:flex;align-items:center;justify-content:center;height:100%}
+  canvas{background:#87ceeb;box-shadow:0 10px 40px #0008;border-radius:16px;max-width:96vw;max-height:92vh}
+  .hint{
+    position:fixed;left:1rem;bottom:1rem;background:#111a;backdrop-filter: blur(4px);
+    padding:.75rem 1rem;border-radius:10px;font-size:.9rem;color:#ddd
+  }
+  .pill{
+    display:inline-block;background:var(--btn);color:var(--btnText);padding:.25rem .6rem;
+    border-radius:999px;font-weight:600;margin-left:.5rem
+  }
+  /* UI pequeños rótulos */
+  .badge{position:absolute;top:.8rem;right:.8rem;background:#111c;padding:.35rem .6rem;border-radius:8px;font:600 .9rem/1 system-ui}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <canvas id="game" width="1200" height="675" aria-label="Violin Beach Volley"></canvas>
+</div>
+
+<div class="badge" id="badge"></div>
+
+<script>
+/* Configuración del juego */
+const CONFIG = {
+  PLAYER_RADIUS: 48,
+  PLAYER_HITBOX_SCALE: 1.0,
+  BALL_RADIUS: 36,
+
+  GROUND_Y: 600, //altura del suelo (px desde arriba del canvas)
+  NET_X: 600,
+  NET_THICKNESS: 18,
+  NET_HEIGHT: 200,
+
+  GRAVITY: 1800,        //gravedad (px/s^2)
+  AIR_DRAG: 0.001,           // 0.002 recomendable si quieres frenar un poco en el aire
+  PLAYER_SPEED: 580,
+  PLAYER_JUMP_V: 820,
+  PLAYER_MAX_VX: 660,
+
+  BALL_BOUNCE: -0.32,
+  PLAYER_IMPULSE: 1.0,      // más alto = golpes más potentes
+  BALL_MAX_SPEED: 1250,
+
+  BASE_POINTS_TO_WIN: 10,
+  SKY_VARIANT: 1,
+
+  // --- Parámetros de saque ---
+  SERVE_HOLD_MS: 10,   // tiempo en ms que la bola queda inmóvil antes de lanzarse
+  SERVE_Y: 280,          // altura inicial Y de la pelota durante el saque
+  SERVE_OFFSET_X: 10,     // offset horizontal desde el centro del lado para colocar la pelota
+  SERVE_VX: -20,         // velocidad horizontal aplicada al liberar el saque (px/s)
+  SERVE_VY: -1000,         // velocidad vertical inicial aplicada al liberar el saque (px/s) (neg = hacia arriba)
+  GROUND_POINT_HOLD_MS: 250,
+};
+
+// Precargar imágenes
+const bgImages = {};
+function loadBackgroundImage(name, url) {
+  const img = new Image();
+  img.src = url;
+  bgImages[name] = img;
+}
+
+// Cargar las imágenes que usarás
+loadBackgroundImage('beachPhoto', 'https://img.freepik.com/foto-gratis/hermosa-playa-mar_74190-3820.jpg');
+loadBackgroundImage('beachPhoto_night', 'https://lh3.googleusercontent.com/sitesv/AAzXCkevv_mdCUsP0RD7NV6bks3Eprsz-PKfPz8GpKBZKGCnGVQ-BwEJhprXDuBlntnbyLJqZo0XLpFJ2azQFPhMgPGMSFI6D455OpOjnL5AfYFdS1haIVwmaSXxBIcPT4FbuKQUDmKQzJZyYH_YcZGtQZ04OMMeqq_Z1MAq1o7FcJABCfUJHIT4-wwCkvY9KiONXmU-aeJAMI-Bsu0wjN3Nn4e6bG6e9F405A=w1280');
+loadBackgroundImage('beachPhoto_weather', 'https://lh3.googleusercontent.com/sitesv/AAzXCkemKeFsvxEbYnvS0Kj918IAzpk0k9mMZ4cs0QMEMJY8iZllxoPHWsg4mqMjApz5vC3NYMray6JLWlgipRPyug1bOA04flALSpyf7H8ffaZ-_XSaxoRPEt8jQdNnLoRK1VWGoyT7FPIsCqHE9kgTJu69lYosFB5uTaXNVGy-ADg_oXvcPEXyJUXq735Xf4I_5gwEfmfT-74RNjUYSS7fz5ARSfh6Q315oZ3GTjg=w1280');
+
+// Presets de fondos y pelotas (selección aleatoria al empezar partida)
+const BACKGROUNDS = [
+  {
+    name: 'Sunny',
+    skyVariant: 0,
+    sky: { top: '#87ceeb', mid: '#bfe9ff', bot: '#fefefe' },
+    sun: { color: 'rgba(255,245,180,0.95)', radius: 60, visible: true },
+    moon: { color: '', radius: 0, visible: false },
+    sea: '#5ec3e6',
+    sand: '#f5e2a8',
+    weight: 0.01
+  },
+  {
+    name: 'Night',
+    skyVariant: 0,
+    sky: { top: '#071a35', mid: '#0d2548', bot: '#1a2a4f' },
+    sun: { visible: false },
+    moon: { color: 'rgba(200,220,255,0.9)', radius: 50, visible: true },
+    sea: '#1b4b74',
+    sand: '#a19777',
+    weight: 0.01
+  },
+  {
+    name: 'Cloudy',
+    skyVariant: 0,
+    sky: { top: '#a6c2d1', mid: '#c8d7de', bot: '#dce5e8' },
+    sun: { visible: false },
+    moon: { visible: false },
+    sea: '#7db7c5',
+    sand: '#e8dfb0',
+    weight: 0.01
+  },
+ {
+    name: 'Real Beach',
+    skyVariant: 0,
+    imageKey: 'beachPhoto',  // referencia a la imagen precargada
+    isPhoto: true,
+    sun: { visible: false },
+    moon: { visible: false },
+    weight: 15.0
+  },
+  {
+    name: 'Beach Night',
+    skyVariant: 0,
+    imageKey: 'beachPhoto_night',  // referencia a la imagen precargada
+    isPhoto: true,
+    sun: { visible: false },
+    moon: { visible: false },
+    weight: 3.0
+  },
+  {
+    name: 'Beach Cloudy',
+    skyVariant: 0,
+    imageKey: 'beachPhoto_weather',  // referencia a la imagen precargada
+    isPhoto: true,
+    sun: { visible: false },
+    moon: { visible: false },
+    weight: 10.0
+  }
+];
+
+function pickWeighted(list, weightKey='weight'){
+  if(!Array.isArray(list) || list.length===0) return null;
+  const items = list.map(it => ({it, w: Math.max(0, (it[weightKey] == null ? 1 : it[weightKey]))}));
+  const total = items.reduce((s,x)=>s+x.w,0);
+  if(total <= 0) return items[0].it;
+  let r = Math.random() * total;
+  for(const x of items){
+    if(r < x.w) return x.it;
+    r -= x.w;
+  }
+  return items[items.length-1].it;
+}
+
+const BALL_TYPES = [
+  // gradiente: stops: [ [offset,color], ... ], seam color, radius multiplier (1 = default)
+  { name:'Classic', stops:[[0,'#fff8'],[1,'#f2742a']], seam:'#fff', rMul:1 , weight: 2.0 },
+  { name:'Fire',    stops:[[0,'#fff8'],[1,'#ff4c00']], seam:'#ffddb3', rMul:1.05, weight: 2.0 },
+  { name:'Ice',     stops:[[0,'#fff8'],[1,'#00d4ff']], seam:'#b3f0ff', rMul:1.1, weight: 2.0 },
+  { name:'Blue',    stops:[[0,'#fff8'],[1,'#2aa6ff']], seam:'#e6f7ff', rMul:1.15, weight: 2.0 },
+  { name:'Dark',    stops:[[0,'#fff8'],[1,'#7a4bff']], seam:'#fff3', rMul:1.2, weight: 2.0 }
+];
+
+// Estado actual elegido al iniciar la partida
+let currentBackground = null;
+let currentBallType = null;
+
+// ← AÑADE ESTO: asignar un fondo por defecto para la selección
+currentBackground = BACKGROUNDS[3]; // índice 3 = 'Real Beach' (la foto)
+
+/* Utilidades */
+const TAU = Math.PI*2;
+const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
+const now = ()=>performance.now();
+
+/* Canvas */
+const cvs = document.getElementById('game');
+const ctx = cvs.getContext('2d');
+const W = cvs.width, H = cvs.height;
+const badge = document.getElementById('badge');
+
+/* Estados */
+const STATE = { SELECT:'select', PLAY:'play', PAUSE:'pause', GAMEOVER:'gameover' };
+let gameState = STATE.SELECT;
+let useBot = false;
+
+/* Roster de skins dibujadas por código */
+const ROSTER = [
+  'violin',
+  'metal',
+  'dj',
+  'queen',
+  'fire',
+  'drum',
+  'hydra',
+  'ghost',
+  'harp',
+  'theremin',
+  'director',
+  'piano',
+  'cello',
+  'horn',
+  'mystery'
+];
+
+function drawSkin(ctx, skin, b){
+  ctx.save();
+  const TAU = Math.PI * 2;
+  const R = b.r;
+  const t = now();
+
+  switch(skin){
+
+   /* === VIOLIN === */
+case 'violin': {
+  const R = b.r;
+  ctx.save();
+  ctx.scale(1.0, 1.0);
+
+  // cuerpo principal más redondeado
+  const grad = ctx.createLinearGradient(-R, -R, R, R);
+  grad.addColorStop(0, '#b3682e');
+  grad.addColorStop(1, '#7b3f1b');
+  ctx.fillStyle = grad;
+  ctx.strokeStyle = '#3f2412';
+  ctx.lineWidth = 2.4;
+  ctx.beginPath();
+  ctx.ellipse(0, -R * 0.3, R * 0.65, R * 0.55, 0, 0, TAU);
+  ctx.ellipse(0, R * 0.38, R * 0.8, R * 0.70, 0, 0, TAU);
+  ctx.fill();
+  ctx.stroke();
+
+  // tapa más clara
+  ctx.fillStyle = '#d58a49';
+  ctx.beginPath();
+  ctx.ellipse(-0.2, 1.8, R * 0.48, R * 0.72, -0.05, 0, TAU);
+  ctx.fill();
+
+  // diapasón
+  ctx.fillStyle = '#2e2e2e';
+  ctx.fillRect(-R * 0.09, -R * 1.3, R * 0.18, R * 1.05);
+
+  // clavijero
+  ctx.fillStyle = '#3b2b1e';
+  ctx.fillRect(-R * 0.1, -R * 1.42, R * 0.20, R * 0.15);
+  ctx.beginPath();
+  ctx.fillStyle = '#2a1a0a';
+  ctx.arc(0, -R * 1.46, R * 0.12, 0, TAU);
+  ctx.fill();
+
+  // f-holes
+  ctx.strokeStyle = '#2a1407';
+  ctx.lineWidth = 2;
+  const drawFholeLocal = (x, y, dir) => {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(1, dir);
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.bezierCurveTo(6, -10, 6, 10, 0, 0);
+    ctx.stroke();
+    ctx.restore();
+  };
+  drawFholeLocal(-R * 0.28, 0, 1);
+  drawFholeLocal(R * 0.28, 0, -1);
+
+  // cuerdas metálicas
+  ctx.strokeStyle = '#f2f2f2';
+  ctx.lineWidth = 1.6;
+  for (let i = -2; i <= 2; i++) {
+    const off = i * 3;
+    ctx.beginPath();
+    ctx.moveTo(off, -R * 1.35);
+    ctx.lineTo(off, R * 0.85);
+    ctx.stroke();
+  }
+
+  ctx.restore();
+  break;
+}
+
+/* === CELLO === */
+case 'cello': {
+  const R = b.r;
+  ctx.save();
+  ctx.scale(0.95, 0.95);
+
+  // cuerpo tipo violín pero más grande y oscuro
+  const wood = ctx.createLinearGradient(-R * 1.2, -R, R * 1.2, R);
+  wood.addColorStop(0, '#7b4a23');
+  wood.addColorStop(1, '#5a3518');
+  ctx.fillStyle = wood;
+  ctx.strokeStyle = '#392412';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(-R * 1.08, 0);
+  ctx.bezierCurveTo(-R * 1.25, -R * 0.95, R * 1.25, -R * 0.95, R * 1.08, 0);
+  ctx.bezierCurveTo(R * 1.25, R * 0.95, -R * 1.25, R * 0.95, -R * 1.08, 0);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  // tapa clara
+  ctx.fillStyle = '#b37632';
+  ctx.beginPath();
+  ctx.ellipse(0, 0, R * 0.94, R * 0.72, 0, 0, TAU);
+  ctx.fill();
+
+  // f-holes
+  ctx.strokeStyle = '#2a1407';
+  ctx.lineWidth = 2;
+  const drawFholeLocal = (x, y, dir) => {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(dir, 1);
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.bezierCurveTo(6, -10, 6, 10, 0, 0);
+    ctx.stroke();
+    ctx.restore();
+  };
+  drawFholeLocal(-R * 0.30, -R * 0.08, 1);
+  drawFholeLocal(R * 0.30, -R * 0.08, -1);
+
+  // diapasón
+  ctx.fillStyle = '#1d1d1f';
+  ctx.beginPath();
+  ctx.moveTo(-R * 0.08, -R * 0.18);
+  ctx.lineTo(R * 1.18, -R * 0.06);
+  ctx.lineTo(R * 1.18, R * 0.06);
+  ctx.lineTo(-R * 0.08, R * 0.18);
+  ctx.closePath();
+  ctx.fill();
+
+  // clavijero y clavijas
+  ctx.fillStyle = '#2b2f37';
+  ctx.beginPath();
+  ctx.roundRect(R * 1.18, -R * 0.12, R * 0.38, R * 0.24, 3);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(R * 1.62, 0, R * 0.11, 0, TAU);
+  ctx.fill();
+
+  ctx.fillStyle = '#c7ccd6';
+  const pegY = R * 0.08, pegX = R * 1.28, pegR = R * 0.03;
+  for (const sy of [-1, 1]) {
+    ctx.beginPath(); ctx.arc(pegX, sy * pegY, pegR, 0, TAU); ctx.fill();
+    ctx.beginPath(); ctx.arc(pegX + R * 0.09, sy * pegY * 0.6, pegR, 0, TAU); ctx.fill();
+  }
+
+  // cordal + endpin
+  ctx.fillStyle = '#1a1a1e';
+  ctx.beginPath();
+  ctx.moveTo(-R * 0.12, -R * 0.13);
+  ctx.quadraticCurveTo(-R * 0.48, 0, -R * 0.12, R * 0.13);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.strokeStyle = '#2a2a2a';
+  ctx.lineWidth = 2.2;
+  ctx.beginPath();
+  ctx.moveTo(-R * 1.06, 0);
+  ctx.lineTo(-R * 1.22, 0);
+  ctx.stroke();
+
+  // cuerdas (ahora horizontales)
+  ctx.strokeStyle = '#e9e9e9';
+  ctx.lineWidth = 1.4;
+  for (let i = -2; i <= 2; i++) {
+    const off = i * 3.5;
+    ctx.beginPath();
+    ctx.moveTo(-R * 1.05, off);
+    ctx.lineTo(R * 1.55, off);
+    ctx.stroke();
+  }
+
+  ctx.restore();
+  break;
+}
+
+// ===== PIANO =====
+case 'piano': {
+  // proporciones reducidas
+  const W = b.r * 2.4;           // ancho más corto (~mitad)
+  const H = b.r * 1.2;           // alto algo menor
+  const Rr = Math.min(W,H) * 0.18;
+  const padX = W * 0.07;
+  const keyDepth = H * 0.6;
+  const usableW = W - padX * 2;
+
+  // === cuerpo ===
+  const gBody = ctx.createLinearGradient(-W/2, -H/2, W/2, H/2);
+  gBody.addColorStop(0, '#1a1b21');
+  gBody.addColorStop(1, '#0f1015');
+  ctx.fillStyle = gBody;
+  ctx.strokeStyle = '#2b2f37';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(-W/2 + Rr, -H/2);
+  ctx.lineTo(W/2 - Rr, -H/2);
+  ctx.quadraticCurveTo(W/2, -H/2, W/2, -H/2 + Rr);
+  ctx.lineTo(W/2, H/2 - Rr);
+  ctx.quadraticCurveTo(W/2, H/2, W/2 - Rr, H/2);
+  ctx.lineTo(-W/2 + Rr, H/2);
+  ctx.quadraticCurveTo(-W/2, H/2, -W/2, H/2 - Rr);
+  ctx.lineTo(-W/2, -H/2 + Rr);
+  ctx.quadraticCurveTo(-W/2, -H/2, -W/2 + Rr, -H/2);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  // === teclas blancas ===
+  const kbX = -W/2 + padX;
+  const kbY = H/2 - keyDepth;
+  const gKeys = ctx.createLinearGradient(0, kbY, 0, H/2);
+  gKeys.addColorStop(0, '#f0f0f0');
+  gKeys.addColorStop(1, '#ffffff');
+  ctx.fillStyle = gKeys;
+  ctx.fillRect(kbX, kbY, usableW, keyDepth);
+
+  ctx.fillStyle = 'rgba(255,255,255,0.35)';
+  ctx.fillRect(kbX, H/2 - 2, usableW, 2);
+
+  // separadores
+  ctx.strokeStyle = 'rgba(0,0,0,0.14)';
+  ctx.lineWidth = 1;
+  const whiteKeys = 8;
+  for (let i=1; i<whiteKeys; i++){
+    const x = kbX + (usableW * i / whiteKeys);
+    ctx.beginPath();
+    ctx.moveTo(x, kbY + keyDepth*0.22);
+    ctx.lineTo(x, H/2);
+    ctx.stroke();
+  }
+
+  // === negras: patrón 2-3 ===
+  const blkDepth = keyDepth * 0.62;
+  const blkW = Math.min(usableW/16, 12);
+  const yTop = H/2 - blkDepth;
+  ctx.fillStyle = '#121214';
+  ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+  ctx.lineWidth = 1.2;
+  const pattern = [0.18,0.35,0.55,0.72,0.9]; // distribución sobre una octava
+  for(const f of pattern){
+    const cx = kbX + usableW * f;
+    ctx.beginPath();
+    ctx.rect(cx - blkW/2, yTop, blkW, blkDepth - 2);
+    ctx.fill();
+    ctx.stroke();
+  }
+
+  // === panel superior ===
+  ctx.fillStyle = 'rgba(255,255,255,0.06)';
+  const topH = H * 0.16;
+  ctx.fillRect(-W/2 + Rr*0.8, -H/2 + Rr*0.4, W - Rr*1.6, topH);
+
+  // knobs decorativos
+  ctx.fillStyle = 'rgba(180,200,255,0.10)';
+  for (let i=0; i<4; i++){
+    const xx = -W/2 + Rr + 10 + i * ((W - Rr*2 - 50) / 3);
+    const yy = -H/2 + Rr*0.4 + topH*0.55;
+    ctx.beginPath();
+    ctx.arc(xx, yy, 3, 0, TAU);
+    ctx.fill();
+  }
+
+  break;
+}
+    
+/* === HORN — Cacho vikingo estilizado y redondeado === */
+case 'horn': {
+  const R = b.r;
+  ctx.save();
+
+  // Paleta simple y rústica
+  const boneLight = "#f2e6c9";
+  const boneDark  = "#d1c0a2";
+  const iron      = "#666";
+  const ironLight = "#aaa";
+  const outline   = "#3a2f1e";
+
+  /* ==============================
+       ESTRUCTURA PRINCIPAL DEL CACHO
+     ============================== */
+
+  // Curva del cacho: una espiral suave (2 arcos)
+  ctx.lineWidth = R * 0.22;
+  ctx.strokeStyle = boneDark;
+  ctx.beginPath();
+  ctx.arc(0, 0, R * 0.75, Math.PI * 0.15, Math.PI * 1.85);
+  ctx.stroke();
+
+  // Brillo interior del cacho
+  ctx.lineWidth = R * 0.12;
+  ctx.strokeStyle = boneLight;
+  ctx.beginPath();
+  ctx.arc(0, 0, R * 0.72, Math.PI * 0.15, Math.PI * 1.85);
+  ctx.stroke();
+
+  /* ==============================
+       CAMPANA DEL CACHO (borde)
+     ============================== */
+
+  ctx.fillStyle = boneLight;
+  ctx.strokeStyle = outline;
+  ctx.lineWidth = 1.8;
+
+  ctx.beginPath();
+  ctx.ellipse(
+    R * 0.68,            // x
+    R * 0.24,           // y
+    R * 0.38,            // ancho
+    R * 0.20,            // alto
+    0.5, 0, TAU
+  );
+  ctx.fill();
+  ctx.stroke();
+
+  /* ==============================
+       ARO METÁLICO CERCA DE LA PUNTA
+     ============================== */
+
+  ctx.lineWidth = R * 0.09;
+  ctx.strokeStyle = iron;
+  ctx.beginPath();
+  ctx.arc(0, 0, R * 0.53, Math.PI * 0.55, Math.PI * 1.20);
+  ctx.stroke();
+
+  ctx.lineWidth = R * 0.05;
+  ctx.strokeStyle = ironLight;
+  ctx.beginPath();
+  ctx.arc(0, 0, R * 0.51, Math.PI * 0.55, Math.PI * 1.20);
+  ctx.stroke();
+
+  /* ==============================
+       BOQUILLA PEQUEÑA (extremo)
+     ============================== */
+
+  ctx.fillStyle = ironLight;
+  ctx.beginPath();
+  ctx.arc(-R * 0.80, R * 0.15, R * 0.10, 0, TAU);
+  ctx.fill();
+
+  ctx.strokeStyle = iron;
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(-R * 0.18, R * 0.08);
+  ctx.lineTo(-R * 0.80, R * 0.15);
+  ctx.stroke();
+
+  ctx.restore();
+  break;
+}
+
+// ===== METAL =====
+case 'metal': {
+  const r = R * 0.60;
+  const teeth = 8, inset = 0.20;
+
+  const p = ((t % 30000) / 30000);
+  const clamp01 = x => Math.max(0, Math.min(1, x));
+  const ease = x => x*x*(3 - 2*x);
+  const lerp = (a,b,u)=> a + (b-a)*u;
+
+  const C = {
+    steel:  { r:145, g:155, b:165 },
+    red2:   { r:110, g: 20, b: 18 },
+    red1:   { r:170, g: 32, b: 28 },
+    orange: { r:244, g:140, b: 30 },
+    yellow: { r:255, g:214, b:102 },
+    nearW:  { r:255, g:242, b:224 },
+    white:  { r:255, g:255, b:255 }
+  };
+  const rgba = (c,a=1)=>`rgba(${c.r},${c.g},${c.b},${a})`;
+
+  const g = ctx.createRadialGradient(0,0,0,0,0,R);
+  g.addColorStop(0,rgba(C.steel));
+  g.addColorStop(0.7,rgba(C.orange));
+  g.addColorStop(1,rgba(C.white,0.9));
+
+  ctx.rotate((t/1000) * 1.6);
+  ctx.beginPath();
+  for (let i=0;i<teeth;i++){
+    const a=i*TAU/teeth;
+    ctx.lineTo(Math.cos(a)*R, Math.sin(a)*R);
+    ctx.lineTo(Math.cos(a+inset)*r, Math.sin(a+inset)*r);
+  }
+  ctx.closePath();
+  ctx.fillStyle = g;
+  ctx.fill();
+
+  ctx.fillStyle = '#222';
+  ctx.beginPath();
+  ctx.arc(0,0,R*0.35,0,TAU);
+  ctx.fill();
+  break;
+}
+
+// ===== DJ =====
+case 'dj': {
+  ctx.fillStyle='#111'; ctx.beginPath(); ctx.arc(0,0,R,0,TAU); ctx.fill();
+  ctx.strokeStyle='#444'; ctx.lineWidth=2;
+  for(let i=1;i<=5;i++){ ctx.beginPath(); ctx.arc(0,0,R*i/5,0,TAU); ctx.stroke(); }
+  ctx.fillStyle='#12d1ff';
+  for(let i=-4;i<=4;i++){
+    const h=(Math.sin((t/200)+i)*0.5+0.5)*12+6;
+    ctx.fillRect(i*6-2, -h/2, 3, h);
+  }
+  break;
+}
+
+// ===== QUEEN =====
+case 'queen': {
+  const pulse = 0.25 + 0.20 * (Math.sin(t/720) + 1)*0.5;
+  ctx.save();
+  ctx.globalAlpha = pulse;
+  ctx.strokeStyle = 'rgba(255,235,160,0.95)';
+  ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.arc(0,0, R*0.95, 0, TAU); ctx.stroke();
+  ctx.restore();
+
+  const core = ctx.createRadialGradient(0,0, R*0.05, 0,0, R*0.72);
+  core.addColorStop(0, 'rgba(255,230,150,0.65)');
+  core.addColorStop(0.55, 'rgba(255,210,100,0.32)');
+  core.addColorStop(1, 'rgba(255,200,90,0.12)');
+  ctx.fillStyle = core;
+  ctx.beginPath(); ctx.arc(0,0, R*0.70, 0, TAU); ctx.fill();
+
+  // CÍRCULO NEGRO EN EL CENTRO
+  ctx.save();
+  ctx.strokeStyle = 'rgba(1,1,1,0.4)';
+  ctx.lineWidth = Math.max(2, R * 0.12);
+  ctx.beginPath();
+  ctx.arc(0, 0, R * 0.92, 0, TAU);
+  ctx.stroke();
+  ctx.restore();
+
+  const baseGrad = ctx.createLinearGradient(-R, 0, R, 0);
+  baseGrad.addColorStop(0, '#f9e08e');
+  baseGrad.addColorStop(1, '#f3bf53');
+  ctx.fillStyle = baseGrad;
+  ctx.beginPath();
+  ctx.moveTo(-R*0.88, R*0.15);
+  ctx.quadraticCurveTo(-R*0.44, 0, 0, -R*0.05);
+  ctx.quadraticCurveTo(R*0.44, 0, R*0.88, R*0.15);
+  ctx.lineTo(R*0.88, R*0.26);
+  ctx.quadraticCurveTo(R*0.44, R*0.12, 0, R*0.06);
+  ctx.quadraticCurveTo(-R*0.44, R*0.12, -R*0.88, R*0.26);
+  ctx.closePath();
+  ctx.fill();
+  break;
+}
+
+// ===== FIRE =====
+case 'fire': {
+  const phase = (t / 120) % 3;
+  const r1 = R * 0.85;
+  const g = ctx.createRadialGradient(0,0, r1*0.1, 0,0, r1);
+  g.addColorStop(0,'#2a2a33');
+  g.addColorStop(0.5,'#1d1d24');
+  g.addColorStop(1,'#0b0b10');
+  ctx.fillStyle = g;
+  ctx.beginPath(); ctx.arc(0,0, r1, 0, TAU); ctx.fill();
+
+  const ringR = r1 * 1.18;
+  const segs = 36;
+  const chase = Math.floor((t/40)) % segs;
+  const palette = ['#ff0044','#0ff096','#36a2ff'];
+    // borde negro
+  ctx.save();
+  ctx.strokeStyle = 'rgba(1,1,1,0.9)';
+  ctx.lineWidth = Math.max(2, R * 0.12);
+  ctx.beginPath();
+  ctx.arc(0, 0, R * 1, 0, TAU);
+  ctx.stroke();
+  ctx.restore();
+
+  for (let i=0;i<segs;i++){
+    const idx = (Math.floor(i/ (segs/3)) + Math.floor(phase)) % 3;
+    let dist = Math.abs(((i - chase + segs) % segs));
+    if (dist > segs/2) dist = segs - dist;
+    const alpha = 0.22 + Math.max(0, (1 - dist/8)) * 0.6;
+    ctx.strokeStyle = palette[idx];
+    ctx.globalAlpha = alpha;
+    ctx.lineWidth = 7;
+    const a0 = i * TAU / segs;
+    const a1 = (i+0.8) * TAU / segs;
+    ctx.beginPath();
+    ctx.arc(0,0, ringR, a0, a1);
+    ctx.stroke();
+  }
+  ctx.globalAlpha=1;
+  break;
+}
+
+// ===== DRUM =====
+case 'drum': {
+  ctx.fillStyle = '#e0d6c6';
+  ctx.beginPath(); ctx.arc(0, 0, R * 0.95, 0, TAU); ctx.fill();
+  ctx.strokeStyle = '#5a3c1a'; ctx.lineWidth = 4; ctx.stroke();
+
+  ctx.strokeStyle = '#7a7a7a'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.arc(0, 0, R * 0.82, 0, TAU); ctx.stroke();
+
+  for (let i=0;i<10;i++){
+    const a = i * TAU / 10;
+    const px = Math.cos(a) * R * 1.2;
+    const py = Math.sin(a) * R * 1.2;
+    ctx.fillStyle = 'rgba(220,50,50,0.9)';
+    ctx.beginPath(); ctx.arc(px, py, 5, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#111';
+    ctx.beginPath(); ctx.arc(px, py, 2.2, 0, TAU); ctx.fill();
+  }
+  break;
+}
+
+// ===== HYDRA =====
+case 'hydra': {
+  for(let i=-1;i<=1;i++){
+    ctx.fillStyle=['#b48eff','#8dffb4','#ff8df0'][i+1];
+    ctx.beginPath(); ctx.arc(i*R*0.8,0,R*0.6,0,TAU); ctx.fill();
+  }
+  break;
+}
+
+// ===== GHOST =====
+case 'ghost': {
+  ctx.save();
+
+  ctx.translate(0, 28); // <--- BAJA la skin 28 píxeles
+
+  // Transparencia global pulsante (fantasmal)
+  const pulse = 0.05 + 0.85 * (0.5 + 0.5 * Math.sin(now() / 4000)); 
+  ctx.globalAlpha = pulse;
+
+  // --- Tubos del fondo (rojos, altos, entre medio) ---
+  for(let i=0;i<4;i++){
+    const hFactor = 1.6 + 0.3*Math.sin((i*1.1)+now()/1500); 
+    const w = b.r*0.25;
+    const h = b.r*1.8*hFactor;
+
+    const grad = ctx.createLinearGradient(0,-h,0,h);
+    grad.addColorStop(0,'rgba(255,100,100,0.6)');
+    grad.addColorStop(1,'rgba(120,40,40,0.2)');
+
+    ctx.fillStyle = grad;
+    // un poco más centrados que los tubos frontales
+    ctx.fillRect(-b.r*0.5 + i*(b.r*0.33), -h, w, h);
+  }
+
+  // --- Tubos del frente (azules fantasmas) ---
+  for(let i=0;i<5;i++){
+    const hFactor = 1.3 + 0.4*Math.sin((i*1.2)+now()/1200); 
+    const w = b.r*0.28;
+    const h = b.r*1.4*hFactor;
+
+    const grad = ctx.createLinearGradient(0,-h,0,h);
+    grad.addColorStop(0,'rgba(200,220,255,0.9)');
+    grad.addColorStop(0.4,'rgba(150,170,255,0.5)');
+    grad.addColorStop(1,'rgba(120,140,200,0.2)');
+
+    ctx.fillStyle = grad;
+    ctx.fillRect(-b.r + i*(b.r*0.5), -h, w, h);
+  }
+
+  ctx.restore();
+  break;
+}
+
+// ===== THEREMIN =====
+case 'theremin': {
+  ctx.save();
+
+  // --- AURA PULSANTE (suave) ---
+  const pulse = 0.65 + 0.25 * Math.sin(t / 600);
+  const gAura = ctx.createRadialGradient(0, 0, R*0.8, 0, 0, R*1.1);
+  gAura.addColorStop(0, `rgba(140, 220, 255, ${0.55 * pulse})`);
+  gAura.addColorStop(1, `rgba(140, 220, 255, 0)`);
+
+  ctx.fillStyle = gAura;
+  ctx.beginPath();
+  ctx.arc(0, 0, R * 1.1, 0, TAU);
+  ctx.fill();
+
+  // --- GLOW EXTERIOR ---
+  ctx.shadowColor = 'rgba(150, 154, 255, 0.65)';
+  ctx.shadowBlur = 22;
+
+  // --- TRAMA DEL THEREMIN ---
+  ctx.strokeStyle = '#c8f8ff';
+  ctx.lineWidth = 3.5;
+  ctx.beginPath();
+  for (let a = 0; a <= TAU; a += 0.2) {
+    const rr = R * 0.7 + Math.sin(a * 4 + t / 200) * 6;
+    ctx.lineTo(Math.cos(a) * rr, Math.sin(a) * rr);
+  }
+  ctx.stroke();
+
+  // --- NÚCLEO ENERGÉTICO (centro) ---
+  const core = ctx.createRadialGradient(0, 0, 0, 0, 0, R*0.4);
+  core.addColorStop(0, 'rgba(199, 190, 255,0.85)');
+  core.addColorStop(0.6, 'rgba(230, 225, 252,0.25)');
+  core.addColorStop(1, 'rgba(242, 240, 255,0)');
+  
+  ctx.fillStyle = core;
+  ctx.beginPath();
+  ctx.arc(0, 0, R * 0.4, 0, TAU);
+  ctx.fill();
+
+  ctx.restore();
+  break;
+}
+
+// ===== HARP =====
+
+case 'harp': {
+  const t = now(), R = b.r;
+  const strings = 9;
+
+  // === Marco dorado (idéntico al original) ===
+  const wood = ctx.createLinearGradient(-R, -R, R*0.8, R);
+  wood.addColorStop(0, '#f0c879');
+  wood.addColorStop(0.45, '#d9aa57');
+  wood.addColorStop(1, '#8c6028');
+  ctx.fillStyle = wood;
+  ctx.strokeStyle = '#3b2a0e';
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.moveTo(-R*0.9, R*0.95);
+  ctx.lineTo(-R*0.72, -R*0.95);
+  ctx.quadraticCurveTo(R*0.10, -R*1.15, R*0.75, -R*0.70);
+  ctx.quadraticCurveTo(R*0.40, R*0.80, -R*0.2, R*0.98);
+  ctx.closePath();
+  ctx.fill(); ctx.stroke();
+
+  // === Sombra interior / brillo del marco ===
+  ctx.shadowBlur = 12; ctx.shadowColor = 'rgba(255,215,160,0.35)';
+  ctx.strokeStyle = 'rgba(255,230,180,0.35)';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(-R*0.7, -R*0.8);
+  ctx.quadraticCurveTo(R*0.10, -R*1.05, R*0.65, -R*0.64);
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+
+  // === Tapa interna clara ===
+  const board = ctx.createLinearGradient(-R*0.5, -R, R*0.6, R);
+  board.addColorStop(0, '#edce97');
+  board.addColorStop(1, 'rgba(240,210,150,0.7)');
+  ctx.fillStyle = board;
+  ctx.beginPath();
+  ctx.moveTo(-R*0.62, -R*0.85);
+  ctx.quadraticCurveTo(R*0.12, -R*1.03, R*0.60, -R*0.65);
+  ctx.quadraticCurveTo(R*0.30, R*0.65, -R*0.10, R*0.87);
+  ctx.lineTo(-R*0.75, R*0.88);
+  ctx.closePath();
+  ctx.fill();
+
+  // === Clavijas metálicas ===
+  ctx.fillStyle = '#b9c2d0';
+  for (let i=0;i<strings;i++){
+    const u=i/(strings-1);
+    const x=-R*0.62+u*(R*1.22);
+    const y=-R*0.85+u*(R*0.22);
+    ctx.beginPath(); ctx.arc(x,y,2,0,TAU); ctx.fill();
+  }
+
+  // === Curva base inferior (idéntica) ===
+  const bx = u => -R*0.75 + u*(R*0.95);
+  const by = u => R*0.88 - Math.sin(u*Math.PI)*R*0.12;
+
+  // helper: lerp RGB hex
+  const lerp = (a,b,t)=> a + (b-a)*t;
+  const hexToRgb = h => {
+    const v = parseInt(h.replace('#',''),16);
+    return [(v>>16)&255, (v>>8)&255, v&255];
+  };
+  const rgbToCss = (r,g,b)=> `rgb(${r|0},${g|0},${b|0})`;
+  const mixHex = (h1,h2,f)=>{
+    const a = hexToRgb(h1), b = hexToRgb(h2);
+    return rgbToCss( lerp(a[0],b[0],f), lerp(a[1],b[1],f), lerp(a[2],b[2],f) );
+  };
+
+  // === Dibujar cuerdas (estáticas geométricamente)
+  // color oscila suavemente entre gris y rojo (ida y vuelta)
+  const period = 1800; // ms para ciclo completo ida+vuelta (ajustable)
+  for (let i=0;i<strings;i++){
+    const u = i/(strings-1);
+    const x1 = -R*0.62 + u*(R*1.22), y1 = -R*0.85 + u*(R*0.22);
+    const x2 = bx(u), y2 = by(u);
+
+    // efecto de fase para que no todas las cuerdas cambien idéntico
+    const phase = (t/period) * TAU + u * 1.2;
+    // f en [0,1], ida y vuelta
+    const f = (Math.sin(phase) + 1) * 0.5;
+
+    // color entre gris y rojo
+    const color = mixHex('#bdbdbd', '#ff5a5a', f);
+
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // === Base inferior ===
+  ctx.fillStyle = '#2a2e36';
+  ctx.strokeStyle = '#414855';
+  ctx.lineWidth = 1.8;
+  ctx.beginPath();
+  ctx.moveTo(-R*0.9, R*0.98);
+  ctx.quadraticCurveTo(-R*0.2, R*1.08, R*0.35, R*0.98);
+  ctx.lineTo(R*0.42, R*0.78);
+  ctx.quadraticCurveTo(-R*0.15, R*0.88, -R*0.75, R*0.83);
+  ctx.closePath();
+  ctx.fill(); ctx.stroke();
+
+  break;
+}
+
+// ===== MYSTERY =====
+case 'mystery': {
+  const R = b.r;
+  
+  // Fondo gris oscuro
+  ctx.fillStyle = '#4a4a4a';
+  ctx.beginPath();
+  ctx.arc(0, 0, R * 0.95, 0, TAU);
+  ctx.fill();
+  
+  // Borde gris claro
+  ctx.strokeStyle = '#b0b0b0';
+  ctx.lineWidth = 3;
+  ctx.stroke();
+  
+  // Signo de interrogación (?)
+  ctx.fillStyle = '#e0e0e0';
+  ctx.font = `bold ${R * 1.4}px system-ui`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('?', 0, R * 0.1);
+  
+  break;
+}
+
+// ===== DIRECTOR =====
+case 'director': {
+  const auraGrad = ctx.createRadialGradient(0,0,R*0.8, 0,0,R*1.6);
+  auraGrad.addColorStop(0,'rgba(199,182,255,0.25)');
+  auraGrad.addColorStop(1,'rgba(199,182,255,0)');
+  ctx.fillStyle = auraGrad;
+  ctx.beginPath();
+  ctx.arc(0,0,R*1.6,0,TAU);
+  ctx.fill();
+
+  const grad = ctx.createRadialGradient(0,0,0,0,0,R);
+  grad.addColorStop(0,'#ffffff');
+  grad.addColorStop(0.4,'#d7caff');
+  grad.addColorStop(1,'#6f57d6');
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  for (let i=0;i<5;i++){
+    const a=i*TAU/5;
+    ctx.lineTo(Math.cos(a)*R, Math.sin(a)*R);
+    ctx.lineTo(Math.cos(a+TAU/10)*R*0.5, Math.sin(a+TAU/10)*R*0.5);
+  }
+  ctx.closePath();
+  ctx.fill();
+
+  const pulse = 0.6 + 0.4*Math.sin(t/200);
+  ctx.strokeStyle = `rgba(255,255,255,${pulse})`;
+  ctx.lineWidth = 3;
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.arc(0,0,R*0.25,0,TAU);
+  ctx.fillStyle = 'rgba(255,255,255,0.9)';
+  ctx.fill();
+  break;
+}
+
+default:
+  ctx.fillStyle='#999';
+  ctx.beginPath(); ctx.arc(0,0,R,0,TAU); ctx.fill();
+}
+
+  ctx.restore();
+}
+
+/* Entidades */
+function makePlayer(x, side, skin='violin'){
+  return {
+    x, y: CONFIG.GROUND_Y - CONFIG.PLAYER_RADIUS,
+    vx:0, vy:0,
+    r: CONFIG.PLAYER_RADIUS,
+    onGround:true,
+    side, // 'L' o 'R' mitad de cancha
+    skin
+  };
+}
+let p1 = makePlayer(W*0.25,'L', 'violin');
+let p2 = makePlayer(W*0.75,'R', 'theremin');
+let botActive = false;
+
+let ball = {
+  x: W*0.5, y: 200,
+  vx: 260, vy: -120,
+  r: CONFIG.BALL_RADIUS
+};
+
+let score = { p1:0, p2:0, target: CONFIG.BASE_POINTS_TO_WIN };
+let hitTracker = {lastHitter: null, p1Hits: 0, p2Hits: 0, lastHitTime: 0 };
+let suddenDeathActive = false;
+
+// Timeout global de saque (se limpia/reescribe desde resetRally)
+let serveTimeout = null;
+
+let ballGroundTimeout = null;
+
+// Marca que el bote ya está programado para resolverse (evita dobles)
+ball.groundScheduled = false; // si no existe, se crea más abajo en resetRally / al iniciar
+
+function resetRally(servingTo='L'){
+  // cancelar timeouts previos relacionados con saque/punto en suelo
+  if(serveTimeout){ clearTimeout(serveTimeout); serveTimeout = null; }
+  if(ballGroundTimeout){ clearTimeout(ballGroundTimeout); ballGroundTimeout = null; }
+  // limpiar bandera
+  ball.groundScheduled = false;
+
+  // Posición base lateral
+  const sideX = (servingTo === 'L') ? (W * 0.30) : (W * 0.70);
+  ball.x = sideX + (CONFIG.SERVE_OFFSET_X * (servingTo === 'L' ? 1 : -1));
+  ball.y = CONFIG.SERVE_Y;
+  ball.r = CONFIG.BALL_RADIUS;
+
+  // Mantenerla quieta hasta liberar
+  ball.vx = 0;
+  ball.vy = 0;
+  ball.waitServe = true;
+  ball.servingSide = servingTo;
+
+  // Programar liberación automática tras SERVE_HOLD_MS
+  serveTimeout = setTimeout(()=>{
+    serveTimeout = null;
+    const vx = (ball.servingSide === 'L') ? CONFIG.SERVE_VX : -CONFIG.SERVE_VX;
+    const vy = CONFIG.SERVE_VY;
+    ball.vx = vx;
+    ball.vy = vy;
+    ball.waitServe = false;
+  }, CONFIG.SERVE_HOLD_MS);
+  hitTracker = { lastHitter:null, p1Hits:0, p2Hits:0, lastHitTime:0 };
+
+}
+
+function gameOver(who){
+  if(serveTimeout){ clearTimeout(serveTimeout); serveTimeout = null; }
+  if(ballGroundTimeout){ clearTimeout(ballGroundTimeout); ballGroundTimeout = null; }
+  ball.groundScheduled = false;
+
+  // Determinar ganador y puntaje final
+  const winner = (who === 'p1') ? 'Jugador 1' : (botActive ? 'BOT' : 'Jugador 2');
+  const finalScore = `${score.p1} - ${score.p2}`;
+  gameState = STATE.GAMEOVER;
+
+  // Guardar para mostrar
+  badge.innerText = '';
+  window._winnerInfo = { winner, finalScore };
+}
+
+/* Input */
+const keys = {};
+addEventListener('keydown', e=>{
+  keys[e.code]=true;
+
+if(gameState === STATE.GAMEOVER && e.code === 'Escape'){
+  gameState = STATE.SELECT;
+  sel = { p1Index:0, p2Index:1, p1Locked:false, p2Locked:false };
+  badge.innerText = useBot ? 'Modo: P1 vs BOT' : 'Modo: 1 vs 1';
+  ball = { x: W/2, y: 200, vx: 0, vy: 0, r: CONFIG.BALL_RADIUS };
+  return;
+}
+
+  
+  if(gameState===STATE.SELECT){
+    if(e.code==='KeyB'){ useBot=!useBot; badge.innerText = useBot? 'Modo: P1 vs BOT' : 'Modo: 1 vs 1'; }
+  }else{
+    if(e.code==='KeyR'){ resetRally(Math.random()<0.5?'L':'R'); }
+    if(e.code==='KeyP'){
+  if(gameState === STATE.PLAY){
+    gameState = STATE.PAUSE;
+    badge.innerText = 'Juego en pausa (P para reanudar)';
+  } else if(gameState === STATE.PAUSE){
+    gameState = STATE.PLAY;
+    badge.innerText = '';
+  }
+}
+
+    if(e.code==='Escape'){
+  gameState = STATE.SELECT;
+  sel = { p1Index:0, p2Index:1, p1Locked:false, p2Locked:false };
+  badge.innerText = useBot ? 'Modo: P1 vs BOT' : 'Modo: 1 vs 1';
+  // Reiniciar pelota y evitar que siga moviéndose
+  ball = { x: W/2, y: 200, vx: 0, vy: 0, r: CONFIG.BALL_RADIUS };
+  clearTimeout(serveTimeout);
+  clearTimeout(ballGroundTimeout);
+  serveTimeout = null;
+  ballGroundTimeout = null;
+}
+
+  }
+});
+addEventListener('keyup', e=>{ keys[e.code]=false; });
+
+/* Selección */
+/* === CONFIGURACIÓN DEL GRID DE SELECCIÓN === */
+
+const GRID_COLS = 5;                // Número de columnas del roster
+const GRID_ROWS = Math.ceil(ROSTER.length / GRID_COLS);
+
+const CARD_W = 150;                 // Tamaño de cada tarjeta
+const CARD_H = 135;
+
+const SPACING_X = 175;              // Distancia horizontal entre tarjetas
+const SPACING_Y = 160;              // Distancia vertical entre tarjetas
+
+const GRID_PAD_X = (W - (GRID_COLS-1)*SPACING_X - CARD_W) / 2;
+const GRID_PAD_Y = 120;             // distancia desde arriba
+
+/* === SELECCIÓN === */
+let sel = {
+  p1Index: 0,
+  p2Index: 1,
+  p1ConfirmTimer: 0,
+  p2ConfirmTimer: 0,
+  p1Locked: false,
+  p2Locked: false,
+    // nuevas banderas: confirmar solo si el jugador ha movido su selector al menos una vez
+  p1HasMovedOnce: false,
+  p2HasMovedOnce: false
+};
+
+const CONFIRM_HOLD_TIME = 2750; // ms — tiempo quieto para confirmar
+function handleSelection(){
+  badge.innerText = useBot ? 'Modo: P1 vs BOT' : 'Modo: 1 vs 1';
+
+  const now = performance.now();
+
+  // ============================
+  //   LECTURA DEL MOVIMIENTO
+  // ============================
+
+  let p1Moved = false;
+  let p2Moved = false;
+
+  // -- P1 movimiento WASD --
+  if(keys['KeyA']){
+    sel.p1Index = (sel.p1Index - 1 + ROSTER.length) % ROSTER.length;
+    p1Moved = true;
+    sel.p1HasMovedOnce = true;   // marcar que P1 movió el selector
+    keys['KeyA']=false;
+  }
+  if(keys['KeyD']){
+    sel.p1Index = (sel.p1Index + 1) % ROSTER.length;
+    p1Moved = true;
+    sel.p1HasMovedOnce = true;   // marcar que P1 movió el selector
+    keys['KeyD']=false;
+  }
+  if(keys['KeyW']){
+    sel.p1Index = (sel.p1Index - GRID_COLS + ROSTER.length) % ROSTER.length;
+    p1Moved = true;
+    sel.p1HasMovedOnce = true;   // marcar que P1 movió el selector
+    keys['KeyW']=false;
+  }
+  if(keys['KeyS']){
+    sel.p1Index = (sel.p1Index + GRID_COLS) % ROSTER.length;
+    p1Moved = true;
+    sel.p1HasMovedOnce = true;   // marcar que P1 movió el selector
+    keys['KeyS']=false;
+  }
+
+  // -- P2 movimiento flechas --
+  if(!useBot){
+    if(keys['ArrowLeft']){
+      sel.p2Index = (sel.p2Index - 1 + ROSTER.length) % ROSTER.length;
+      p2Moved = true;
+      sel.p2HasMovedOnce = true; // marcar que P2 movió el selector
+      keys['ArrowLeft']=false;
+    }
+    if(keys['ArrowRight']){
+      sel.p2Index = (sel.p2Index + 1) % ROSTER.length;
+      p2Moved = true;
+      sel.p2HasMovedOnce = true; // marcar que P2 movió el selector
+      keys['ArrowRight']=false;
+    }
+    if(keys['ArrowUp']){
+      sel.p2Index = (sel.p2Index - GRID_COLS + ROSTER.length) % ROSTER.length;
+      p2Moved = true;
+      sel.p2HasMovedOnce = true; // marcar que P2 movió el selector
+      keys['ArrowUp']=false;
+    }
+    if(keys['ArrowDown']){
+      sel.p2Index = (sel.p2Index + GRID_COLS) % ROSTER.length;
+      p2Moved = true;
+      sel.p2HasMovedOnce = true; // marcar que P2 movió el selector
+      keys['ArrowDown']=false;
+    }
+  }
+
+  // ================================
+  //   SISTEMA DE CONFIRMACIÓN NUEVO
+  // ================================
+
+  const dt = 1000/60;
+
+  // --- P1 ---
+  if(p1Moved){
+    sel.p1Locked = false;
+    sel.p1ConfirmTimer = 0;
+  } else if(!sel.p1Locked && sel.p1HasMovedOnce){
+    // sólo incrementar si el jugador ya movió el selector al menos una vez
+    sel.p1ConfirmTimer += dt;
+    if(sel.p1ConfirmTimer >= CONFIRM_HOLD_TIME){
+      sel.p1Locked = true;
+    }
+  }
+
+  // --- P2 ---
+  if(useBot){
+    sel.p2Locked = true;
+  } else {
+    if(p2Moved){
+      sel.p2Locked = false;
+      sel.p2ConfirmTimer = 0;
+    } else if(!sel.p2Locked && sel.p2HasMovedOnce){
+      // sólo incrementar si el jugador ya movió el selector al menos una vez
+      sel.p2ConfirmTimer += dt;
+      if(sel.p2ConfirmTimer >= CONFIRM_HOLD_TIME){
+        sel.p2Locked = true;
+      }
+    }
+  }
+
+  // ============================
+  //   DIBUJAR PANTALLA
+  // ============================
+
+  drawBackground();
+  drawNet();
+
+  ctx.save();
+  ctx.fillStyle = "#00000066";
+  ctx.fillRect(0,0,W,H);
+  ctx.restore();
+
+  ctx.fillStyle="#fff";
+  ctx.font="700 40px system-ui";
+  ctx.textAlign="center";
+  ctx.fillText("Violin Beach Kombat (v1.1)", W/2, 90);
+
+  drawSelectionGrid();
+
+  ctx.font="600 18px system-ui";
+  ctx.fillStyle="#ccc";
+  ctx.fillText("Seleccione un personaje quedándose quieto 2 segundos", W/2, H-34);
+  ctx.fillText("P1 WASD   ·   P2 Flechas   ·   B Bot ON/OFF   ·   Esc Menú", W/2, H-12);
+
+  // ============================
+  //  INICIAR PARTIDA SI LISTOS
+  // ============================
+
+  if(sel.p1Locked && sel.p2Locked){
+    suddenDeathActive = false;
+    currentBackground = pickWeighted(BACKGROUNDS, 'weight');
+    currentBallType = pickWeighted(BALL_TYPES, 'weight');
+
+// --- Resolver preset RANDOM ---
+function resolveSkin(index){
+  const chosen = ROSTER[index];
+  if(chosen === 'mystery'){
+    // Elegir una skin REAL al azar, excluyendo 'random'
+    const pool = ROSTER.filter(s => s !== 'mistery');
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+  return chosen;
+}
+
+p1.skin = resolveSkin(sel.p1Index);
+p2.skin = resolveSkin(sel.p2Index);
+
+    botActive = useBot;
+
+    p1 = makePlayer(W*0.25,'L', p1.skin);
+    p2 = makePlayer(W*0.75,'R', p2.skin);
+
+    score.p1=0;
+    score.p2=0;
+    score.target=CONFIG.BASE_POINTS_TO_WIN;
+
+    ball.type = currentBallType;
+
+    resetRally(Math.random()<0.5 ? 'L':'R');
+    gameState = STATE.PLAY;
+  }
+}
+
+function drawSelectionGrid(){
+  for(let i=0; i<ROSTER.length; i++){
+    const skin = ROSTER[i];
+    const col = i % GRID_COLS;
+    const row = Math.floor(i / GRID_COLS);
+    const x = GRID_PAD_X + col * SPACING_X;
+    const y = GRID_PAD_Y + row * SPACING_Y;
+
+    // --- Card base ---
+    ctx.fillStyle = '#10131aee';
+    ctx.strokeStyle = '#ffffff22';
+    ctx.lineWidth = 2;
+    roundRect(ctx, x, y, CARD_W, CARD_H, 12);
+    ctx.fill();
+    ctx.stroke();
+
+
+
+    // --- Skin render ---
+    ctx.save();
+    ctx.translate(x + CARD_W/2, y + CARD_H*0.58);
+    drawSkin(ctx, skin, {r:36});
+    ctx.restore();
+
+    // --- Nombre ---
+    ctx.font = '600 18px system-ui';
+    ctx.fillStyle = '#9fd4ff';
+    ctx.textAlign = 'center';
+    ctx.fillText(skin.toUpperCase(), x + CARD_W/2, y + CARD_H - 10);
+
+    // ============================
+    //     MARCOS DE SELECCIÓN
+    // ============================
+
+    const p1Here = (i === sel.p1Index);
+    const p2Here = (i === sel.p2Index);
+
+    // Ambos en la misma tarjeta
+    if(p1Here && p2Here){
+      const glow1 = sel.p1Locked ? 25 : Math.min(25, sel.p1ConfirmTimer/80);
+      const glow2 = sel.p2Locked ? 25 : Math.min(25, sel.p2ConfirmTimer/80);
+
+      // mitad azul
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(x, y, CARD_W/2, CARD_H);
+      ctx.clip();
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = '#1f85ff';
+      ctx.shadowColor = '#96e5ff';
+      ctx.shadowBlur = glow1;
+      roundRect(ctx, x, y, CARD_W, CARD_H, 12);
+      ctx.stroke();
+      ctx.restore();
+
+      // mitad roja
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(x+CARD_W/2, y, CARD_W/2, CARD_H);
+      ctx.clip();
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = '#ff1f1f';
+      ctx.shadowColor = '#fcb8b8';
+      ctx.shadowBlur = glow2;
+      roundRect(ctx, x, y, CARD_W, CARD_H, 12);
+      ctx.stroke();
+      ctx.restore();
+
+      continue;
+    }
+
+    // Solo P1
+    if(p1Here){
+      const glow = sel.p1Locked ? 25 : Math.min(25, sel.p1ConfirmTimer/80);
+      ctx.save();
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = sel.p1Locked ? '#70dbff' : '#1f85ff';
+      ctx.shadowColor = '#96e5ff';
+      ctx.shadowBlur = glow;
+      roundRect(ctx, x, y, CARD_W, CARD_H, 12);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // Solo P2
+    if(p2Here){
+      const glow = sel.p2Locked ? 25 : Math.min(25, sel.p2ConfirmTimer/80);
+      ctx.save();
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = sel.p2Locked ? '#fc8d81' : '#ff1f1f';
+      ctx.shadowColor = '#fcb8b8';
+      ctx.shadowBlur = glow;
+      roundRect(ctx, x, y, CARD_W, CARD_H, 12);
+      ctx.stroke();
+      ctx.restore();
+    }
+  }
+}
+
+function roundRect(ctx, x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y, x+w,y+h, r);
+  ctx.arcTo(x+w,y+h, x,y+h, r);
+  ctx.arcTo(x,y+h, x,y, r);
+  ctx.arcTo(x,y, x+w,y, r);
+  ctx.closePath();
+}
+
+/* Fondo playa + mar + sol (con variante ligera) */
+function drawBackground(){
+  const t = CONFIG.SKY_VARIANT ? (Math.sin(now()/4000)*0.08) : 0;
+  const bg = currentBackground || BACKGROUNDS[0];
+
+  // Si es foto, dibujar imagen y salir
+  if(bg.isPhoto && bg.imageKey && bgImages[bg.imageKey]){
+    const img = bgImages[bg.imageKey];
+    if(img.complete){
+      ctx.drawImage(img, 0, 0, W, H);
+    } else {
+      // mientras carga, mostrar color de fallback
+      ctx.fillStyle = '#87ceeb';
+      ctx.fillRect(0, 0, W, H);
+    }
+    return;
+  }
+
+  // Fondo del cielo
+  const grd = ctx.createLinearGradient(0, 0, 0, H);
+  grd.addColorStop(0, bg.sky.top);
+  grd.addColorStop(0.6, bg.sky.mid);
+  grd.addColorStop(1, bg.sky.bot);
+  ctx.fillStyle = grd;
+  ctx.fillRect(0, 0, W, H);
+
+  // Sol o luna
+  if(bg.sun?.visible){
+    ctx.save();
+    ctx.globalAlpha = 0.9;
+    ctx.fillStyle = bg.sun.color;
+    ctx.beginPath();
+    ctx.arc(W*0.85, H*0.18, bg.sun.radius, 0, TAU);
+    ctx.fill();
+    ctx.restore();
+  }
+  if(bg.moon?.visible){
+    ctx.save();
+    ctx.globalAlpha = 0.9;
+    ctx.fillStyle = bg.moon.color;
+    ctx.beginPath();
+    ctx.arc(W*0.82, H*0.22, bg.moon.radius, 0, TAU);
+    ctx.fill();
+    // luna con leve cráter (sombra interior)
+  const skyGrd = ctx.createLinearGradient(0, 0, 0, H);
+  skyGrd.addColorStop(0, bg.sky.top);
+  skyGrd.addColorStop(0.6, bg.sky.mid);
+  skyGrd.addColorStop(1, bg.sky.bot);
+  ctx.globalCompositeOperation = 'source-over';
+  ctx.fillStyle = skyGrd;
+  ctx.beginPath();
+  ctx.arc(W*0.79, H*0.2, bg.moon.radius*1.05, 0, TAU);
+  ctx.fill();
+
+  ctx.restore();
+}
+
+  // Mar
+  ctx.fillStyle = bg.sea;
+  ctx.fillRect(0, CONFIG.GROUND_Y - 120, W, 120);
+
+  // Arena
+  ctx.fillStyle = bg.sand;
+  ctx.fillRect(0, CONFIG.GROUND_Y, W, H - CONFIG.GROUND_Y);
+
+  // Línea de cancha
+  ctx.strokeStyle = '#d9c88f';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.rect(60, CONFIG.GROUND_Y - 4, W - 120, 4);
+  ctx.stroke();
+}
+/* Red */
+function drawNet(){
+  ctx.save();
+  ctx.fillStyle='#555';
+  const x = CONFIG.NET_X - CONFIG.NET_THICKNESS/2;
+  const y = CONFIG.GROUND_Y - CONFIG.NET_HEIGHT;
+  ctx.fillRect(x, y, CONFIG.NET_THICKNESS, CONFIG.NET_HEIGHT);
+  ctx.restore();
+}
+
+/* Juego: entrada, física, colisiones */
+function handleInput(){
+  // Configuración local del salto variable
+  const maxHoldTime = 0.2;    // segundos que puede prolongar el salto
+  const gravityFactor = 0.35;  // factor que atenúa la gravedad mientras se mantiene pulsado
+  const playerDrag = 0.2;    // fricción horizontal (0.88 = desaceleración suave, más bajo = más freno)
+
+  // === Jugador 1 ===
+  const p = p1;
+  if(keys['KeyA']) p.vx = -CONFIG.PLAYER_SPEED;
+  else if(keys['KeyD']) p.vx = CONFIG.PLAYER_SPEED;
+  else p.vx = playerDrag * p.vx; // fricción cuando no se pulsa
+
+  // Inicio del salto
+  if(keys['KeyW'] && p.onGround){
+    p.vy = -CONFIG.PLAYER_JUMP_V; // impulso vertical inicial
+    p.onGround = false;
+    p.jumpStartTime = performance.now();
+    p.isJumping = true;
+  }
+
+  // Mantener salto (gravedad reducida)
+  if(p.isJumping && keys['KeyW']){
+    const held = (performance.now() - p.jumpStartTime) / 1000;
+    if(held < maxHoldTime){
+      p.gravityScale = gravityFactor;  // reduce gravedad mientras mantiene
+    } else {
+      p.isJumping = false;
+    }
+  } else {
+    p.gravityScale = 1.0;
+  }
+
+  if(!keys['KeyW'] && p.isJumping){
+    p.isJumping = false;
+    p.gravityScale = 1.0;
+  }
+
+  // === Jugador 2 o BOT ===
+  if(botActive){
+    botAI();
+  } else {
+    const q = p2;
+    if(keys['ArrowLeft']) q.vx = -CONFIG.PLAYER_SPEED;
+    else if(keys['ArrowRight']) q.vx = CONFIG.PLAYER_SPEED;
+    else q.vx = playerDrag * q.vx; // fricción cuando no se pulsa
+
+    if(keys['ArrowUp'] && q.onGround){
+      q.vy = -CONFIG.PLAYER_JUMP_V;
+      q.onGround = false;
+      q.jumpStartTime = performance.now();
+      q.isJumping = true;
+    }
+
+    if(q.isJumping && keys['ArrowUp']){
+      const held = (performance.now() - q.jumpStartTime) / 1000;
+      if(held < maxHoldTime){
+        q.gravityScale = gravityFactor;
+      } else {
+        q.isJumping = false;
+      }
+    } else {
+      q.gravityScale = 1.0;
+    }
+
+    if(!keys['ArrowUp'] && q.isJumping){
+      q.isJumping = false;
+      q.gravityScale = 1.0;
+    }
+  }
+}
+
+function botAI(){
+  const p = p2;
+  const g = CONFIG.GRAVITY;
+
+  // Parámetros ajustables
+  const anticipation = 0.35;   // anticipa mejor la caída
+  const moveSpeedFactor = 0.99;
+  const jumpHeightFactor = 0.99;
+  const jumpOffsetX = 18;     // dónde quiere golpear la pelota (ligeramente derecha)
+  const reactionDistance = 280; // rango de reacción cuando la pelota entra a su zona
+  const perfectTiming = 0.14;   // segundos antes de llegar la pelota para saltar
+
+  // --- 1. Predicción de trayectoria (dónde caerá la pelota)
+  let predictedLanding = p.predictedLanding || (W * 0.75);
+  if(ball.vy > 0){ // solo si va cayendo
+    const timeToGround = Math.sqrt(Math.max(0, (2 * (CONFIG.GROUND_Y - ball.y - ball.r)) / g));
+    predictedLanding = ball.x + ball.vx * timeToGround * anticipation;
+  }
+  predictedLanding = clamp(predictedLanding, CONFIG.NET_X + 50, W - 50);
+  p.predictedLanding = predictedLanding;
+
+  // --- 2. Posicionamiento: se mueve para interceptar la caída
+  const dx = predictedLanding - p.x;
+  if(Math.abs(dx) > 10){
+    const dir = Math.sign(dx);
+    p.vx = dir * CONFIG.PLAYER_SPEED * moveSpeedFactor;
+  } else {
+    p.vx = 0;
+  }
+
+  // --- 3. Defensa y salto de reacción ---
+  // Si la pelota está bajando cerca de su mitad, intenta interceptar
+  const distX = Math.abs(ball.x - p.x);
+  const distY = ball.y - p.y;
+  const ballGoingDown = ball.vy > 50;
+  const inDefZone = ball.x > CONFIG.NET_X + 40;
+
+  if(inDefZone && ballGoingDown && distX < reactionDistance){
+    // Predice cuándo pasará la pelota por su altura
+    const tImpact = Math.abs(distY / (ball.vy || 1));
+    if(p.onGround && tImpact < perfectTiming){
+      p.vy = -CONFIG.PLAYER_JUMP_V * jumpHeightFactor;
+      p.onGround = false;
+    }
+  }
+
+  // --- 4. Ajuste fino del golpe ---
+  // Si la pelota está muy cerca, ajusta posición para golpearla en el lado derecho
+  if(inDefZone && Math.abs(ball.x - p.x) < p.r * 1.4 && ball.y < p.y - 10){
+    // Ajusta levemente su posición para impactar el lado derecho del balón
+    const desiredX = ball.x + jumpOffsetX;
+    const offset = desiredX - p.x;
+    p.vx = clamp(offset * 8, -CONFIG.PLAYER_SPEED, CONFIG.PLAYER_SPEED);
+  }
+
+  // --- 5. Vuelta al centro defensivo cuando la pelota va al otro lado ---
+  if(ball.x < CONFIG.NET_X - 60){
+    const homeX = (CONFIG.NET_X + W) / 2.05;
+    const diff = homeX - p.x;
+    if(Math.abs(diff) > 20){
+      p.vx = clamp(diff * 3, -CONFIG.PLAYER_SPEED, CONFIG.PLAYER_SPEED);
+    } else {
+      p.vx = 0;
+    }
+  }
+}
+
+/* Integración y límites */
+function stepPhysics(dt){
+  // Jugadores
+  for(const p of [p1,p2]){
+    p.vy += CONFIG.GRAVITY * (p.gravityScale || 1.0) * dt;
+    p.vx *= (1 - CONFIG.AIR_DRAG);
+    p.vy *= (1 - CONFIG.AIR_DRAG*0.6);
+    p.x += clamp(p.vx, -CONFIG.PLAYER_MAX_VX, CONFIG.PLAYER_MAX_VX)*dt;
+    p.y += p.vy*dt;
+    const minX = (p.side==='L')? 60 : CONFIG.NET_X+40;
+    const maxX = (p.side==='L')? CONFIG.NET_X-40 : W-60;
+    p.x = clamp(p.x, minX, maxX);
+    const gy = CONFIG.GROUND_Y - p.r;
+    if(p.y > gy){ p.y = gy; p.vy = 0; p.onGround=true; }
+    if(p.y < 60) { p.y = 60; p.vy = 20; }
+  }
+
+  // Pelota (si está en espera de saque, dejamos la integración normal pero waitServe evita movimiento)
+  if(!ball.waitServe){
+    ball.vy += CONFIG.GRAVITY*dt;
+    ball.x += ball.vx*dt;
+    ball.y += ball.vy*dt;
+  }
+
+  // Tope de velocidad pelota
+  const sp = Math.hypot(ball.vx, ball.vy);
+  if(sp>CONFIG.BALL_MAX_SPEED){ const s=CONFIG.BALL_MAX_SPEED/sp; ball.vx*=s; ball.vy*=s; }
+
+  // Rebotar con suelo — pero ahora: al primer contacto programamos timeout en vez de contar punto inmediato
+  const gyBall = CONFIG.GROUND_Y - ball.r;
+  if(ball.y > gyBall){
+    // fijar en superficie
+    ball.y = gyBall;
+    // sólo en el primer frame que toca suelo:
+    if(!ball.groundScheduled){
+      // frenamos la bola visualmente (no congelamos el juego)
+      ball.vx = 0;
+      ball.vy = 0;
+      ball.groundScheduled = true;
+
+      // programar resolución del punto tras el tiempo configurado
+      ballGroundTimeout = setTimeout(()=>{
+        ballGroundTimeout = null;
+        // determinar lado donde botó y asignar punto
+        const leftSide = (ball.x < CONFIG.NET_X);
+        if(leftSide){
+          addPoint('p2');
+          // iniciar siguiente saque si no terminó juego
+          if(!(Math.max(score.p1, score.p2) >= CONFIG.BASE_POINTS_TO_WIN && Math.abs(score.p1-score.p2)>=2)){
+            resetRally('R');
+          }
+        }else{
+          addPoint('p1');
+          if(!(Math.max(score.p1, score.p2) >= CONFIG.BASE_POINTS_TO_WIN && Math.abs(score.p1-score.p2)>=2)){
+            resetRally('L');
+          }
+        }
+        // limpiar bandera (resetRally también la limpia)
+        ball.groundScheduled = false;
+      }, CONFIG.GROUND_POINT_HOLD_MS);
+    } else {
+      // ya programado: dejamos la bola en suelo (vx/vy = 0)
+      ball.vx = 0;
+      ball.vy = 0;
+    }
+  }
+
+  // Paredes laterales
+  if(ball.x < ball.r){ ball.x = ball.r; ball.vx = Math.abs(ball.vx)*0.9; }
+  if(ball.x > W - ball.r){ ball.x = W - ball.r; ball.vx = -Math.abs(ball.vx)*0.9; }
+
+  // Muro central
+  const netLeft = CONFIG.NET_X - CONFIG.NET_THICKNESS/2;
+  const netRight = CONFIG.NET_X + CONFIG.NET_THICKNESS/2;
+  const netTop = CONFIG.GROUND_Y - CONFIG.NET_HEIGHT;
+  const overNet = (ball.y - ball.r) < netTop;
+  if(!overNet){
+    if(ball.x + ball.r > netLeft && ball.x < CONFIG.NET_X && ball.y + ball.r > netTop){
+      ball.x = netLeft - ball.r;
+      ball.vx = -Math.abs(ball.vx)*0.95;
+    }
+    if(ball.x - ball.r < netRight && ball.x > CONFIG.NET_X && ball.y + ball.r > netTop){
+      ball.x = netRight + ball.r;
+      ball.vx = Math.abs(ball.vx)*0.95;
+    }
+  }
+
+  // Colisiones pelota-jugador (seguir aplicando aunque haya timeout pendiente)
+  handlePlayerHit(p1);
+  handlePlayerHit(p2);
+}
+
+function handlePlayerHit(p){
+  const hitR = p.r * CONFIG.PLAYER_HITBOX_SCALE;
+  const dx = ball.x - p.x, dy = ball.y - p.y;
+  const dist = Math.hypot(dx,dy);
+  const minD = ball.r + hitR;
+
+  if(dist < minD){
+    const currentTime = performance.now();
+
+    // --- Delay mínimo de 0.1s entre toques ---
+    if(currentTime - hitTracker.lastHitTime > 100){ // 100 ms
+      hitTracker.lastHitTime = currentTime;
+
+      // Si el mismo jugador vuelve a golpear
+      if(hitTracker.lastHitter === p.side){
+        if(p.side === 'L') hitTracker.p1Hits++;
+        else hitTracker.p2Hits++;
+      } else {
+        // Si cambió de jugador, reiniciamos los contadores
+        hitTracker.lastHitter = p.side;
+        hitTracker.p1Hits = (p.side === 'L') ? 1 : 0;
+        hitTracker.p2Hits = (p.side === 'R') ? 1 : 0;
+      }
+
+      // --- Verificar falta (4 golpes consecutivos) ---
+      if(hitTracker.p1Hits >= 4){
+        foulMessage = 'Jugador 1: Foul';
+        foulTimer = 2500; // 2.5 segundos visible
+        addPoint('p2');
+        resetRally('R');
+        hitTracker = { lastHitter:null, p1Hits:0, p2Hits:0, lastHitTime:0 };
+        return;
+      }
+      if(hitTracker.p2Hits >= 4){
+        foulMessage = botActive ? 'BOT: Foul' : 'Jugador 2: Foul';
+        foulTimer = 2500;
+        addPoint('p1');
+        resetRally('L');
+        hitTracker = { lastHitter:null, p1Hits:0, p2Hits:0, lastHitTime:0 };
+        return;
+      }
+
+    }
+
+    // --- Física del golpe normal ---
+    const nx = dx / (dist || 1e-6), ny = dy / (dist || 1e-6);
+    const overlap = (minD - dist);
+    ball.x += nx*overlap;
+    ball.y += ny*overlap;
+
+    const relVX = ball.vx - p.vx;
+    const relVY = ball.vy - p.vy;
+    const dot = relVX*nx + relVY*ny;
+
+    let impX = ball.vx - 2*dot*nx;
+    let impY = ball.vy - 2*dot*ny;
+
+    impX += (p.vx)*0.45;
+    impY += (p.vy)*0.20;
+
+    ball.vx = impX * CONFIG.PLAYER_IMPULSE;
+    ball.vy = impY * CONFIG.PLAYER_IMPULSE;
+
+    ball.x += nx*2;
+    ball.y += ny*2;
+  }
+}
+
+/* Marcador con ventaja de 2 */
+function addPoint(who){
+  if(who==='p1') {
+    score.p1++;
+    // 🔁 Si el BOT pierde un punto, cambia su skin al siguiente del roster
+    if(botActive){
+      const currentIndex = ROSTER.indexOf(p2.skin);
+      const nextIndex = (currentIndex + 1) % ROSTER.length;
+      p2.skin = ROSTER[nextIndex];
+    }
+  } else {
+    score.p2++;
+  }
+
+  // Regla: ganar con >= BASE y diferencia >= 2
+  const a = score.p1, b = score.p2, base = CONFIG.BASE_POINTS_TO_WIN;
+  const lead = Math.abs(a-b);
+  const high = Math.max(a,b);
+
+  if(high >= base && lead >= 2){
+    gameOver(who);
+  } else {
+    // En “deuce” implícito, no hay tope superior (12, 14, ...)
+    score.target = Math.max(base, high+1);
+  }
+}
+
+/* Render */
+function drawGame(){
+  drawBackground();
+  drawNet();
+
+  // Suelo “contacto”
+  ctx.strokeStyle='#00000011';
+  ctx.lineWidth=1;
+  ctx.beginPath();
+  ctx.moveTo(0, CONFIG.GROUND_Y+0.5);
+  ctx.lineTo(W, CONFIG.GROUND_Y+0.5);
+  ctx.stroke();
+
+  // Jugadores
+  drawPlayer(p1);
+  drawPlayer(p2);
+
+  // Pelota
+  drawBall();
+
+  // Flecha si la pelota está por arriba de la pantalla
+  if(ball.y + ball.r < 0){
+    const tx = clamp(ball.x, 20, W-20);
+    ctx.fillStyle='#000';
+    ctx.beginPath();
+    ctx.moveTo(tx, 18);
+    ctx.lineTo(tx-10, 36);
+    ctx.lineTo(tx+10, 36);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  // HUD
+  drawHUD();
+}
+function drawPlayer(p){
+  ctx.save();
+  ctx.translate(p.x, p.y);
+  drawSkin(ctx, p.skin, {r:p.r});
+  // Hitbox (debug opcional)
+  // ctx.globalAlpha=0.15; ctx.fillStyle='red'; ctx.beginPath(); ctx.arc(0,0,p.r*CONFIG.PLAYER_HITBOX_SCALE,0,TAU); ctx.fill();
+  ctx.restore();
+}
+
+function drawBall(){
+  ctx.save();
+  ctx.translate(ball.x, ball.y);
+
+  // Sombra (igual)
+  const gy = CONFIG.GROUND_Y;
+  const d = clamp( (gy - ball.y)/(gy-80), 0, 1 );
+  const shR = 26*(1-d) + 8;
+  ctx.globalAlpha = 0.28*(1-d)+0.08;
+  ctx.fillStyle='#000';
+  ctx.beginPath(); ctx.ellipse(0, gy - ball.y + 2, shR, shR*0.35, 0, 0, TAU); ctx.fill();
+  ctx.globalAlpha = 1;
+
+  // Determinar estilo de pelota
+  const bt = ball.type || currentBallType || BALL_TYPES[0];
+  const r = (CONFIG.BALL_RADIUS || ball.r) * (bt.rMul || 1);
+  ball.r = r; // sincronizar radio visual con lógica física si lo deseas
+
+  // Esfera con gradiente según preset
+  const g = ctx.createRadialGradient(-6,-6,4, 0,0, r);
+  // stops definidos por preset
+  for(const s of bt.stops){ g.addColorStop(s[0], s[1]); }
+  ctx.fillStyle=g;
+  ctx.beginPath(); ctx.arc(0,0, r, 0, TAU); ctx.fill();
+
+  // Costuras: usar seam color del preset
+  ctx.strokeStyle = bt.seam || '#fff';
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.arc(0,0, r*0.65, 0.4, TAU-0.4); ctx.stroke();
+  ctx.beginPath(); ctx.arc(0,0, r*0.55, -0.8, TAU+0.8); ctx.stroke();
+
+  ctx.restore();
+}
+function drawHUD(){
+  ctx.save();
+
+  // ===============================
+  //   CÁLCULO DE VIDA SEGÚN SCORE
+  // ===============================
+  const base = CONFIG.BASE_POINTS_TO_WIN;   // normalmente 10
+  const p1 = score.p1;
+  const p2 = score.p2;
+
+  // vida base: 10 "trozos"
+function scoreToLife(myScore, oppScore){
+  const base = CONFIG.BASE_POINTS_TO_WIN;
+
+  // ----------------------------
+  // 1) MODO NORMAL (antes del 9–9)
+  // ----------------------------
+  if(myScore < base-1 || oppScore < base-1){
+    // vida = (10 - puntos del rival), evitando pasar de 10
+    return Math.max(0, base - oppScore);
+  }
+
+  // ----------------------------
+  // 2) MODO DEUCE / VENTAJA
+  //    (desde 9–9 en adelante)
+  // ----------------------------
+
+  // Empate → ambos con 1 vida
+  if(myScore === oppScore){
+    return 1;
+  }
+
+  const diff = myScore - oppScore;
+
+  // Ventaja simple → ganador = 2 vidas, perdedor = 1
+  if(Math.abs(diff) === 1){
+    return (diff > 0) ? 2 : 1;
+  }
+
+  // Victoria → perdedor = 0 vidas
+  if(Math.abs(diff) >= 2){
+    return (diff > 0) ? 0 : 0;
+  }
+
+  return 1; // fallback
+}
+
+  const p1Life = scoreToLife(p1, p2);
+  const p2Life = scoreToLife(p2, p1);
+
+  const MAX_SEGMENTS = 10;
+
+const inSuddenDeath = suddenDeathActive;
+
+  // ===============================
+  //     DIBUJAR BARRA SEGMENTADA
+  // ===============================
+  function drawLifeBar(x, y, w, h, life, alignLeft){
+    const segW = w / MAX_SEGMENTS;
+    for(let i=0;i<MAX_SEGMENTS;i++){
+      ctx.strokeStyle = '#550000';
+      ctx.lineWidth = 0.5;
+
+      const fill = (i < life);
+      ctx.fillStyle = fill ? '#b80606' : '#330000';
+
+      const sx = alignLeft ? (x + i*segW) : (x + (MAX_SEGMENTS-1-i)*segW);
+
+      ctx.beginPath();
+      ctx.rect(sx, y, segW - 1, h);
+      ctx.fill();
+      ctx.stroke();
+    }
+  }
+
+// Activar Sudden Death si ambos llegan por primera vez a 1 vida
+if (!suddenDeathActive && p1Life === 1 && p2Life === 1) {
+    suddenDeathActive = true;
+}
+
+  function drawSuddenDeathBar(x, y, w, h, life, alignLeft){
+  const MAX = 2; // sólo dos segmentos (1 y 2)
+  const segW = w / MAX;
+
+  // Glow dinámico
+  const glow = 6 + Math.sin(performance.now() / 200) * 4;
+
+  for(let i=0; i<MAX; i++){
+    const filled = (i < life);
+
+    // posición del segmento
+    const sx = alignLeft ? (x + i*segW) : (x + (MAX-1-i)*segW);
+
+    ctx.save();
+    ctx.lineWidth = 2;
+
+    if(filled){
+      ctx.fillStyle = '#5a0000'; // rojo oscuro
+      ctx.shadowColor = '#ff2a2a';
+      ctx.shadowBlur = glow;
+    } else {
+      ctx.fillStyle = '#220000';
+      ctx.shadowBlur = 0;
+    }
+
+    ctx.strokeStyle = '#770000';
+
+    ctx.beginPath();
+    ctx.rect(sx, y, segW - 4, h);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.restore();
+  }
+}
+
+if(!inSuddenDeath){
+  // === MODO NORMAL ===
+  drawLifeBar(40, 15, W*0.38, 10, p1Life, true);
+  drawLifeBar(W - 40 - W*0.38, 15, W*0.38, 10, p2Life, false);
+
+} else {
+  // === MODO SUDDEN DEATH (1 vida cada uno) ===
+
+  const barWidth = W * 0.28;
+  const barHeight = 16;
+
+  drawSuddenDeathBar(40, 12, barWidth, barHeight, p1Life, true);
+  drawSuddenDeathBar(W - 40 - barWidth, 12, barWidth, barHeight, p2Life, false);
+
+  // Texto “SUDDEN DEATH” centrado
+  ctx.save();
+  ctx.font = '700 28px system-ui';
+  ctx.fillStyle = '#ff4444';
+  ctx.shadowColor = '#ff1111';
+  ctx.shadowBlur = 10 + Math.sin(performance.now()/150)*6;
+  ctx.textAlign = 'center';
+  ctx.fillText('SUDDEN DEATH', W/2, 54);
+  ctx.restore();
+}
+
+  // Etiquetas
+  ctx.font = '700 20px system-ui';
+  ctx.fillStyle = '#fff';
+  ctx.textAlign = 'left';
+  ctx.fillText('P1', 40, 60);
+
+  ctx.textAlign = 'right';
+  ctx.fillText(botActive ? 'BOT' : 'P2', W - 40, 60);
+
+  // Foul
+  if (foulTimer > 0 && foulMessage) {
+    const alpha = Math.max(0, Math.min(1, foulTimer / 2500));
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = 'rgba(255,50,50,1)';
+    ctx.font = 'bold 28px system-ui';
+    ctx.textAlign = 'center';
+    ctx.fillText(foulMessage, W/2, 90);
+    ctx.globalAlpha = 1;
+  }
+
+  ctx.restore();
+}
+
+/* Bucle principal */
+let last = performance.now();
+let foulMessage = null; // texto a mostrar
+let foulTimer = 0;      // tiempo restante en milisegundos
+function loop(){
+  const t = performance.now();
+  let dt = (t - last)/1000; if(dt>0.033) dt=0.033;
+  last = t;
+  if (foulTimer > 0) foulTimer -= (dt * 1000);
+
+
+  switch(gameState){
+    case STATE.SELECT:
+      handleSelection();
+      break;
+
+    case STATE.PLAY:
+      handleInput();
+      stepPhysics(dt);
+      drawGame();
+      break;
+
+    case STATE.PAUSE:
+      drawGame();
+      ctx.save();
+      ctx.fillStyle = 'rgba(0,0,0,0.4)';
+      ctx.fillRect(0,0,W,H);
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 60px system-ui';
+      ctx.textAlign = 'center';
+      ctx.fillText('PAUSA', W/2, H/2);
+      ctx.font = '20px system-ui';
+      ctx.fillText('(Presiona P para continuar)', W/2, H/2 + 40);
+      ctx.restore();
+      break;
+
+    case STATE.GAMEOVER:
+      drawGame();
+      const info = window._winnerInfo;
+      ctx.save();
+      ctx.fillStyle = 'rgba(0,0,0,0.65)';
+      ctx.fillRect(0,0,W,H);
+      ctx.fillStyle = '#fff';
+      ctx.textAlign = 'center';
+      ctx.font = 'bold 64px system-ui';
+      ctx.fillText(`${info.winner} gana`, W/2, H/2 - 30);
+      ctx.font = '600 36px system-ui';
+      ctx.fillText(`Marcador final: ${info.finalScore}`, W/2, H/2 + 30);
+      ctx.font = '400 20px system-ui';
+      ctx.fillText('(Presiona Esc para volver al menú)', W/2, H/2 + 80);
+      ctx.restore();
+      break;
+  }
+
+  requestAnimationFrame(loop);
+}
+
+/* Inicio */
+badge.innerText = 'Modo: 1 vs 1';
+resetRally(Math.random()<0.5?'L':'R');
+loop();
+
+</script>
+</body>
+</html>
