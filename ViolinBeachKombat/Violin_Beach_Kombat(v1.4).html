@@ -45,6 +45,18 @@
     background-position:center;
     filter:saturate(95%);
   }
+  @media (max-height:780px){
+    .ui-layer{
+      align-items:flex-start;
+      justify-content:center;
+      overflow-y:auto;
+      padding:18px 0 72px;
+      scroll-behavior:smooth;
+    }
+    .ui-layer::-webkit-scrollbar{width:10px}
+    .ui-layer::-webkit-scrollbar-thumb{background:#24406b;border-radius:12px}
+    .ui-layer::-webkit-scrollbar-track{background:transparent}
+  }
   .panel{
     background:rgba(7,12,24,0.92);
     border:1px solid #20365c;
@@ -73,6 +85,16 @@
     cursor:pointer;
     box-shadow:0 8px 20px #0006;
     transition:transform .08s ease,box-shadow .08s ease,opacity .15s;
+  }
+  .ui-btn.low-profile{
+    background:rgba(31,122,236,0.5);
+    border:1px solid rgba(31,122,236,0.35);
+    color:#e8f2ff;
+    box-shadow:0 6px 16px #0005;
+  }
+  .ui-btn.low-profile:hover:not(:disabled){
+    background:rgba(31,122,236,0.6);
+    box-shadow:0 8px 18px #0007;
   }
   .ui-btn.secondary{
     background:#152235;
@@ -110,21 +132,28 @@
   .hidden{display:none!important}
   .hud-btn{
     position:fixed;right:1rem;top:1rem;
-    background:linear-gradient(135deg,#1f7aec,#10b2ff);
-    color:#fff;border:none;border-radius:12px;
-    padding:10px 14px;font:700 14px system-ui;box-shadow:0 8px 20px #0008;
+    background:rgba(31,122,236,0.5);
+    color:#eaf3ff;border:none;border-radius:12px;
+    padding:10px 14px;font:700 14px system-ui;box-shadow:0 8px 20px #0006;
     z-index:12;cursor:pointer;opacity:0.9;transition:transform .08s ease,opacity .12s;
+    border:1px solid rgba(31,122,236,0.4);
   }
   .hud-btn.secondary{
-    top:3.4rem;
-    background:#152235;border:1px solid #24406b;color:#d5e5ff;
+    left:50%;
+    top:63%;
+    right:auto;
+    transform:translate(-50%,-50%);
+    background:rgba(21,34,53,0.55);border:1px solid rgba(36,64,107,0.5);color:#dbe7ff;
+  }
+  .hud-btn.secondary:active{
+    transform:translate(-50%,-50%) translateY(1px);
   }
   .hud-btn.mini{
     top:5.6rem;
     right:1rem;
-    padding:8px 10px;
+    padding:6px 8px;
     font:800 12px system-ui;
-    min-width:70px;
+    min-width:54px;
   }
   .hud-btn:active{transform:translateY(1px);opacity:1}
   .menu-focus{
@@ -243,6 +272,98 @@
     margin:12px 0 10px;
   }
   .menu-actions .ui-btn{min-width:160px}
+  .tutorial-panel{
+    background:rgba(7,12,24,0.94);
+    border:1px solid #20365c;
+    box-shadow:0 20px 50px #000a, 0 0 0 1px #0f2038;
+    border-radius:14px;
+    padding:18px 20px 22px;
+    width:min(940px,96vw);
+    color:#e8f2ff;
+  }
+  .tutorial-hero{
+    display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+    margin-bottom:8px;
+  }
+  .tutorial-hero h1{margin:0;font:800 28px/1.1 'Barlow',system-ui}
+  .tutorial-hero .pill{margin-left:0;background:#15375c}
+  .tutorial-grid{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-top:8px;
+  }
+  .tutorial-section{
+    background:#0c1422;
+    border:1px solid #1f365a;
+    border-radius:12px;
+    padding:12px 14px;
+    box-shadow:0 10px 30px #0007;
+  }
+  .tutorial-section h2{margin:0 0 6px;font:800 16px/1.2 'Barlow',system-ui;color:#9dc6ff}
+  .tutorial-section p{margin:4px 0 8px;font:500 13px/1.5 'Barlow',system-ui;color:#cddaf5}
+  .tutorial-section ul{margin:4px 0 8px;padding-left:18px;color:#cddaf5;font:500 13px/1.45 'Barlow',system-ui}
+  .tutorial-section li{margin:2px 0}
+  .tutorial-note{
+    background:rgba(255,205,92,0.08);
+    border:1px solid rgba(255,205,92,0.25);
+    color:#ffe8a3;
+    border-radius:10px;
+    padding:10px 12px;
+    font:700 13px/1.4 'Barlow',system-ui;
+    box-shadow:0 8px 24px #0006;
+  }
+  .tutorial-download{
+    display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px;
+  }
+  .tutorial-download input{
+    flex:1 1 260px;
+    min-width:220px;
+    padding:10px 12px;
+    border-radius:10px;
+    border:1px solid #20365c;
+    background:#0c1422;
+    color:#d8e6ff;
+    font:600 13px system-ui;
+  }
+  .tutorial-download .mini-btn{
+    padding:10px 12px;
+    font:700 12px system-ui;
+    border-radius:10px;
+    border:1px solid #20365c;
+    background:rgba(31,122,236,0.5);
+    color:#e8f2ff;
+    cursor:pointer;
+  }
+  .tutorial-download small{width:100%;color:#9bb3d7;font:600 12px system-ui}
+  .ency-panel{
+    background:rgba(7,12,24,0.94);
+    border:1px solid #20365c;
+    box-shadow:0 20px 50px #000a, 0 0 0 1px #0f2038;
+    border-radius:14px;
+    padding:18px 20px 22px;
+    width:min(980px,96vw);
+    color:#e8f2ff;
+  }
+  .ency-panel.scrollable{
+    max-height:90vh;
+    overflow-y:auto;
+    padding-bottom:120px;
+  }
+  .ency-header{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+  .ency-header h1{margin:0;font:800 26px/1.1 'Barlow',system-ui}
+  .ency-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-top:12px}
+  .ency-card{
+    background:#0f182a;
+    border:1px solid #21375c;
+    border-radius:12px;
+    padding:12px;
+    box-shadow:0 12px 28px #0007;
+    display:grid;
+    grid-template-columns:96px 1fr;
+    gap:10px;
+  }
+  .ency-card canvas{width:96px;height:96px;background:#0c1422;border:1px solid #1b2d4c;border-radius:10px;box-shadow:inset 0 0 18px #0006}
+  .ency-card h3{margin:0;font:800 16px/1.2 'Barlow',system-ui;color:#9dc6ff}
+  .ency-meta{margin:4px 0;font:700 11px/1.2 'Barlow',system-ui;color:#8fb3ff;letter-spacing:0.5px;text-transform:uppercase}
+  .ency-card p{margin:4px 0;font:500 13px/1.45 'Barlow',system-ui;color:#ced9f6}
   .menu-footer{
     text-align:center;
     color:#8aa2c8;
@@ -283,9 +404,10 @@
           <span class="mode-copy">Conecta dos dispositivos en la misma red.</span>
         </button>
       </div>
-      <div class="menu-description">Elige un modo para saltar a la selección de personajes y entrar al combate en la playa.</div>
+<div class="menu-description">Elige un modo para saltar a la selección de personajes y entrar al combate en la playa.</div>
       <div class="menu-actions">
-        <button class="ui-btn" id="btnToggleFullscreen">Pantalla completa</button>
+        <button class="ui-btn low-profile" id="btnOpenTutorial">Tutorial</button>
+        <button class="ui-btn low-profile" id="btnToggleFullscreen">Pantalla completa</button>
       </div>
       <div class="menu-footer">Violin Beach Kombat v1.4 · 3 de diciembre de 2025 · francisco.araya.work@gmail.com</div>
     </div>
@@ -331,6 +453,97 @@
       <button class="ui-btn secondary" id="btnResetLink">Reiniciar enlace</button>
     </div>
   </div>
+
+  <div class="tutorial-panel hidden scrollable" id="tutorialPanel">
+    <div class="tutorial-hero">
+      <h1>Cómo jugar Violin Beach Kombat</h1>
+      <span class="pill">Tutorial</span>
+    </div>
+    <p class="tutorial-note">En móvil: el 1v1 local no es jugable (controles se solapan). Usa PvBot para practicar o LAN/WiFi para jugar con otra persona.</p>
+    <div class="tutorial-grid">
+      <div class="tutorial-section">
+        <h2>Modos rápidos</h2>
+        <ul>
+          <li><b>Local 1v1:</b> ideal en PC/teclado+mandos; en móvil no es práctico.</li>
+          <li><b>PvBot:</b> entrena contra la IA y prueba personajes.</li>
+          <li><b>LAN / WiFi:</b> conecta dos dispositivos en la misma red.</li>
+        </ul>
+        <p><b>Conexión LAN/WiFi</b>: comparte Oferta/Respuesta (copiar/pegar) o usa Lobby (sólo con el juego descargado y servidor en la red).</p>
+      </div>
+      <div class="tutorial-section">
+        <h2>Lobby en LAN (descargado)</h2>
+        <ul>
+          <li>En un PC de la red corre el lobby (Node.js) y déjalo abierto.</li>
+          <li>En el juego: ve a Lobby, pon tu <b>nombre</b> y <b>código/URL</b> del server, pulsa <b>Conectar</b>.</li>
+          <li>Verás la lista de jugadores; selecciona uno y <b>invita</b>.</li>
+          <li>El invitado acepta; el host genera la oferta y se abre la selección.</li>
+        </ul>
+        <p>Si no hay lobby, usa Oferta/Respuesta manual: Host crea oferta, invitado genera respuesta y la devuelve; luego se abre selección.</p>
+      </div>
+      <div class="tutorial-section">
+        <h2>Selección de personaje</h2>
+        <ul>
+          <li>Mueve el cursor, selecciona y confirma; cada jugador elige color/skin.</li>
+          <li>Bloquea con tiempo limitado; si no eliges, se asigna un default.</li>
+        </ul>
+        <button class="ui-btn low-profile" id="btnOpenEncy" style="margin-top:6px">Abrir enciclopedia de personajes</button>
+      </div>
+<div class="tutorial-section">
+        <h2>Controles</h2>
+        <ul>
+          <li><b>Teclado P1:</b> W/A/S/D para mover/saltar/agacharse.</li>
+          <li><b>Teclado P2:</b> Flechas para mover/saltar/agacharse.</li>
+          <li><b>Mandos (ej. Xbox):</b> stick/DPAD para mover, A para saltar.</li>
+          <li><b>Pantalla táctil:</b> joysticks y botones virtuales en pantalla.</li>
+          <li><b>Pausa:</b> botón Pausa o tecla P (cuidado: fullscreen puede salir con Esc).</li>
+        </ul>
+      </div>
+      <div class="tutorial-section">
+        <h2>Descarga directa (offline)</h2>
+        <p>Descarga el HTML (v1.4) desde el juego para jugar sin navegador o montar el lobby local.</p>
+        <div class="tutorial-download">
+          <input id="tutorialDownloadUrl" type="url" value="https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/refs/heads/main/ViolinBeachKombat/Violin_Beach_Kombat%28v1.4%29.html" />
+          <button class="mini-btn" id="btnTutorialDownload">Descargar</button>
+          <button class="mini-btn secondary" id="btnTutorialCopy">Copiar link</button>
+          <small id="tutorialDownloadStatus"></small>
+        </div>
+      </div>
+      <div class="tutorial-section">
+        <h2>Reglas de set y final</h2>
+        <ul>
+          <li><b>Sudden death:</b> debes ganar por 2 puntos; barra se reduce.</li>
+          <li><b>Finish Him:</b> el ganador elige:
+            <ul>
+              <li><b>Mercy:</b> perdona y pierdes el punto final.</li>
+              <li><b>Rematar:</b> anota el punto y termina.</li>
+              <li><b>Fatality:</b> secuencia <code>a,d,a,d,w</code> en ritmo.</li>
+            </ul>
+          </li>
+        </ul>
+        <p>La arena guarda secretos: hay quien habla de una pelota que sólo aparece a los pacientes.</p>
+      </div>
+      <div class="tutorial-section">
+        <h2>Tips rápidos</h2>
+        <ul>
+          <li>Activa pantalla completa para evitar toques accidentales.</li>
+          <li>Si el ping sube en LAN, reintenta oferta/respuesta.</li>
+          <li>Practica habilidades en PvBot antes de retar en LAN.</li>
+        </ul>
+        <button class="ui-btn low-profile" id="btnTutorialBack" style="margin-top:6px">Volver al menú</button>
+      </div>
+    </div>
+  </div>
+  <div class="ency-panel hidden scrollable" id="encyPanel">
+    <div class="ency-header">
+      <div>
+        <h1>Enciclopedia de personajes</h1>
+        <div class="ency-meta">Roster completo con habilidades y fatality</div>
+      </div>
+      <button class="ui-btn low-profile" id="btnEncyBack">Volver</button>
+    </div>
+    <div class="ency-list" id="encyList"></div>
+  </div>
+
 </div>
 
 <div class="ui-layer hidden" id="lobbyLayer">
@@ -684,6 +897,8 @@ const netStatusBox = document.getElementById('netStatus');
 const uiLayer = document.getElementById('uiLayer');
 const menuPanel = document.getElementById('menuPanel');
 const lanPanel = document.getElementById('lanPanel');
+const encyPanel = document.getElementById('encyPanel');
+const tutorialPanel = document.getElementById('tutorialPanel');
 const lobbyLayer = document.getElementById('lobbyLayer');
 const lobbyPanel = document.getElementById('lobbyPanel');
 const pauseHudBtn = document.getElementById('btnPauseHud');
@@ -701,6 +916,16 @@ const uiRefs = {
   btnLocalBot: document.getElementById('btnLocalBot'),
   btnLan: document.getElementById('btnLan'),
   btnToggleFullscreen: document.getElementById('btnToggleFullscreen'),
+  btnOpenTutorial: document.getElementById('btnOpenTutorial'),
+  btnTutorialBack: document.getElementById('btnTutorialBack'),
+  btnOpenEncy: document.getElementById('btnOpenEncy'),
+  btnEncyBack: document.getElementById('btnEncyBack'),
+  encyPanel: document.getElementById('encyPanel'),
+  encyList: document.getElementById('encyList'),
+  tutorialDownloadUrl: document.getElementById('tutorialDownloadUrl'),
+  btnTutorialDownload: document.getElementById('btnTutorialDownload'),
+  btnTutorialCopy: document.getElementById('btnTutorialCopy'),
+  tutorialDownloadStatus: document.getElementById('tutorialDownloadStatus'),
   btnHudFullscreen: document.getElementById('btnHudFullscreen'),
   btnCreateOffer: document.getElementById('btnCreateOffer'),
   btnCreateAnswer: document.getElementById('btnCreateAnswer'),
@@ -728,6 +953,9 @@ const MATCH_MODE = { LOCAL:'local', BOT:'bot', LAN:'lan' };
 let appScene = APP_SCENE.MENU;
 let matchMode = MATCH_MODE.LOCAL;
 let netRole = null; // 'host' o 'client'
+let tutorialOpen = false;
+let encyOpen = false;
+let encyReturnTarget = 'menu';
 let lobbySocket = null;
 let lobbyId = null;
 let lobbyPeers = [];
@@ -777,12 +1005,18 @@ function setScene(scene){
   appScene = scene;
   if(lobbyLayer) lobbyLayer.classList.add('hidden');
   if(scene === APP_SCENE.MENU){
+    if(tutorialPanel) tutorialPanel.classList.toggle('hidden', !tutorialOpen || encyOpen);
+    if(uiRefs.encyPanel) uiRefs.encyPanel.classList.toggle('hidden', !encyOpen);
     uiLayer.classList.remove('hidden');
-    menuPanel.classList.remove('hidden');
+    menuPanel.classList.toggle('hidden', tutorialOpen || encyOpen);
     lanPanel.classList.add('hidden');
     menuFocusIndex = 0;
     syncMenuFocus();
   } else if(scene === APP_SCENE.NET){
+    tutorialOpen = false;
+    encyOpen = false;
+    if(tutorialPanel) tutorialPanel.classList.add('hidden');
+    if(uiRefs.encyPanel) uiRefs.encyPanel.classList.add('hidden');
     uiLayer.classList.remove('hidden');
     menuPanel.classList.add('hidden');
     lanPanel.classList.remove('hidden');
@@ -797,10 +1031,22 @@ function setScene(scene){
 function getActiveMenuButtons(){
   const buttons = [];
   if(appScene === APP_SCENE.MENU){
-    ['btnLocalPvp','btnLocalBot','btnLan','btnToggleFullscreen'].forEach(id=>{
-      const el = document.getElementById(id);
-      if(el && !el.disabled) buttons.push(el);
-    });
+    if(encyOpen){
+      ['btnEncyBack'].forEach(id=>{
+        const el = document.getElementById(id);
+        if(el && !el.disabled) buttons.push(el);
+      });
+    } else if(tutorialOpen){
+      ['btnTutorialBack','btnOpenEncy'].forEach(id=>{
+        const el = document.getElementById(id);
+        if(el && !el.disabled) buttons.push(el);
+      });
+    } else {
+      ['btnLocalPvp','btnLocalBot','btnLan','btnOpenTutorial','btnToggleFullscreen'].forEach(id=>{
+        const el = document.getElementById(id);
+        if(el && !el.disabled) buttons.push(el);
+      });
+    }
   } else if(appScene === APP_SCENE.NET){
     const lobbyVisible = lobbyLayer && !lobbyLayer.classList.contains('hidden');
     if(lobbyVisible){
@@ -859,6 +1105,155 @@ function showLobbyPanel(show){
   }
 }
 
+function openTutorial(){
+  tutorialOpen = true;
+  encyOpen = false;
+  encyReturnTarget = 'menu';
+  if(uiRefs.encyPanel) uiRefs.encyPanel.classList.add('hidden');
+  if(uiRefs.btnOpenEncy) uiRefs.btnOpenEncy.textContent = 'Abrir enciclopedia de personajes';
+  if(menuPanel) menuPanel.classList.add('hidden');
+  if(tutorialPanel) tutorialPanel.classList.remove('hidden');
+  syncMenuFocus();
+}
+
+function closeTutorial(){
+  tutorialOpen = false;
+  encyOpen = false;
+  if(uiRefs.encyPanel) uiRefs.encyPanel.classList.add('hidden');
+  if(uiRefs.btnOpenEncy) uiRefs.btnOpenEncy.textContent = 'Abrir enciclopedia de personajes';
+  if(tutorialPanel) tutorialPanel.classList.add('hidden');
+  if(menuPanel) menuPanel.classList.remove('hidden');
+  syncMenuFocus();
+}
+
+function openEncy(target='menu'){
+  encyReturnTarget = target;
+  encyOpen = true;
+  tutorialOpen = false;
+  if(tutorialPanel) tutorialPanel.classList.add('hidden');
+  if(menuPanel) menuPanel.classList.add('hidden');
+  if(uiRefs.encyPanel) uiRefs.encyPanel.classList.remove('hidden');
+  if(uiRefs.btnOpenEncy) uiRefs.btnOpenEncy.textContent = 'Abrir enciclopedia de personajes';
+  renderEncyCards();
+  syncMenuFocus();
+}
+
+function closeEncy(){
+  encyOpen = false;
+  if(uiRefs.encyPanel) uiRefs.encyPanel.classList.add('hidden');
+   if(uiRefs.btnOpenEncy) uiRefs.btnOpenEncy.textContent = 'Abrir enciclopedia de personajes';
+  if(encyReturnTarget === 'tutorial'){
+    tutorialOpen = true;
+    if(tutorialPanel) tutorialPanel.classList.remove('hidden');
+    if(menuPanel) menuPanel.classList.add('hidden');
+  } else {
+    tutorialOpen = false;
+    if(menuPanel) menuPanel.classList.remove('hidden');
+  }
+  syncMenuFocus();
+}
+
+function updateTutorialDownloadStatus(msg, tone='info'){
+  if(uiRefs.tutorialDownloadStatus){
+    uiRefs.tutorialDownloadStatus.textContent = msg || '';
+    const colors = { info:'#9bb3d7', ok:'#9ff3c9', warn:'#ffd57a', error:'#ff9b9b' };
+    uiRefs.tutorialDownloadStatus.style.color = colors[tone] || colors.info;
+  }
+}
+
+async function triggerTutorialDownload(){
+  const url = (uiRefs.tutorialDownloadUrl?.value || '').trim();
+  if(!url) return;
+  updateTutorialDownloadStatus('Descargando...', 'info');
+  try{
+    const res = await fetch(url);
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const blob = await res.blob();
+    const objectUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = objectUrl;
+    a.download = url.split('/').pop() || 'Violin_Beach_Kombat_v1.4.html';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=>URL.revokeObjectURL(objectUrl), 2000);
+    updateTutorialDownloadStatus('Descarga iniciada. Revisa tu carpeta de descargas.', 'ok');
+  }catch(err){
+    console.warn('download failed', err);
+    // Fallback: intento directo con atributo download
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = url.split('/').pop() || 'Violin_Beach_Kombat_v1.4.html';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    updateTutorialDownloadStatus('No se pudo forzar descarga. Si se abre en el navegador, usa Guardar como.', 'warn');
+  }
+}
+
+async function copyTutorialLink(){
+  const url = (uiRefs.tutorialDownloadUrl?.value || '').trim();
+  if(!url) return;
+  const ok = await copyToClipboard(url, 'Link copiado');
+  if(!ok) updateTutorialDownloadStatus('No se pudo copiar, selecciona y copia manual', 'warn');
+}
+
+function buildEncyRoster(){
+  return ROSTER.map(skin=>{
+    const profile = getSkinProfile(skin) || {};
+    const abilityId = profile.abilityId || 'none';
+    const ability = ABILITIES[abilityId] || ABILITIES.none;
+    const fatalityKey = SKIN_FATALITY_MAP[skin] || 'default';
+    return {
+      skin,
+      label: profile.label || skin.toUpperCase(),
+      abilityLabel: ability.label || abilityId,
+      abilityDesc: ability.description || 'Habilidad especial.',
+      fatalityKey,
+      fatalityDesc: FATALITY_LORE[fatalityKey] || 'Fatality característico de este luchador.'
+    };
+  });
+}
+
+function renderEncyCards(){
+  const list = uiRefs.encyList;
+  if(!list) return;
+  list.innerHTML = '';
+  const data = buildEncyRoster();
+  data.forEach(entry=>{
+    const card = document.createElement('div');
+    card.className = 'ency-card';
+
+    const cv = document.createElement('canvas');
+    cv.width = 120; cv.height = 120;
+    const ctx = cv.getContext('2d');
+    ctx.save();
+    ctx.translate(cv.width/2, cv.height/2);
+    drawSkin(ctx, entry.skin, { r:34, player:{ skin: entry.skin } });
+    ctx.restore();
+
+    const body = document.createElement('div');
+    const title = document.createElement('h3');
+    title.textContent = entry.label;
+    const meta = document.createElement('div');
+    meta.className = 'ency-meta';
+    meta.textContent = `${entry.abilityLabel} · Fatality: ${entry.fatalityKey.toUpperCase()}`;
+    const ability = document.createElement('p');
+    ability.innerHTML = `<b>${entry.abilityLabel}:</b> ${entry.abilityDesc}`;
+    const fatal = document.createElement('p');
+    fatal.innerHTML = `<b>Fatality:</b> ${entry.fatalityDesc}`;
+
+    body.appendChild(title);
+    body.appendChild(meta);
+    body.appendChild(ability);
+    body.appendChild(fatal);
+
+    card.appendChild(cv);
+    card.appendChild(body);
+    list.appendChild(card);
+  });
+}
+
 function getFullscreenElement(){
   return document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
 }
@@ -911,7 +1306,7 @@ function syncFullscreenUi(){
   }
   if(uiRefs.btnHudFullscreen){
     uiRefs.btnHudFullscreen.disabled = !supported;
-    uiRefs.btnHudFullscreen.textContent = active ? 'Salir FS' : 'FS';
+    uiRefs.btnHudFullscreen.textContent = active ? '🗖' : '⛶'; // fullscreen icon and exit fullscreen icon
     uiRefs.btnHudFullscreen.setAttribute('aria-pressed', active ? 'true' : 'false');
   }
 }
@@ -921,9 +1316,18 @@ function syncUiState(){
   if(cvs){
     cvs.style.pointerEvents = menuLike ? 'none' : 'auto';
   }
+  if(!menuLike && (tutorialOpen || encyOpen)){
+    tutorialOpen = false;
+    encyOpen = false;
+    if(tutorialPanel) tutorialPanel.classList.add('hidden');
+    if(uiRefs.encyPanel) uiRefs.encyPanel.classList.add('hidden');
+    if(menuPanel && appScene === APP_SCENE.MENU) menuPanel.classList.remove('hidden');
+    if(uiRefs.btnOpenEncy) uiRefs.btnOpenEncy.textContent = 'Abrir enciclopedia de personajes';
+  }
   if(pauseHudBtn){
     const inSelection = (gameState === STATE.SELECT && appScene === APP_SCENE.SELECT);
-    pauseHudBtn.textContent = inSelection ? 'Menú' : 'Pausa';
+    const paused = (gameState === STATE.PAUSE);
+    pauseHudBtn.textContent = inSelection ? '🏠︎' : (paused ? '►' : '⏸');
     pauseHudBtn.classList.toggle('hidden', !!menuLike || gameState === STATE.GAMEOVER);
   }
   if(exitPauseBtn){
@@ -1390,6 +1794,12 @@ if(uiRefs.btnLocalPvp) uiRefs.btnLocalPvp.addEventListener('click', ()=>startLoc
 if(uiRefs.btnLocalBot) uiRefs.btnLocalBot.addEventListener('click', ()=>startLocalMode('bot'));
 if(uiRefs.btnLan) uiRefs.btnLan.addEventListener('click', ()=>openLanMenu());
 if(uiRefs.btnToggleFullscreen) uiRefs.btnToggleFullscreen.addEventListener('click', ()=>toggleFullscreen());
+if(uiRefs.btnOpenTutorial) uiRefs.btnOpenTutorial.addEventListener('click', ()=>openTutorial());
+if(uiRefs.btnTutorialBack) uiRefs.btnTutorialBack.addEventListener('click', ()=>closeTutorial());
+if(uiRefs.btnOpenEncy) uiRefs.btnOpenEncy.addEventListener('click', ()=>openEncy(tutorialOpen ? 'tutorial' : 'menu'));
+if(uiRefs.btnEncyBack) uiRefs.btnEncyBack.addEventListener('click', ()=>closeEncy());
+if(uiRefs.btnTutorialDownload) uiRefs.btnTutorialDownload.addEventListener('click', ()=>triggerTutorialDownload());
+if(uiRefs.btnTutorialCopy) uiRefs.btnTutorialCopy.addEventListener('click', ()=>copyTutorialLink());
 if(uiRefs.btnHudFullscreen) uiRefs.btnHudFullscreen.addEventListener('click', ()=>toggleFullscreen());
 if(uiRefs.btnBackMenu) uiRefs.btnBackMenu.addEventListener('click', ()=>{ resetNetState(); setScene(APP_SCENE.MENU); });
 if(uiRefs.btnResetLink) uiRefs.btnResetLink.addEventListener('click', ()=>resetNetState());
@@ -2623,6 +3033,23 @@ const SKIN_FATALITY_MAP = {
   mystery: 'mystery'
 };
 const FINISH_INPUT_PATTERN = ['back','forward','back','forward','jump'];
+const FATALITY_LORE = {
+  violin:'Corta el aire con un acorde final que hace estallar el punto de impacto.',
+  metal:'Puas y metal pesado: empala con una estela de spikes.',
+  dj:'Drop final: comprime el beat y revienta al rival en el downbeat.',
+  queen:'Cae la corona y una ola real sella la arena.',
+  fire:'Columna de fuego que consume el último aliento.',
+  drum:'Explosión sónica al golpear el suelo, como un bombo gigante.',
+  hydra:'Sombras múltiples convergen y pulverizan al adversario.',
+  ghost:'Se desvanece y vuelve dentro del rival en una implosión ectoplasma.',
+  harp:'Hilos resonantes que cortan y dejan eco brillante.',
+  theremin:'Tormenta de ondas agudas que desintegra en un zumbido.',
+  director:'Ordena el corte final: claqueta, luces, fade to black.',
+  piano:'Cae desde el techo un piano que aplasta al rival.',
+  cello:'Se eleva, desaparece y cae como meteorito de madera y cuerdas.',
+  flor:'Lianas y pétalos estrangulan el punto final.',
+  mystery:'El azar revela un final impredecible; a veces, otra cara asoma.'
+};
 
 function defineAbility(def){
   const ability = { ...def };
@@ -6103,6 +6530,16 @@ addEventListener('keydown', e=>{
     registerFinishInput(e.code);
   }
   if(appScene === APP_SCENE.MENU || appScene === APP_SCENE.NET){
+    if(appScene === APP_SCENE.MENU && encyOpen && e.code === 'Escape'){
+      closeEncy();
+      e.preventDefault();
+      return;
+    }
+    if(appScene === APP_SCENE.MENU && tutorialOpen && !encyOpen && e.code === 'Escape'){
+      closeTutorial();
+      e.preventDefault();
+      return;
+    }
     const isPrev = (e.code === 'ArrowLeft' || e.code === 'ArrowUp' || e.code === 'KeyA' || e.code === 'KeyW');
     const isNext = (e.code === 'ArrowRight' || e.code === 'ArrowDown' || e.code === 'KeyD' || e.code === 'KeyS');
     if(isPrev){
