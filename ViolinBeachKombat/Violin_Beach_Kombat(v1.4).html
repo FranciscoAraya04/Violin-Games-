@@ -228,6 +228,14 @@
     letter-spacing:0.3px;
     margin:4px 0 10px;
   }
+  .menu-actions{
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    flex-wrap:wrap;
+    margin:12px 0 10px;
+  }
+  .menu-actions .ui-btn{min-width:160px}
   .menu-footer{
     text-align:center;
     color:#8aa2c8;
@@ -268,6 +276,9 @@
         </button>
       </div>
       <div class="menu-description">Elige un modo para saltar a la selección de personajes y entrar al combate en la playa.</div>
+      <div class="menu-actions">
+        <button class="ui-btn" id="btnToggleFullscreen">Pantalla completa</button>
+      </div>
       <div class="menu-footer">Violin Beach Kombat v1.4 · 3 de diciembre de 2025 · francisco.araya.work@gmail.com</div>
     </div>
   </div>
@@ -681,6 +692,7 @@ const uiRefs = {
   btnLocalPvp: document.getElementById('btnLocalPvp'),
   btnLocalBot: document.getElementById('btnLocalBot'),
   btnLan: document.getElementById('btnLan'),
+  btnToggleFullscreen: document.getElementById('btnToggleFullscreen'),
   btnCreateOffer: document.getElementById('btnCreateOffer'),
   btnCreateAnswer: document.getElementById('btnCreateAnswer'),
   btnApplyAnswer: document.getElementById('btnApplyAnswer'),
@@ -776,7 +788,7 @@ function setScene(scene){
 function getActiveMenuButtons(){
   const buttons = [];
   if(appScene === APP_SCENE.MENU){
-    ['btnLocalPvp','btnLocalBot','btnLan'].forEach(id=>{
+    ['btnLocalPvp','btnLocalBot','btnLan','btnToggleFullscreen'].forEach(id=>{
       const el = document.getElementById(id);
       if(el && !el.disabled) buttons.push(el);
     });
@@ -838,6 +850,58 @@ function showLobbyPanel(show){
   }
 }
 
+function getFullscreenElement(){
+  return document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
+}
+
+function isFullscreenSupported(){
+  const el = document.documentElement;
+  return !!(document.fullscreenEnabled || document.webkitFullscreenEnabled || el?.requestFullscreen || el?.webkitRequestFullscreen || el?.msRequestFullscreen);
+}
+
+async function enterFullscreen(){
+  if(!isFullscreenSupported()) return;
+  const el = document.documentElement;
+  const req = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
+  if(!req) return;
+  try{
+    await req.call(el);
+  }catch(err){
+    console.warn('No pude activar pantalla completa', err);
+  }
+  syncFullscreenUi();
+}
+
+async function exitFullscreen(){
+  const exit = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen;
+  if(!exit) return;
+  try{
+    await exit.call(document);
+  }catch(err){
+    console.warn('No pude salir de pantalla completa', err);
+  }
+  syncFullscreenUi();
+}
+
+function toggleFullscreen(){
+  if(getFullscreenElement()){
+    exitFullscreen();
+  } else {
+    enterFullscreen();
+  }
+}
+
+function syncFullscreenUi(){
+  const supported = isFullscreenSupported();
+  const active = !!getFullscreenElement();
+  if(uiRefs.btnToggleFullscreen){
+    uiRefs.btnToggleFullscreen.disabled = !supported;
+    uiRefs.btnToggleFullscreen.textContent = supported
+      ? (active ? 'Salir de pantalla completa' : 'Pantalla completa')
+      : 'Pantalla completa no disponible';
+  }
+}
+
 function syncUiState(){
   const menuLike = (appScene === APP_SCENE.MENU || appScene === APP_SCENE.NET);
   if(cvs){
@@ -858,6 +922,7 @@ function syncUiState(){
   if(menuLike){
     syncMenuFocus();
   }
+  syncFullscreenUi();
 }
 
 function updateNetStatus(msg, tone='info'){
@@ -1307,6 +1372,7 @@ function getModeLabel(){
 if(uiRefs.btnLocalPvp) uiRefs.btnLocalPvp.addEventListener('click', ()=>startLocalMode('pvp'));
 if(uiRefs.btnLocalBot) uiRefs.btnLocalBot.addEventListener('click', ()=>startLocalMode('bot'));
 if(uiRefs.btnLan) uiRefs.btnLan.addEventListener('click', ()=>openLanMenu());
+if(uiRefs.btnToggleFullscreen) uiRefs.btnToggleFullscreen.addEventListener('click', ()=>toggleFullscreen());
 if(uiRefs.btnBackMenu) uiRefs.btnBackMenu.addEventListener('click', ()=>{ resetNetState(); setScene(APP_SCENE.MENU); });
 if(uiRefs.btnResetLink) uiRefs.btnResetLink.addEventListener('click', ()=>resetNetState());
 if(uiRefs.btnCreateOffer) uiRefs.btnCreateOffer.addEventListener('click', ()=>createHostOffer());
@@ -1334,6 +1400,10 @@ if(pauseHudBtn) pauseHudBtn.addEventListener('click', ()=>{
   }
 });
 if(exitPauseBtn) exitPauseBtn.addEventListener('click', ()=>requestEscapeToMenu());
+
+['fullscreenchange','webkitfullscreenchange','msfullscreenchange'].forEach(evt=>{
+  document.addEventListener(evt, syncFullscreenUi);
+});
 
 function buildSignalPayload(desc, ice){
   return btoa(JSON.stringify({ sdp: desc, ice }));
