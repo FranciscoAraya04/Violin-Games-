@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Violin Beach Kombat (v1.5)</title>
+<title>Violin Beach Kombat (v1.6)</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600;700&display=swap');
   :root{
@@ -23,6 +23,9 @@
     --mode-bot-img: url('https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Gemini_Generated_Image_trez19trez19trez.png?raw=true');
     /* // Reemplaza con la URL de la imagen que quieras para: PvP LAN/WiFi */
     --mode-lan-img: url('https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Gemini_Generated_Image_lyjjkulyjjkulyjj.png?raw=true');
+    /* Imagen o gradiente para Arcade */
+    /* //foto de fondo para modo arcade */
+    --mode-arcade-img: url('https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Gemini_Generated_Image_bdsxtqbdsxtqbdsx.png?raw=true');
   }
   html,body{height:100%;margin:0;background:#0b1420;color:#eee;font-family:'Barlow',system-ui,Segoe UI,Roboto,Arial}
   .wrap{display:flex;align-items:center;justify-content:center;height:100%}
@@ -203,9 +206,9 @@
   .profile-fav{
     margin-top:10px;
     padding:10px;
-    background:#0d1626;
+    background:linear-gradient(145deg,#0d1626,#0a111f);
     border:1px solid #1f365a;
-    border-radius:10px;
+    border-radius:12px;
     display:flex;
     align-items:center;
     gap:10px;
@@ -228,12 +231,49 @@
     background:#0c1422;
     border:1px solid #1f365a;
     box-shadow:0 0 0 1px #1f365a;
+    position:relative;
+    overflow:hidden;
+    z-index:0;
   }
+  .skin-frame::before{
+    content:'';
+    position:absolute;
+    inset:-6px;
+    pointer-events:none;
+    border-radius:14px;
+    opacity:0;
+    transition:opacity .2s ease;
+    z-index:0;
+  }
+  .skin-frame > *{
+    position:relative;
+    z-index:1;
+  }
+  .glow-level-0::before{opacity:0;}
+  .glow-level-1::before{opacity:1;background:radial-gradient(circle at 50% 50%, rgba(205,138,58,0.8) 0%, rgba(205,138,58,0.35) 45%, rgba(205,138,58,0) 80%);}
+  .glow-level-2::before{opacity:1;background:radial-gradient(circle at 50% 50%, rgba(138,138,138,0.8) 0%, rgba(138,138,138,0.35) 45%, rgba(138,138,138,0) 80%);}
+  .glow-level-3::before{opacity:1;background:radial-gradient(circle at 50% 50%, rgba(176,190,197,0.8) 0%, rgba(176,190,197,0.35) 45%, rgba(176,190,197,0) 80%);}
+  .glow-level-4::before{opacity:1;background:radial-gradient(circle at 50% 50%, rgba(255,214,102,0.8) 0%, rgba(255,214,102,0.35) 45%, rgba(255,214,102,0) 80%);}
+  .glow-level-5::before{opacity:1;background:radial-gradient(circle at 50% 50%, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.35) 45%, rgba(255,255,255,0) 80%);}
+  .glow-level-6::before{opacity:1;background:radial-gradient(circle at 50% 50%, rgba(120,235,255,0.8) 0%, rgba(120,235,255,0.35) 45%, rgba(120,235,255,0) 80%);}
+  .glow-level-7::before{opacity:1;background:radial-gradient(circle at 50% 50%, rgba(142,245,182,0.8) 0%, rgba(142,245,182,0.35) 45%, rgba(142,245,182,0) 80%);}
+  .glow-level-8::before{opacity:1;background:radial-gradient(circle at 50% 50%, rgba(255,90,90,0.8) 0%, rgba(255,90,90,0.35) 45%, rgba(255,90,90,0) 80%);}
+  .glow-level-9::before{opacity:1;background:radial-gradient(circle at 50% 50%, rgba(97,40,199,0.8) 0%, rgba(97,40,199,0.35) 45%, rgba(97,40,199,0) 80%);}
+  .skin-frame.glow-level-1{box-shadow:0 0 0 2px #cd8a3a, 0 0 22px #cd8a3a77, 0 0 48px #cd8a3a55;}
+  .skin-frame.glow-level-2{box-shadow:0 0 0 2px #8a8a8a, 0 0 22px #8a8a8a77, 0 0 48px #8a8a8a55;}
+  .skin-frame.glow-level-3{box-shadow:0 0 0 2px #d0d7dc, 0 0 22px #d0d7dc77, 0 0 48px #d0d7dc55;}
+  .skin-frame.glow-level-4{box-shadow:0 0 0 2px #ffd666, 0 0 22px #ffd66677, 0 0 48px #ffd66655;}
+  .skin-frame.glow-level-5{box-shadow:0 0 0 2px #ffffff, 0 0 22px #ffffff77, 0 0 48px #ffffff55;}
+  .skin-frame.glow-level-6{box-shadow:0 0 0 2px #78ebff, 0 0 22px #78ebff77, 0 0 48px #78ebff55;}
+  .skin-frame.glow-level-7{box-shadow:0 0 0 2px #7be0a0, 0 0 22px #7be0a077, 0 0 48px #7be0a055;}
+  .skin-frame.glow-level-8{box-shadow:0 0 0 2px #ff5a5a, 0 0 22px #ff5a5a77, 0 0 48px #ff5a5a55;}
+  .skin-frame.glow-level-9{box-shadow:0 0 0 2px #6128c7, 0 0 22px #6128c777, 0 0 48px #6128c755;}
   .profile-fav-meta{display:flex;flex-direction:column;gap:4px;min-width:140px;}
   .profile-fav-label{font:700 12px 'Barlow',system-ui;color:#9dc6ff;text-transform:uppercase;letter-spacing:0.4px;}
   .profile-fav-name{font:800 18px/1 'Barlow',system-ui;color:#e9f4ff;}
   .profile-fav-sub{font:600 12px/1.3 'Barlow',system-ui;color:#8fa5c8;}
-  .stat-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 8px;border-radius:8px;background:#122235;border:1px solid #1f365a;color:#cfe1ff;font:700 12px 'Barlow',system-ui;}
+.stat-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 8px;border-radius:8px;background:#122235;border:1px solid #1f365a;color:#cfe1ff;font:700 12px 'Barlow',system-ui;}
+.stat-chip.achieved{background:#163024;border-color:#2f6d4b;color:#c6ffd7;box-shadow:0 0 0 1px #2f6d4b55;}
   .char-stats-list{display:flex;flex-direction:column;gap:8px;margin-top:8px;}
   .char-stat-row{display:flex;align-items:center;gap:10px;background:#0c1422;border:1px solid #1f365a;border-radius:10px;padding:10px 12px;}
   .char-stat-name{font:800 14px/1.2 'Barlow',system-ui;color:#e9f4ff;}
@@ -364,6 +404,39 @@
     margin:12px 0 10px;
   }
   .menu-actions .ui-btn{min-width:160px}
+  .arcade-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:12px;
+    margin:12px 0;
+  }
+  .arcade-card{
+    background:#0e1727;
+    border:1px solid #1f365a;
+    border-radius:12px;
+    padding:12px;
+    box-shadow:0 12px 28px #0008;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+  .arcade-card h3{
+    margin:0;
+    font:800 18px/1.2 'Barlow',system-ui;
+    color:#9dc6ff;
+  }
+  .arcade-card p{
+    margin:0;
+    color:#c9d9ff;
+    font:500 14px/1.4 'Barlow',system-ui;
+  }
+  .arcade-meta{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    font:700 12px 'Barlow',system-ui;
+    color:#8fa5c8;
+  }
   .tutorial-panel{
     background:rgba(7,12,24,0.94);
     border:1px solid #20365c;
@@ -505,6 +578,10 @@
           <span class="mode-tag">PvP LAN / WiFi</span>
           <span class="mode-copy">Conecta dos dispositivos en la misma red.</span>
         </button>
+        <button class="mode-card" id="btnArcade" style="--mode-img: var(--mode-arcade-img);">
+          <span class="mode-tag">Arcade</span>
+          <span class="mode-copy">Reta mini juegos: dominadas, targets y fatality practice.</span>
+        </button>
       </div>
 <div class="menu-description">Elige un modo para saltar a la selección de personajes y entrar al combate en la playa.</div>
       <div class="profile-card" id="profileCard">
@@ -538,6 +615,14 @@
           <div class="profile-stat">
             <div class="profile-stat-value" id="statLanKd">0/0</div>
             <div class="profile-stat-label">K/D LAN</div>
+          </div>
+          <div class="profile-stat">
+            <div class="profile-stat-value" id="statArcadeDom">0</div>
+            <div class="profile-stat-label">Dominadas máx</div>
+          </div>
+          <div class="profile-stat">
+            <div class="profile-stat-value" id="statArcadeTarget">0</div>
+            <div class="profile-stat-label">Targets máx / racha</div>
           </div>
         </div>
         <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
@@ -578,7 +663,47 @@
         <button class="ui-btn low-profile" id="btnOpenTutorial">Tutorial</button>
         <button class="ui-btn low-profile" id="btnToggleFullscreen">Pantalla completa</button>
       </div>
-      <div class="menu-footer">Violin Beach Kombat v1.5 · 4 de diciembre de 2025 · francisco.araya.work@gmail.com</div>
+      <div class="menu-footer">Violin Beach Kombat v1.6 · diciembre de 2025 · francisco.araya.work@gmail.com</div>
+    </div>
+  </div>
+
+  <div class="panel hidden scrollable" id="arcadePanel">
+    <div class="tutorial-hero" style="margin-bottom:4px;">
+      <h1>Modo Arcade</h1>
+      <span class="pill">Mini juegos</span>
+    </div>
+    <p class="menu-description" style="text-align:left;">Entra a micro retos sin malla y enfocados en habilidad individual. Elige tu personaje, marca rachas y guarda tu mejor récord en el perfil.</p>
+    <div class="arcade-grid">
+      <div class="arcade-card">
+        <h3>Dominadas</h3>
+        <p>Mantén la pelota en el aire la mayor cantidad de toques posibles. Se termina tras 5 caídas.</p>
+        <div class="arcade-meta">
+          <span>Timer + contador de toques</span>
+          <span>Racha máxima se guarda en el perfil</span>
+        </div>
+        <button class="ui-btn low-profile" id="btnArcadeDominadas">Jugar dominadas</button>
+      </div>
+      <div class="arcade-card">
+        <h3>Target</h3>
+        <p>Golpea dianas que aparecen aleatoriamente. Al tocar una aparece la siguiente. 5 caídas y termina.</p>
+        <div class="arcade-meta">
+          <span>Cuenta dianas y rachas consecutivas</span>
+          <span>Sin malla, cancha completa</span>
+        </div>
+        <button class="ui-btn low-profile" id="btnArcadeTarget">Jugar target</button>
+      </div>
+      <div class="arcade-card">
+        <h3>Fatality practice</h3>
+        <p>Empieza en Finish Him con un dummy especial. Practica el fatality las veces que quieras.</p>
+        <div class="arcade-meta">
+          <span>Repite fatality en bucle</span>
+          <span>Dummy fuera del roster</span>
+        </div>
+        <button class="ui-btn low-profile" id="btnArcadeFatality">Entrar a fatality practice</button>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+      <button class="ui-btn secondary" id="btnArcadeBack">Volver al menú</button>
     </div>
   </div>
 
@@ -669,9 +794,9 @@
       </div>
       <div class="tutorial-section">
         <h2>Descarga directa (offline)</h2>
-        <p>Descarga el HTML (v1.5) desde el juego para jugar sin navegador o montar el lobby local.</p>
+        <p>Descarga el HTML (v1.6) desde el juego para jugar sin navegador o montar el lobby local.</p>
         <div class="tutorial-download">
-          <input id="tutorialDownloadUrl" type="url" value="https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/refs/heads/main/ViolinBeachKombat/Violin_Beach_Kombat%28v1.5%29.html" />
+          <input id="tutorialDownloadUrl" type="url" value="https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/refs/heads/main/ViolinBeachKombat/Violin_Beach_Kombat%28v1.6%29.html" />
           <button class="mini-btn" id="btnTutorialDownload">Descargar</button>
           <button class="mini-btn secondary" id="btnTutorialCopy">Copiar link</button>
           <small id="tutorialDownloadStatus"></small>
@@ -738,6 +863,14 @@
       <div class="stats-card">
         <h3>K/D LAN</h3>
         <p id="statLanKd2">0/0</p>
+      </div>
+      <div class="stats-card">
+        <h3>Arcade · Dominadas</h3>
+        <p id="statArcadeDom2">0</p>
+      </div>
+      <div class="stats-card">
+        <h3>Arcade · Targets</h3>
+        <p id="statArcadeTarget2">0</p>
       </div>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -1100,7 +1233,14 @@ const CHAR_DEFAULT_STATS = {
   botKillsTotal: 0,
   best20TimeMs: null,
   lanMatches: 0,
-  fouls: 0
+  fouls: 0,
+  arcadeRuns: 0,
+  arcadeDominadasMax: 0,
+  arcadeDominadasTotal: 0,
+  arcadeTargetHitsMax: 0,
+  arcadeTargetTotal: 0,
+  arcadeTargetStreakMax: 0,
+  arcadeFatalities: 0
 };
 
 function genUserId(){
@@ -1120,14 +1260,16 @@ function createBaseProgress(){
     version: PROGRESS_VERSION,
     user: { id: genUserId(), name: 'Jugador' },
   stats: {
-    matches: { total:0, local:0, bot:0, lan:0 },
+    matches: { total:0, local:0, bot:0, lan:0, arcade:0 },
     totalHits: 0,
     hitsByChar: {},
     perChar: {},
     timePlayedMs: 0,
     botKillsTotal: 0,
     lanKd: { wins:0, losses:0 },
-    totalFatalities: 0
+    totalFatalities: 0,
+    totalFouls: 0,
+    arcade: { runs:0, dominadasMax:0, dominadasTotal:0, targetHitsMax:0, targetTotal:0, targetStreakMax:0, fatalityPractice:0 }
   },
   badges: [],
   skins: [],
@@ -1143,7 +1285,7 @@ function normalizeProgress(data, base = createBaseProgress()){
   if(!merged.user.id) merged.user.id = genUserId();
   if(!merged.user.name) merged.user.name = 'Jugador';
   const stats = data?.stats || {};
-  const matches = { total:0, local:0, bot:0, lan:0, ...(stats.matches || {}) };
+  const matches = { total:0, local:0, bot:0, lan:0, arcade:0, ...(stats.matches || {}) };
   merged.stats = {
     ...base.stats,
     ...stats,
@@ -1157,6 +1299,15 @@ function normalizeProgress(data, base = createBaseProgress()){
   if(typeof merged.stats.lanKd.wins !== 'number') merged.stats.lanKd.wins = 0;
   if(typeof merged.stats.lanKd.losses !== 'number') merged.stats.lanKd.losses = 0;
   if(typeof merged.stats.totalFatalities !== 'number') merged.stats.totalFatalities = 0;
+  if(typeof merged.stats.totalFouls !== 'number') merged.stats.totalFouls = 0;
+  const arcadeDefault = { runs:0, dominadasMax:0, dominadasTotal:0, targetHitsMax:0, targetTotal:0, targetStreakMax:0, fatalityPractice:0 };
+  const arcadeStats = { ...arcadeDefault, ...(data?.stats?.arcade || {}) };
+  for(const key of Object.keys(arcadeDefault)){
+    if(typeof arcadeStats[key] !== 'number' || Number.isNaN(arcadeStats[key])){
+      arcadeStats[key] = arcadeDefault[key];
+    }
+  }
+  merged.stats.arcade = arcadeStats;
   for(const [skin, data] of Object.entries(merged.stats.perChar)){
     merged.stats.perChar[skin] = { ...CHAR_DEFAULT_STATS, ...(data || {}) };
     for(const key of Object.keys(CHAR_DEFAULT_STATS)){
@@ -1260,6 +1411,9 @@ function addFoulStat(skin){
   const entry = ensureCharStats(skin);
   if(!entry) return;
   entry.fouls = (entry.fouls || 0) + 1;
+  if(progress?.stats){
+    progress.stats.totalFouls = (progress.stats.totalFouls || 0) + 1;
+  }
 }
 
 function getSkinLabel(skin){
@@ -1306,29 +1460,84 @@ function getAchFrameStyle(level){
   return ACH_COLORS[level] || null;
 }
 
+function getAchLevelName(level){
+  switch(level){
+    case 1: return 'BRONCE';
+    case 2: return 'HIERRO';
+    case 3: return 'PLATA';
+    case 4: return 'ORO';
+    case 5: return 'PLATINO';
+    case 6: return 'DIAMANTE';
+    case 7: return 'ESMERALDA';
+    case 8: return 'RUBÍ';
+    case 9: return 'DARK';
+    default: return '';
+  }
+}
+
 function getCharAchievementData(stats){
   const s = stats || {};
   const botKills = s.botKillsTotal || 0;
   const best20 = (typeof s.best20TimeMs === 'number') ? s.best20TimeMs : null;
   const lan = s.lanMatches || 0;
   const fatals = s.fatalities || 0;
+  const fouls = s.fouls || 0;
+  const domMax = s.arcadeDominadasMax || 0;
+  const domTotal = s.arcadeDominadasTotal || 0;
+  const targetMax = s.arcadeTargetHitsMax || 0;
+  const targetTotal = s.arcadeTargetTotal || 0;
+  const targetStreak = s.arcadeTargetStreakMax || 0;
+
+  const lines = [];
+  const pushLine = (text, done)=>{ lines.push({ text, done }); };
   let met = 0;
-  if(botKills >= 50) met++;
-  if(botKills >= 100) met++;
-  if(botKills >= 500) met++;
-  if(botKills >= 1000) met++;
-  if(best20 !== null && best20 <= 120000) met++;
-  if(lan >= 5) met++;
-  if(fatals >= 10) met++;
+  const botMilestones = [50,100,500,1000];
+  met += botMilestones.filter(m=>botKills >= m).length;
+  pushLine(`Bots: ${botKills} / 50 / 100 / 500 / 1000`, botKills >= 1000);
+
+  const best20done = best20 !== null && best20 <= 120000;
+  if(best20done) met++;
+  pushLine(`20 bots <2: ${best20 !== null ? formatMsClock(best20) : '--'}`, best20done);
+
+  const landone = lan >= 5;
+  if(landone) met++;
+  pushLine(`LAN: ${lan}/5`, landone);
+
+  const fataldone = fatals >= 10;
+  if(fataldone) met++;
+  pushLine(`Fatalities: ${fatals}/10`, fataldone);
+
+  const foulsDone = fouls >= 50;
+  if(foulsDone) met++;
+  pushLine(`Fouls: ${fouls}/50`, foulsDone);
+
+  const domMaxDone = domMax >= 50;
+  if(domMaxDone) met++;
+  pushLine(`Dominadas seguidas: ${domMax}/50`, domMaxDone);
+
+  const domTotalDone = domTotal >= 500;
+  if(domTotalDone) met++;
+  pushLine(`Dominadas total: ${domTotal}/500`, domTotalDone);
+
+  const targetTotalDone = targetTotal >= 100;
+  if(targetTotalDone) met++;
+  pushLine(`Targets: ${targetTotal}/100`, targetTotalDone);
+
+  const targetStreakDone = targetStreak >= 10;
+  if(targetStreakDone) met++;
+  pushLine(`Targets seguidos: ${targetStreak}/10`, targetStreakDone);
+
   const level = Math.min(met, ACH_COLORS.length - 1);
-  const lines = [
-    `Bots: ${botKills} / 50 / 100 / 500 / 1000`,
-    `20 bots <2: ${best20 !== null ? formatMsClock(best20) : '--'}`,
-    `LAN: ${lan}/5`,
-    `Fatalities: ${fatals}/10`,
-    `Fouls: ${s.fouls || 0}`
-  ];
-  return { level, lines, botKills, best20, lan, fatals, fouls: s.fouls || 0, met };
+  return {
+    level,
+    lines,
+    botKills,
+    best20,
+    lan,
+    fatals,
+    fouls,
+    met
+  };
 }
 
 function unlockAchievement(id){
@@ -1398,6 +1607,47 @@ function applyPostGameStats(winnerKey, elapsedMs=0, context = {}){
   saveProgress(progress);
 }
 
+function applyArcadeProgress(result = {}){
+  if(!progress?.stats) return;
+  const stats = progress.stats;
+  const arcadeDefault = { runs:0, dominadasMax:0, dominadasTotal:0, targetHitsMax:0, targetTotal:0, targetStreakMax:0, fatalityPractice:0 };
+  const arc = { ...arcadeDefault, ...(stats.arcade || {}) };
+  arc.runs = (arc.runs || 0) + 1;
+  if(result.mode === ARCADE_MODES.DOMINADAS){
+    arc.dominadasMax = Math.max(arc.dominadasMax || 0, result.score || 0);
+    arc.dominadasTotal = (arc.dominadasTotal || 0) + (result.score || 0);
+  } else if(result.mode === ARCADE_MODES.TARGET){
+    arc.targetHitsMax = Math.max(arc.targetHitsMax || 0, result.score || 0);
+    arc.targetTotal = (arc.targetTotal || 0) + (result.score || 0);
+    arc.targetStreakMax = Math.max(arc.targetStreakMax || 0, result.bestStreak || 0);
+  } else if(result.mode === ARCADE_MODES.FATALITY){
+    arc.fatalityPractice = (arc.fatalityPractice || 0) + (result.fatalities || 1);
+  }
+  stats.arcade = arc;
+  if(typeof result.elapsedMs === 'number' && result.elapsedMs > 0){
+    stats.timePlayedMs = (stats.timePlayedMs || 0) + result.elapsedMs;
+  }
+  const skin = result.skin;
+  if(skin){
+    const entry = ensureCharStats(skin);
+    if(entry){
+      entry.arcadeRuns = (entry.arcadeRuns || 0) + 1;
+      if(result.mode === ARCADE_MODES.DOMINADAS){
+        entry.arcadeDominadasMax = Math.max(entry.arcadeDominadasMax || 0, result.score || 0);
+        entry.arcadeDominadasTotal = (entry.arcadeDominadasTotal || 0) + (result.score || 0);
+      } else if(result.mode === ARCADE_MODES.TARGET){
+        entry.arcadeTargetHitsMax = Math.max(entry.arcadeTargetHitsMax || 0, result.score || 0);
+        entry.arcadeTargetTotal = (entry.arcadeTargetTotal || 0) + (result.score || 0);
+        entry.arcadeTargetStreakMax = Math.max(entry.arcadeTargetStreakMax || 0, result.bestStreak || 0);
+      } else if(result.mode === ARCADE_MODES.FATALITY){
+        entry.arcadeFatalities = (entry.arcadeFatalities || 0) + (result.fatalities || 1);
+      }
+    }
+  }
+  evaluateAchievements();
+  saveProgress(progress);
+}
+
 /* Utilidades */
 const TAU = Math.PI*2;
 const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
@@ -1437,6 +1687,12 @@ const uiRefs = {
   btnLocalPvp: document.getElementById('btnLocalPvp'),
   btnLocalBot: document.getElementById('btnLocalBot'),
   btnLan: document.getElementById('btnLan'),
+  btnArcade: document.getElementById('btnArcade'),
+  arcadePanel: document.getElementById('arcadePanel'),
+  btnArcadeBack: document.getElementById('btnArcadeBack'),
+  btnArcadeDominadas: document.getElementById('btnArcadeDominadas'),
+  btnArcadeTarget: document.getElementById('btnArcadeTarget'),
+  btnArcadeFatality: document.getElementById('btnArcadeFatality'),
   profileCard: document.getElementById('profileCard'),
   profileName: document.getElementById('profileName'),
   profileId: document.getElementById('profileId'),
@@ -1445,6 +1701,9 @@ const uiRefs = {
   statTimePlayed: document.getElementById('statTimePlayed'),
   statBots: document.getElementById('statBots'),
   statLanKd: document.getElementById('statLanKd'),
+  statArcadeDom: document.getElementById('statArcadeDom'),
+  statArcadeTarget: document.getElementById('statArcadeTarget'),
+  favSkinFrame: document.getElementById('favSkinFrame'),
   favSkinCanvas: document.getElementById('favSkinCanvas'),
   favSkinName: document.getElementById('favSkinName'),
   favSkinMeta: document.getElementById('favSkinMeta'),
@@ -1458,6 +1717,8 @@ const uiRefs = {
   statTimePlayed2: document.getElementById('statTimePlayed2'),
   statBots2: document.getElementById('statBots2'),
   statLanKd2: document.getElementById('statLanKd2'),
+  statArcadeDom2: document.getElementById('statArcadeDom2'),
+  statArcadeTarget2: document.getElementById('statArcadeTarget2'),
   btnStatsBack: document.getElementById('btnStatsBack'),
   btnStatsEncy: document.getElementById('btnStatsEncy'),
   profileExportBox: document.getElementById('profileExportBox'),
@@ -1507,12 +1768,13 @@ const uiRefs = {
 };
 
 const APP_SCENE = { MENU:'menu', NET:'net', SELECT:'select', GAME:'game' };
-const MATCH_MODE = { LOCAL:'local', BOT:'bot', LAN:'lan' };
+const MATCH_MODE = { LOCAL:'local', BOT:'bot', LAN:'lan', ARCADE:'arcade' };
 let appScene = APP_SCENE.MENU;
 let matchMode = MATCH_MODE.LOCAL;
 let netRole = null; // 'host' o 'client'
 let tutorialOpen = false;
 let encyOpen = false;
+let arcadeOpen = false;
 let encyReturnTarget = 'menu';
 let selectionUsedTouch = false;
 let lobbySocket = null;
@@ -1572,6 +1834,40 @@ const net = {
   lastHostStateSent: 0
 };
 
+const ARCADE_MODES = { DOMINADAS:'dominadas', TARGET:'target', FATALITY:'fatality' };
+function createArcadeContext(){
+  return {
+    active: false,
+    mode: null,
+    drops: 0,
+    maxDrops: 5,
+    score: 0,
+    streak: 0,
+    bestStreak: 0,
+    target: null,
+    singlePlayer: true,
+    hideNet: true,
+    freeCourt: true,
+    startMs: 0,
+    ended: false,
+    lastHitAt: 0
+  };
+}
+let arcadeContext = createArcadeContext();
+
+function isArcadeMode(){
+  return matchMode === MATCH_MODE.ARCADE;
+}
+
+function getArcadeModeLabel(mode = arcadeContext.mode){
+  switch(mode){
+    case ARCADE_MODES.DOMINADAS: return 'Arcade: Dominadas';
+    case ARCADE_MODES.TARGET: return 'Arcade: Target';
+    case ARCADE_MODES.FATALITY: return 'Arcade: Fatality practice';
+    default: return 'Arcade';
+  }
+}
+
 let playerNames = { p1:getStoredPlayerName(), p2:'Jugador 2' };
 function setPlayerNames(names = {}){
   if(names.p1){
@@ -1590,12 +1886,14 @@ function resetPlayerNames(){
 function setScene(scene){
   appScene = scene;
   if(lobbyLayer) lobbyLayer.classList.add('hidden');
+  const showArcade = arcadeOpen && scene === APP_SCENE.MENU;
+  if(uiRefs.arcadePanel) uiRefs.arcadePanel.classList.toggle('hidden', !showArcade);
   if(scene === APP_SCENE.MENU){
-    if(tutorialPanel) tutorialPanel.classList.toggle('hidden', !tutorialOpen || encyOpen);
+    if(tutorialPanel) tutorialPanel.classList.toggle('hidden', !tutorialOpen || encyOpen || arcadeOpen);
     if(uiRefs.encyPanel) uiRefs.encyPanel.classList.toggle('hidden', !encyOpen);
     if(uiRefs.statsLayer) uiRefs.statsLayer.classList.add('hidden');
     uiLayer.classList.remove('hidden');
-    menuPanel.classList.toggle('hidden', tutorialOpen || encyOpen);
+    menuPanel.classList.toggle('hidden', tutorialOpen || encyOpen || arcadeOpen);
     lanPanel.classList.add('hidden');
     menuFocusIndex = 0;
     syncMenuFocus();
@@ -1617,6 +1915,8 @@ function setScene(scene){
   if(scene !== APP_SCENE.MENU){
     toggleProfileExport(false);
     toggleProfileImport(false);
+    arcadeOpen = false;
+    if(uiRefs.arcadePanel) uiRefs.arcadePanel.classList.add('hidden');
   }
   syncUiState();
 }
@@ -1626,6 +1926,11 @@ function getActiveMenuButtons(){
   if(appScene === APP_SCENE.MENU){
     if(encyOpen){
       ['btnEncyBack'].forEach(id=>{
+        const el = document.getElementById(id);
+        if(el && !el.disabled) buttons.push(el);
+      });
+    } else if(arcadeOpen){
+      ['btnArcadeBack','btnArcadeDominadas','btnArcadeTarget','btnArcadeFatality'].forEach(id=>{
         const el = document.getElementById(id);
         if(el && !el.disabled) buttons.push(el);
       });
@@ -1640,7 +1945,7 @@ function getActiveMenuButtons(){
         if(el && !el.disabled) buttons.push(el);
       });
     } else {
-      ['btnLocalPvp','btnLocalBot','btnLan','btnOpenTutorial','btnToggleFullscreen','btnEditName','btnExportProgress','btnImportProgress','btnOpenStats'].forEach(id=>{
+      ['btnLocalPvp','btnLocalBot','btnLan','btnArcade','btnOpenTutorial','btnToggleFullscreen','btnEditName','btnExportProgress','btnImportProgress','btnOpenStats'].forEach(id=>{
         const el = document.getElementById(id);
         if(el && !el.disabled) buttons.push(el);
       });
@@ -1723,15 +2028,23 @@ function renderFavoriteSkin(){
   const fav = getFavoriteChar() || { skin: ROSTER[0], stats: CHAR_DEFAULT_STATS };
   const name = fav ? getSkinLabel(fav.skin) : '-';
   const stats = fav?.stats || null;
-   const ach = getCharAchievementData(stats || {});
+    const ach = getCharAchievementData(stats || {});
   const style = getAchFrameStyle(ach.level);
   if(uiRefs.favSkinFrame){
+    uiRefs.favSkinFrame.classList.remove('glow-level-0','glow-level-1','glow-level-2','glow-level-3','glow-level-4','glow-level-5','glow-level-6');
+    uiRefs.favSkinFrame.classList.add(`glow-level-${ach.level || 0}`);
     if(style){
-      uiRefs.favSkinFrame.style.boxShadow = `0 0 0 2px ${style.glow}aa, 0 0 16px ${style.glow}88`;
-      uiRefs.favSkinFrame.style.borderColor = style.glow + '99';
+      const base = style.glow || '#ffffff';
+      const grad = `radial-gradient(circle at 50% 50%, ${hexToRgba(base,0.8)} 0%, ${hexToRgba(base,0.5)} 55%, ${hexToRgba(base,0)} 90%)`;
+      uiRefs.favSkinFrame.style.background = `#0c1422, ${grad}`;
+      uiRefs.favSkinFrame.style.backgroundBlendMode = 'screen';
+      uiRefs.favSkinFrame.style.boxShadow = `0 0 0 2px ${hexToRgba(base,0.95)}, 0 0 32px ${hexToRgba(base,0.8)}, 0 0 60px ${hexToRgba(base,0.55)}`;
+      uiRefs.favSkinFrame.style.borderColor = hexToRgba(base,0.85);
     } else {
       uiRefs.favSkinFrame.style.boxShadow = '0 0 0 1px #1f365a';
       uiRefs.favSkinFrame.style.borderColor = '#1f365a';
+      uiRefs.favSkinFrame.style.background = '#0c1422';
+      uiRefs.favSkinFrame.style.backgroundBlendMode = 'normal';
     }
   }
   uiRefs.favSkinName.textContent = name;
@@ -1742,28 +2055,31 @@ function renderFavoriteSkin(){
   if(uiRefs.favSkinChips){
     uiRefs.favSkinChips.innerHTML = '';
     if(stats){
-      const chips = [
-        { label:`W ${stats.wins || 0}` },
-        { label:`L ${stats.losses || 0}` },
-        { label:`Hab ${stats.abilityUses || 0}` },
-        { label:`Pts ${stats.points || 0}` },
-        { label:`Fatal ${stats.fatalities || 0}` },
-        { label:`Fouls ${stats.fouls || 0}` }
-      ];
-      chips.forEach(ch=>{
-        const span = document.createElement('span');
-        span.className = 'stat-chip';
-        span.textContent = ch.label;
-        uiRefs.favSkinChips.appendChild(span);
-      });
+    const chips = [
+      { label:`W ${stats.wins || 0}` },
+      { label:`L ${stats.losses || 0}` },
+      { label:`Hab ${stats.abilityUses || 0}` },
+      { label:`Pts ${stats.points || 0}` },
+      { label:`Fatal ${stats.fatalities || 0}` },
+      { label:`Fouls ${stats.fouls || 0}` },
+      { label:`Dom ${stats.arcadeDominadasMax || 0}` },
+      { label:`Target ${stats.arcadeTargetHitsMax || 0}/${stats.arcadeTargetStreakMax || 0}` }
+    ];
+    chips.forEach(ch=>{
+      const span = document.createElement('span');
+      span.className = 'stat-chip';
+      span.textContent = ch.label;
+      uiRefs.favSkinChips.appendChild(span);
+    });
     }
   }
   if(uiRefs.favAchProgress){
     uiRefs.favAchProgress.innerHTML = '';
-    ach.lines.forEach(line=>{
+    ach.lines.forEach(lineObj=>{
+      const line = typeof lineObj === 'string' ? { text: lineObj } : (lineObj || {});
       const span = document.createElement('span');
-      span.className = 'stat-chip';
-      span.textContent = line;
+      span.className = 'stat-chip' + (line.done ? ' achieved' : '');
+      span.textContent = line.text || line;
       uiRefs.favAchProgress.appendChild(span);
     });
   }
@@ -1820,7 +2136,9 @@ function renderCharStatsList(){
     chips.className = 'char-stat-grid';
     const chipData = [
       `Hab ${entry.stats.abilityUses || 0}`,
-      `Fatal ${entry.stats.fatalities || 0}`
+      `Fatal ${entry.stats.fatalities || 0}`,
+      `Dom ${entry.stats.arcadeDominadasMax || 0}`,
+      `Target ${entry.stats.arcadeTargetHitsMax || 0}/${entry.stats.arcadeTargetStreakMax || 0}`
     ];
     chipData.forEach(txt=>{
       const span = document.createElement('span');
@@ -1833,6 +2151,89 @@ function renderCharStatsList(){
     row.appendChild(chips);
     list.appendChild(row);
   });
+}
+
+// Render de favorito con glow y nivel coloreado (override)
+function renderFavoriteSkin(){
+  if(!uiRefs.favSkinName || !uiRefs.favSkinMeta) return;
+  const fav = getFavoriteChar() || { skin: ROSTER[0], stats: CHAR_DEFAULT_STATS };
+  const name = fav ? getSkinLabel(fav.skin) : '-';
+  const stats = fav?.stats || null;
+  const ach = getCharAchievementData(stats || {});
+  const style = getAchFrameStyle(ach.level);
+  const levelName = getAchLevelName(ach.level);
+
+  if(uiRefs.favSkinFrame){
+    const frame = uiRefs.favSkinFrame;
+    frame.className = `skin-frame glow-level-${ach.level || 0}`;
+    if(style){
+      const base = style.glow || '#ffffff';
+      const grad = `radial-gradient(circle at 50% 50%, ${hexToRgba(base,0.8)} 0%, ${hexToRgba(base,0.5)} 55%, ${hexToRgba(base,0)} 90%)`;
+      frame.style.background = `#0c1422, ${grad}`;
+      frame.style.backgroundBlendMode = 'screen';
+      frame.style.boxShadow = `0 0 0 2px ${hexToRgba(base,0.95)}, 0 0 32px ${hexToRgba(base,0.8)}, 0 0 60px ${hexToRgba(base,0.55)}`;
+      frame.style.borderColor = hexToRgba(base,0.85);
+    } else {
+      frame.style.boxShadow = '0 0 0 1px #1f365a';
+      frame.style.borderColor = '#1f365a';
+      frame.style.background = '#0c1422';
+      frame.style.backgroundBlendMode = 'normal';
+    }
+  }
+
+  if(levelName && style?.glow){
+    uiRefs.favSkinName.innerHTML = `${name} - <span style="color:${style.glow};">${levelName}</span>`;
+  } else {
+    uiRefs.favSkinName.textContent = name;
+  }
+  uiRefs.favSkinMeta.textContent = stats
+    ? `${stats.matches || 0} partidas · ${stats.wins || 0} victorias · Nivel ${ach.level}`
+    : 'Aún sin partidas';
+
+  if(uiRefs.favSkinChips){
+    uiRefs.favSkinChips.innerHTML = '';
+    if(stats){
+      const chips = [
+        { label:`W ${stats.wins || 0}` },
+        { label:`L ${stats.losses || 0}` },
+        { label:`Hab ${stats.abilityUses || 0}` },
+        { label:`Pts ${stats.points || 0}` },
+        { label:`Fatal ${stats.fatalities || 0}` },
+        { label:`Fouls ${stats.fouls || 0}` },
+        { label:`Dom ${stats.arcadeDominadasMax || 0}` },
+        { label:`Target ${stats.arcadeTargetHitsMax || 0}/${stats.arcadeTargetStreakMax || 0}` }
+      ];
+      chips.forEach(ch=>{
+        const span = document.createElement('span');
+        span.className = 'stat-chip';
+        span.textContent = ch.label;
+        uiRefs.favSkinChips.appendChild(span);
+      });
+    }
+  }
+
+  if(uiRefs.favAchProgress){
+    uiRefs.favAchProgress.innerHTML = '';
+    ach.lines.forEach(lineObj=>{
+      const line = typeof lineObj === 'string' ? { text: lineObj } : (lineObj || {});
+      const span = document.createElement('span');
+      span.className = 'stat-chip' + (line.done ? ' achieved' : '');
+      span.textContent = line.text || line;
+      uiRefs.favAchProgress.appendChild(span);
+    });
+  }
+
+  const cvs = uiRefs.favSkinCanvas;
+  if(cvs){
+    const ctx = cvs.getContext('2d');
+    ctx.clearRect(0,0,cvs.width,cvs.height);
+    if(fav){
+      ctx.save();
+      ctx.translate(cvs.width/2, cvs.height/2 + 6);
+      drawSkin(ctx, fav.skin, { r: Math.min(cvs.width, cvs.height) * 0.32, player:{ skin: fav.skin } });
+      ctx.restore();
+    }
+  }
 }
 
 function syncProfileUi(noteText){
@@ -1848,11 +2249,19 @@ function syncProfileUi(noteText){
     const kdLan = progress?.stats?.lanKd || { wins:0, losses:0 };
     const kdVal = kdLan.losses > 0 ? (kdLan.wins / kdLan.losses).toFixed(2) : (kdLan.wins > 0 ? '∞' : '0.00');
     if(uiRefs.statLanKd) uiRefs.statLanKd.textContent = `${kdLan.wins}/${kdLan.losses} (${kdVal})`;
+    const arcadeStats = progress?.stats?.arcade || {};
+    const domMax = arcadeStats.dominadasMax || 0;
+    const targetMax = arcadeStats.targetHitsMax || 0;
+    const targetStreak = arcadeStats.targetStreakMax || 0;
+    if(uiRefs.statArcadeDom) uiRefs.statArcadeDom.textContent = domMax;
+    if(uiRefs.statArcadeTarget) uiRefs.statArcadeTarget.textContent = `${targetMax}/${targetStreak}`;
     // Stats panel mirrors
     if(uiRefs.statTotal2) uiRefs.statTotal2.textContent = matches.total ?? 0;
     if(uiRefs.statTimePlayed2) uiRefs.statTimePlayed2.textContent = `${timeHours}h`;
     if(uiRefs.statBots2) uiRefs.statBots2.textContent = progress?.stats?.botKillsTotal || 0;
     if(uiRefs.statLanKd2) uiRefs.statLanKd2.textContent = `${kdLan.wins}/${kdLan.losses} (${kdVal})`;
+    if(uiRefs.statArcadeDom2) uiRefs.statArcadeDom2.textContent = domMax;
+    if(uiRefs.statArcadeTarget2) uiRefs.statArcadeTarget2.textContent = `${targetMax}/${targetStreak}`;
     if(noteText){
       setProfileNote(noteText);
     } else if(uiRefs.profileNote && !uiRefs.profileNote.textContent){
@@ -1865,6 +2274,87 @@ function syncProfileUi(noteText){
     syncLobbyNameFromProfile();
   }catch(err){
     console.warn('No pude actualizar el perfil', err);
+  }
+}
+
+// Override renderFavoriteSkin para asegurar glow y texto de nivel coloreado
+function renderFavoriteSkin(){
+  if(!uiRefs.favSkinName || !uiRefs.favSkinMeta) return;
+  const fav = getFavoriteChar() || { skin: ROSTER[0], stats: CHAR_DEFAULT_STATS };
+  const name = fav ? getSkinLabel(fav.skin) : '-';
+  const stats = fav?.stats || null;
+  const ach = getCharAchievementData(stats || {});
+  const style = getAchFrameStyle(ach.level);
+  const levelName = getAchLevelName(ach.level);
+  if(uiRefs.favSkinFrame){
+    const frame = uiRefs.favSkinFrame;
+    frame.className = `skin-frame glow-level-${ach.level || 0}`;
+    if(style){
+      const base = style.glow || '#ffffff';
+      const grad = `radial-gradient(circle at 50% 50%, ${hexToRgba(base,0.8)} 0%, ${hexToRgba(base,0.5)} 55%, ${hexToRgba(base,0)} 90%)`;
+      frame.style.background = `#0c1422, ${grad}`;
+      frame.style.backgroundBlendMode = 'screen';
+      frame.style.boxShadow = `0 0 0 2px ${hexToRgba(base,0.95)}, 0 0 32px ${hexToRgba(base,0.8)}, 0 0 60px ${hexToRgba(base,0.55)}`;
+      frame.style.borderColor = hexToRgba(base,0.85);
+    } else {
+      frame.style.boxShadow = '0 0 0 1px #1f365a';
+      frame.style.borderColor = '#1f365a';
+      frame.style.background = '#0c1422';
+      frame.style.backgroundBlendMode = 'normal';
+    }
+  }
+  if(levelName && style?.glow){
+    uiRefs.favSkinName.innerHTML = `${name} - <span style="color:${style.glow};">${levelName}</span>`;
+  } else {
+    uiRefs.favSkinName.textContent = name;
+  }
+  uiRefs.favSkinMeta.textContent = stats
+    ? `${stats.matches || 0} partidas · ${stats.wins || 0} victorias · Nivel ${ach.level}`
+    : 'Aún sin partidas';
+
+  if(uiRefs.favSkinChips){
+    uiRefs.favSkinChips.innerHTML = '';
+    if(stats){
+      const chips = [
+        { label:`W ${stats.wins || 0}` },
+        { label:`L ${stats.losses || 0}` },
+        { label:`Hab ${stats.abilityUses || 0}` },
+        { label:`Pts ${stats.points || 0}` },
+        { label:`Fatal ${stats.fatalities || 0}` },
+        { label:`Fouls ${stats.fouls || 0}` },
+        { label:`Dom ${stats.arcadeDominadasMax || 0}` },
+        { label:`Target ${stats.arcadeTargetHitsMax || 0}/${stats.arcadeTargetStreakMax || 0}` }
+      ];
+      chips.forEach(ch=>{
+        const span = document.createElement('span');
+        span.className = 'stat-chip';
+        span.textContent = ch.label;
+        uiRefs.favSkinChips.appendChild(span);
+      });
+    }
+  }
+
+  if(uiRefs.favAchProgress){
+    uiRefs.favAchProgress.innerHTML = '';
+    ach.lines.forEach(lineObj=>{
+      const line = typeof lineObj === 'string' ? { text: lineObj } : (lineObj || {});
+      const span = document.createElement('span');
+      span.className = 'stat-chip' + (line.done ? ' achieved' : '');
+      span.textContent = line.text || line;
+      uiRefs.favAchProgress.appendChild(span);
+    });
+  }
+
+  const cvs = uiRefs.favSkinCanvas;
+  if(cvs){
+    const ctx = cvs.getContext('2d');
+    ctx.clearRect(0,0,cvs.width,cvs.height);
+    if(fav){
+      ctx.save();
+      ctx.translate(cvs.width/2, cvs.height/2 + 6);
+      drawSkin(ctx, fav.skin, { r: Math.min(cvs.width, cvs.height) * 0.32, player:{ skin: fav.skin } });
+      ctx.restore();
+    }
   }
 }
 
@@ -1952,12 +2442,27 @@ function recordCharacterOutcome(winnerKey, options = {}){
 
 function registerMatchPlayed(){
   if(!progress || !progress.stats) return;
-  const key = (matchMode === MATCH_MODE.BOT) ? 'bot' : (matchMode === MATCH_MODE.LAN ? 'lan' : 'local');
-  const matches = progress.stats.matches || { total:0, local:0, bot:0, lan:0 };
+  const key = (matchMode === MATCH_MODE.BOT) ? 'bot' : (matchMode === MATCH_MODE.LAN ? 'lan' : (matchMode === MATCH_MODE.ARCADE ? 'arcade' : 'local'));
+  const matches = progress.stats.matches || { total:0, local:0, bot:0, lan:0, arcade:0 };
   matches[key] = (matches[key] || 0) + 1;
   matches.total = (matches.total || 0) + 1;
   progress.stats.matches = matches;
   saveProgress(progress);
+}
+
+function openArcadeMenu(){
+  tutorialOpen = false;
+  encyOpen = false;
+  arcadeOpen = true;
+  setScene(APP_SCENE.MENU);
+  badge.innerText = 'Arcade';
+}
+
+function closeArcadeMenu(){
+  arcadeOpen = false;
+  if(uiRefs.arcadePanel) uiRefs.arcadePanel.classList.add('hidden');
+  setScene(APP_SCENE.MENU);
+  badge.innerText = 'Selecciona modo';
 }
 
 function showLobbyPanel(show){
@@ -1979,6 +2484,7 @@ function showLobbyPanel(show){
 function openTutorial(){
   tutorialOpen = true;
   encyOpen = false;
+   arcadeOpen = false;
   if(uiRefs.statsLayer) uiRefs.statsLayer.classList.add('hidden');
   encyReturnTarget = 'menu';
   if(uiRefs.encyPanel) uiRefs.encyPanel.classList.add('hidden');
@@ -1991,6 +2497,7 @@ function openTutorial(){
 function closeTutorial(){
   tutorialOpen = false;
   encyOpen = false;
+  arcadeOpen = false;
   if(uiRefs.statsLayer) uiRefs.statsLayer.classList.add('hidden');
   if(uiRefs.encyPanel) uiRefs.encyPanel.classList.add('hidden');
   if(uiRefs.btnOpenEncy) uiRefs.btnOpenEncy.textContent = 'Abrir enciclopedia de personajes';
@@ -2002,6 +2509,7 @@ function closeTutorial(){
 function openEncy(target='menu'){
   encyReturnTarget = target;
   encyOpen = true;
+  arcadeOpen = false;
   tutorialOpen = false;
   if(uiRefs.statsLayer) uiRefs.statsLayer.classList.add('hidden');
   if(tutorialPanel) tutorialPanel.classList.add('hidden');
@@ -2014,6 +2522,7 @@ function openEncy(target='menu'){
 
 function closeEncy(){
   encyOpen = false;
+  arcadeOpen = false;
   if(uiRefs.encyPanel) uiRefs.encyPanel.classList.add('hidden');
    if(uiRefs.btnOpenEncy) uiRefs.btnOpenEncy.textContent = 'Abrir enciclopedia de personajes';
   if(encyReturnTarget === 'tutorial'){
@@ -2035,6 +2544,8 @@ function openStats(){
   if(menuPanel) menuPanel.classList.add('hidden');
   if(tutorialPanel) tutorialPanel.classList.add('hidden');
   if(uiRefs.encyPanel) uiRefs.encyPanel.classList.add('hidden');
+  arcadeOpen = false;
+  if(uiRefs.arcadePanel) uiRefs.arcadePanel.classList.add('hidden');
   encyOpen = false;
   tutorialOpen = false;
   encyReturnTarget = 'menu';
@@ -2115,7 +2626,7 @@ async function triggerTutorialDownload(){
     const objectUrl = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = objectUrl;
-    a.download = url.split('/').pop() || 'Violin_Beach_Kombat_v1.5.html';
+    a.download = url.split('/').pop() || 'Violin_Beach_Kombat_v1.6.html';
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -2126,7 +2637,7 @@ async function triggerTutorialDownload(){
     // Fallback: intento directo con atributo download
     const a = document.createElement('a');
     a.href = url;
-    a.download = url.split('/').pop() || 'Violin_Beach_Kombat_v1.5.html';
+    a.download = url.split('/').pop() || 'Violin_Beach_Kombat_v1.6.html';
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -2239,10 +2750,11 @@ function renderEncyCards(){
     body.appendChild(statsBox);
     const progress = document.createElement('div');
     progress.className = 'char-stat-grid';
-    ach.lines.forEach(line=>{
+    ach.lines.forEach(lineObj=>{
+      const line = typeof lineObj === 'string' ? { text: lineObj } : (lineObj || {});
       const span = document.createElement('span');
-      span.className = 'stat-chip';
-      span.textContent = line;
+      span.className = 'stat-chip' + (line.done ? ' achieved' : '');
+      span.textContent = line.text || line;
       progress.appendChild(span);
     });
     const details = document.createElement('div');
@@ -2974,6 +3486,69 @@ function startLocalMode(mode){
   badge.innerText = getModeLabel();
 }
 
+function resetArcadeState(){
+  arcadeContext = createArcadeContext();
+}
+
+function exitArcadeToMenu(){
+  arcadeContext.active = false;
+  arcadeContext.ended = true;
+  resetArcadeState();
+  arcadeOpen = false;
+  if(uiRefs.arcadePanel) uiRefs.arcadePanel.classList.add('hidden');
+  matchMode = MATCH_MODE.LOCAL;
+  useBot = false;
+  botActive = false;
+  netRole = null;
+  clearMatchTimer();
+  setScene(APP_SCENE.MENU);
+  gameState = STATE.SELECT;
+  badge.innerText = 'Selecciona modo';
+  stopSong(MUSIC.mkmusic);
+  stopSong(MUSIC.suddendeathmusic);
+}
+
+function returnToArcadeSelection(){
+  matchMode = MATCH_MODE.ARCADE;
+  gameState = STATE.SELECT;
+  setArcadeSelectionDefaults();
+  setScene(APP_SCENE.SELECT);
+  badge.innerText = getArcadeModeLabel();
+  clearMatchTimer();
+  clearTimeout(serveTimeout);
+  clearTimeout(ballGroundTimeout);
+  serveTimeout = null;
+  ballGroundTimeout = null;
+  if(net.worldTimer){ clearInterval(net.worldTimer); net.worldTimer = null; }
+  stopSong(MUSIC.mkmusic);
+  stopSong(MUSIC.suddendeathmusic);
+}
+
+function startArcadeMode(mode){
+  resetArcadeState();
+  arcadeContext.mode = mode || ARCADE_MODES.DOMINADAS;
+  arcadeContext.singlePlayer = true;
+  arcadeContext.hideNet = true;
+  arcadeContext.freeCourt = true;
+  arcadeContext.maxDrops = arcadeContext.mode === ARCADE_MODES.FATALITY ? Infinity : 5;
+  matchMode = MATCH_MODE.ARCADE;
+  useBot = false;
+  botActive = false;
+  netRole = null;
+  resetPlayerNames();
+  setArcadeSelectionDefaults();
+  if(arcadeContext.mode === ARCADE_MODES.FATALITY){
+    setPlayerNames({ p2:'Dummy' });
+  } else {
+    setPlayerNames({ p2:'Arcade' });
+  }
+  resetSelectionState();
+  setScene(APP_SCENE.SELECT);
+  gameState = STATE.SELECT;
+  arcadeOpen = false;
+  badge.innerText = getArcadeModeLabel();
+}
+
 function openLanMenu(){
   matchMode = MATCH_MODE.LAN;
   useBot = false;
@@ -2990,6 +3565,7 @@ function getModeLabel(){
     const side = (netRole === 'host') ? 'Host (P1 azul)' : (netRole === 'client' ? 'Invitado (P2 rojo)' : 'LAN');
     return `Modo: ${side}`;
   }
+  if(matchMode === MATCH_MODE.ARCADE) return getArcadeModeLabel();
   if(matchMode === MATCH_MODE.BOT) return 'Modo: Supervivencia Bot';
   return 'Modo: 1 vs 1';
 }
@@ -2997,6 +3573,11 @@ function getModeLabel(){
 if(uiRefs.btnLocalPvp) uiRefs.btnLocalPvp.addEventListener('click', ()=>startLocalMode('pvp'));
 if(uiRefs.btnLocalBot) uiRefs.btnLocalBot.addEventListener('click', ()=>startLocalMode('bot'));
 if(uiRefs.btnLan) uiRefs.btnLan.addEventListener('click', ()=>openLanMenu());
+if(uiRefs.btnArcade) uiRefs.btnArcade.addEventListener('click', ()=>openArcadeMenu());
+if(uiRefs.btnArcadeBack) uiRefs.btnArcadeBack.addEventListener('click', ()=>closeArcadeMenu());
+if(uiRefs.btnArcadeDominadas) uiRefs.btnArcadeDominadas.addEventListener('click', ()=>startArcadeMode(ARCADE_MODES.DOMINADAS));
+if(uiRefs.btnArcadeTarget) uiRefs.btnArcadeTarget.addEventListener('click', ()=>startArcadeMode(ARCADE_MODES.TARGET));
+if(uiRefs.btnArcadeFatality) uiRefs.btnArcadeFatality.addEventListener('click', ()=>startArcadeMode(ARCADE_MODES.FATALITY));
 if(uiRefs.btnOpenStats) uiRefs.btnOpenStats.addEventListener('click', ()=>openStats());
 if(uiRefs.btnStatsBack) uiRefs.btnStatsBack.addEventListener('click', ()=>closeStats());
 if(uiRefs.btnStatsEncy) uiRefs.btnStatsEncy.addEventListener('click', ()=>{ closeStats(); openEncy('menu'); });
@@ -3295,6 +3876,10 @@ function requestPauseToggle(){
 }
 
 function requestEscapeToMenu(){
+  if(matchMode === MATCH_MODE.ARCADE){
+    returnToArcadeSelection();
+    return;
+  }
   if(matchMode === MATCH_MODE.LAN && netRole === 'client'){
     sendNet({ type:'escape', request:true });
     return;
@@ -3307,6 +3892,10 @@ function requestEscapeToMenu(){
 
 function exitSelectionToMenu(){
   if(gameState !== STATE.SELECT || appScene !== APP_SCENE.SELECT) return;
+  if(matchMode === MATCH_MODE.ARCADE){
+    exitArcadeToMenu();
+    return;
+  }
   if(matchMode === MATCH_MODE.LAN){
     resetNetState();
   }
@@ -3324,6 +3913,10 @@ function exitSelectionToMenu(){
 }
 
 function returnToSelectLocal(){
+  if(matchMode === MATCH_MODE.ARCADE){
+    exitArcadeToMenu();
+    return;
+  }
   gameState = STATE.SELECT;
   setScene(APP_SCENE.SELECT);
   stopSong(MUSIC.mkmusic);
@@ -3918,17 +4511,37 @@ const ACHIEVEMENTS = [
   { id:'bots20fast', label:'Speed Bot', desc:'20 bots en < 2:00', check:(s,ctx)=> (ctx?.botKillsRun || 0) >= 20 && (ctx?.elapsedMs || 0) <= 120000 },
   { id:'lan5', label:'LAN 5', desc:'Juega 5 partidas LAN', check:(s,ctx)=> ((s.matches?.lan || 0) + (ctx?.lanPlayed || 0)) >= 5 },
   { id:'fatal10', label:'Fatalist', desc:'10 fatalities', check:(s,ctx)=> ((s.totalFatalities || 0) + (ctx?.fatalityCount || 0)) >= 10 },
+  { id:'foul50', label:'Foul Master', desc:'50 faltas', check:(s)=> (s.totalFouls || 0) >= 50 },
+  { id:'arcDom50', label:'Dominadas x50', desc:'50 dominadas seguidas', check:(s)=> (s.arcade?.dominadasMax || 0) >= 50 },
+  { id:'arcDom500', label:'Dominadas 500', desc:'500 dominadas en total', check:(s)=> (s.arcade?.dominadasTotal || 0) >= 500 },
+  { id:'arcTarget100', label:'Target Hunter', desc:'100 targets en total', check:(s)=> (s.arcade?.targetTotal || 0) >= 100 },
+  { id:'arcTarget10streak', label:'Target Streak', desc:'10 targets seguidos', check:(s)=> (s.arcade?.targetStreakMax || 0) >= 10 },
 ];
 // Tint al ~30% para mezclar 30% color de logro + 70% fondo base en selección (ajusta el alpha si quieres otro mix).
 const ACH_COLORS = [
   null,
-  { tint:'rgba(205,138,58,0.3)', glow:'#cd8a3a' },   // bronce
-  { tint:'rgba(176,190,197,0.3)', glow:'#d0d7dc' },  // plata
-  { tint:'rgba(255,214,102,0.3)', glow:'#ffd666' },  // oro
-  { tint:'rgba(120,235,255,0.3)', glow:'#78ebff' },  // diamante
-  { tint:'rgba(255,90,90,0.3)', glow:'#ff5a5a' },    // rubí
-  { tint:'rgba(120,62,156,0.3)', glow:'#a765ff' }    // obsidiana/violeta
+  { tint:'rgba(205,138,58,0.30)', glow:'#cd8a3a' },  // bronce
+  { tint:'rgba(80,80,80,0.32)',   glow:'#8a8a8a' },  // hierro
+  { tint:'rgba(176,190,197,0.30)', glow:'#d0d7dc' }, // plata
+  { tint:'rgba(255,214,102,0.30)', glow:'#ffd666' }, // oro
+  { tint:'rgba(245,245,245,0.32)', glow:'#ffffff' }, // platino
+  { tint:'rgba(120,235,255,0.30)', glow:'#78ebff' }, // diamante
+  { tint:'rgba(142,245,182,0.30)', glow:'#7be0a0' }, // esmeralda
+  { tint:'rgba(255,90,90,0.30)',   glow:'#ff5a5a' }, // rubí
+  { tint:'rgba(97,40,199,0.32)',   glow:'#6128c7' }  // dark
 ];
+
+function hexToRgba(hex, alpha=1){
+  if(!hex) return `rgba(255,255,255,${alpha})`;
+  let h = hex.trim();
+  if(h.startsWith('#')) h = h.slice(1);
+  if(h.length === 3) h = h.split('').map(c=>c+c).join('');
+  const num = parseInt(h.slice(0,6),16);
+  const r = (num >> 16) & 255;
+  const g = (num >> 8) & 255;
+  const b = num & 255;
+  return `rgba(${r},${g},${b},${alpha})`;
+}
 
 function scoreToLifeGlobal(myScore, oppScore){
   const base = CONFIG.BASE_POINTS_TO_WIN;
@@ -3961,7 +4574,7 @@ function getLifeSnapshot(){
 
 function resetMatchTimer(){
   matchTimerExpired = false;
-  if(matchMode === MATCH_MODE.BOT){
+  if(matchMode === MATCH_MODE.BOT || matchMode === MATCH_MODE.ARCADE){
     matchTimerMode = 'countup';
     matchTimerMs = 0;
   } else {
@@ -4156,7 +4769,7 @@ const ABILITIES = {
     cooldown: 30,
     staminaCost: 50,
     description: 'Regenera al perder vida y duplica permanentemente su velocidad crítica hasta el final del partido.',
-    staminaProfile: { max: 100, regen: 10, start: 0 },
+    staminaProfile: { max: 100, regen: 10, start: 50 },
     dashMultiplier: 2,
     dashDuration: 5,
     dashPermanent: true,
@@ -6103,6 +6716,7 @@ function spawnHydraClone(player, options = {}){
 
 function updateHydraClones(dt){
   const gy = CONFIG.GROUND_Y;
+  const allowFreeCourt = isArcadeMode() && (arcadeContext.mode === ARCADE_MODES.DOMINADAS || arcadeContext.mode === ARCADE_MODES.TARGET);
   const groups = { L: [], R: [] };
   for(const clone of hydraClones){
     const side = clone.ownerSide || clone.side;
@@ -6129,9 +6743,9 @@ function updateHydraClones(dt){
     clone.wanderPhase += dt * 1.5;
     const wander = Math.sin(clone.wanderPhase + idx * 0.5) * 12;
 
-    const baseTarget = (clone.side === 'L')
-      ? clamp(ball.x - 40, 60, CONFIG.NET_X - 50)
-      : clamp(ball.x + 40, CONFIG.NET_X + 50, W - 60);
+    const clampMin = allowFreeCourt ? 60 : (clone.ownerSide === 'L' ? 60 : CONFIG.NET_X + 40);
+    const clampMax = allowFreeCourt ? W - 60 : (clone.ownerSide === 'L' ? CONFIG.NET_X - 40 : W - 60);
+    const baseTarget = clamp(ball.x + (clone.side === 'L' ? -40 : 40), clampMin, clampMax);
     const targetX = baseTarget + spread + wander;
     const dir = targetX - clone.x;
     clone.vx = clamp(dir * 4, -clone.stats.speed, clone.stats.speed);
@@ -6147,9 +6761,7 @@ function updateHydraClones(dt){
     clone.x += clamp(clone.vx, -clone.stats.maxVx, clone.stats.maxVx) * dt;
     clone.y += clone.vy * dt;
 
-    const minX = (clone.side === 'L')? 60 : CONFIG.NET_X+30;
-    const maxX = (clone.side === 'L')? CONFIG.NET_X-30 : W-60;
-    clone.x = clamp(clone.x, minX, maxX);
+    clone.x = clamp(clone.x, clampMin, clampMax);
 
     const gyClone = gy - clone.r;
     if(clone.y > gyClone){
@@ -6185,11 +6797,23 @@ function spawnDirectorClone(player){
   const skin = (player.skin === 'mystery') ? 'mysteryShade' : 'director';
   directorClones.push({
     ownerSide: player.side,
-    side: target.side,
+    side: player.side,
+    isClone: true,
+    vx: 0,
+    vy: 0,
     expires: performance.now() + 4000,
     x: W - player.x,
     y: player.y,
     r: player.r,
+    hitboxScale: player.hitboxScale,
+    hitboxScaleX: player.hitboxScaleX,
+    hitboxScaleY: player.hitboxScaleY,
+    stats: {
+      speed: player.stats?.speed ?? CONFIG.PLAYER_SPEED,
+      jump: player.stats?.jump ?? CONFIG.PLAYER_JUMP_V,
+      maxVx: player.stats?.maxVx ?? CONFIG.PLAYER_MAX_VX,
+      impulse: player.stats?.impulse ?? CONFIG.PLAYER_IMPULSE
+    },
     skin
   });
 }
@@ -6219,8 +6843,8 @@ function updateDirectorClones(dt){
     }
     //const mirrorX = W - owner.x;
     //const mirrorX = W/2 + owner.x;
-    const minX = (clone.side === 'L') ? 60 : CONFIG.NET_X + 40;
-    const maxX = (clone.side === 'L') ? CONFIG.NET_X - 40 : W - 60;
+    const minX = 60;
+    const maxX = W - 60;
     clone.x = clamp(mirrorX, minX, maxX);
     clone.y = clamp(owner.y, 60, CONFIG.GROUND_Y - owner.r);
     clone.r = owner.r;
@@ -6240,8 +6864,8 @@ function resolveDirectorCloneCollision(clone, enemy){
     const ny = dy / dist;
     enemy.x += nx * overlap;
     enemy.y += ny * overlap;
-    const minX = (enemy.side === 'L') ? 60 : CONFIG.NET_X + 40;
-    const maxX = (enemy.side === 'L') ? CONFIG.NET_X - 40 : W - 60;
+    const minX = 60;
+    const maxX = W - 60;
     enemy.x = clamp(enemy.x, minX, maxX);
     const gy = CONFIG.GROUND_Y - enemy.r;
     enemy.y = clamp(enemy.y, 60, gy);
@@ -7485,6 +8109,10 @@ function resetRally(servingTo='L'){
 
 function gameOver(who, options = {}){
   if(finishState.active) return;
+  if(matchMode === MATCH_MODE.ARCADE){
+    endArcadeRun(options.reason || 'end');
+    return;
+  }
   if(serveTimeout){ clearTimeout(serveTimeout); serveTimeout = null; }
   if(ballGroundTimeout){ clearTimeout(ballGroundTimeout); ballGroundTimeout = null; }
   ball.groundScheduled = false;
@@ -7519,6 +8147,135 @@ function gameOver(who, options = {}){
   }
   matchTimerMs = null;
   resetScoreStreaks();
+  syncUiState();
+}
+
+/* Arcade helpers */
+function resetArcadeBall(options = {}){
+  if(serveTimeout){ clearTimeout(serveTimeout); serveTimeout = null; }
+  if(ballGroundTimeout){ clearTimeout(ballGroundTimeout); ballGroundTimeout = null; }
+  ball.groundScheduled = false;
+  ball.fireEffect = null;
+  ball.waitServe = false;
+  ball.servingSide = null;
+  const margin = 70;
+  const targetX = clamp(options.x ?? (p1?.x || W/2), margin, W - margin);
+  ball.x = targetX;
+  ball.y = options.y ?? CONFIG.SERVE_Y;
+  const spread = options.spread ?? 260;
+  ball.vx = options.vx ?? ((Math.random() - 0.5) * spread);
+  ball.vy = options.vy ?? -720;
+  ball.prevX = ball.x;
+  ball.prevY = ball.y;
+}
+
+function spawnArcadeTarget(){
+  const marginX = 110;
+  const minY = 140;
+  const maxY = CONFIG.GROUND_Y - 140;
+  const x = Math.random() * (W - marginX * 2) + marginX;
+  const y = Math.random() * (maxY - minY) + minY;
+  arcadeContext.target = { x, y, r: 26 + Math.random() * 8, createdAt: performance.now() };
+}
+
+function handleArcadeHit(player){
+  if(!arcadeContext.active) return;
+  if(arcadeContext.mode === ARCADE_MODES.DOMINADAS){
+    arcadeContext.score = (arcadeContext.score || 0) + 1;
+    arcadeContext.streak = (arcadeContext.streak || 0) + 1;
+    arcadeContext.bestStreak = Math.max(arcadeContext.bestStreak || 0, arcadeContext.streak);
+  }
+  arcadeContext.lastHitAt = performance.now();
+}
+
+function checkArcadeTargetHit(){
+  if(!arcadeContext.active || arcadeContext.mode !== ARCADE_MODES.TARGET) return;
+  if(!arcadeContext.target){
+    spawnArcadeTarget();
+    return;
+  }
+  const t = arcadeContext.target;
+  const dx = ball.x - t.x;
+  const dy = ball.y - t.y;
+  const dist = Math.hypot(dx, dy);
+  if(dist <= ball.r + t.r){
+    arcadeContext.score = (arcadeContext.score || 0) + 1;
+    arcadeContext.streak = (arcadeContext.streak || 0) + 1;
+    arcadeContext.bestStreak = Math.max(arcadeContext.bestStreak || 0, arcadeContext.streak);
+    spawnArcadeTarget();
+  }
+}
+
+function handleArcadeGroundTouch(){
+  if(!arcadeContext.active) return;
+  if(arcadeContext.mode === ARCADE_MODES.FATALITY){
+    // Reinicia la ventana de fatality si la pelota toca suelo en practice
+    ball.groundScheduled = false;
+    resetArcadeBall({ x: p1?.x ?? W/2, vy: -720, spread: 120 });
+    startArcadeFatalityWindow();
+    return;
+  }
+  arcadeContext.drops = (arcadeContext.drops || 0) + 1;
+  arcadeContext.streak = 0;
+  if(isFinite(arcadeContext.maxDrops) && arcadeContext.drops >= arcadeContext.maxDrops){
+    endArcadeRun('drops');
+    return;
+  }
+  resetArcadeBall({ x: p1?.x, vy: -640, spread: 180 });
+}
+
+function startArcadeFatalityWindow(){
+  resetFinishState();
+  finishState.active = true;
+  finishState.stage = 'intro';
+  finishState.winner = 'p1';
+  finishState.loser = 'p2';
+  finishState.sequenceIndex = 0;
+  finishState.scoreboardSnapshot = { p1:0, p2:0 };
+  freezeFinishPlayer(getPlayerByKey(finishState.loser), { lockGravity:false });
+  if(ballGroundTimeout){ clearTimeout(ballGroundTimeout); ballGroundTimeout = null; }
+  ball.waitServe = true;
+  ball.vx = 0; ball.vy = 0;
+  ball.y = CONFIG.GROUND_Y - ball.r;
+  ball.prevY = ball.y;
+  ball.groundScheduled = true;
+  setFinishOverlay('Finish Him', 1400);
+  badge.innerText = getArcadeModeLabel();
+  scheduleFinishTimer(()=>startFinishServe(), 900);
+  gameState = STATE.FINISH;
+}
+
+function endArcadeRun(reason='end'){
+  if(!arcadeContext.active || arcadeContext.ended) return;
+  arcadeContext.ended = true;
+  const elapsedMs = getMatchElapsedMs();
+  const timeText = formatMsClock(elapsedMs);
+  let summary = '';
+  if(arcadeContext.mode === ARCADE_MODES.DOMINADAS){
+    summary = `Toques: ${arcadeContext.score} · Racha: ${arcadeContext.bestStreak} · Caidas: ${arcadeContext.drops}/${arcadeContext.maxDrops}`;
+  } else if(arcadeContext.mode === ARCADE_MODES.TARGET){
+    summary = `Targets: ${arcadeContext.score} · Racha: ${arcadeContext.bestStreak} · Caidas: ${arcadeContext.drops}/${arcadeContext.maxDrops}`;
+  } else {
+    summary = `Tiempo: ${timeText}`;
+  }
+  window._winnerInfo = {
+    winner: getArcadeModeLabel(),
+    finalScore: `${summary} · Tiempo ${timeText}`,
+    banner: reason === 'drops' ? 'Fin de run' : 'Arcade'
+  };
+  applyArcadeProgress({
+    mode: arcadeContext.mode,
+    score: arcadeContext.score || 0,
+    bestStreak: arcadeContext.bestStreak || 0,
+    drops: arcadeContext.drops || 0,
+    elapsedMs,
+    skin: p1?.skin || null
+  });
+  badge.innerText = '';
+  arcadeContext.active = false;
+  gameState = STATE.GAMEOVER;
+  stopSong(MUSIC.mkmusic);
+  stopSong(MUSIC.suddendeathmusic);
   syncUiState();
 }
 
@@ -7743,6 +8500,20 @@ function startFatalityAnimation(winner){
 
 function finalizeFatalityVictory(){
   if(!finishState.active) return;
+  if(isArcadeMode() && arcadeContext.mode === ARCADE_MODES.FATALITY){
+    arcadeContext.score = (arcadeContext.score || 0) + 1;
+    applyArcadeProgress({
+      mode: ARCADE_MODES.FATALITY,
+      fatalities: 1,
+      elapsedMs: getMatchElapsedMs(),
+      skin: p1?.skin || null
+    });
+    scheduleFinishTimer(()=>{
+      resetFinishState();
+      startArcadeFatalityWindow();
+    }, 900);
+    return;
+  }
   const winnerKey = finishState.winner;
   resetFinishState();
   badge.innerText = '';
@@ -7987,7 +8758,7 @@ if(gameState === STATE.GAMEOVER && (e.code === 'Escape' || e.code === 'KeyS' || 
       exitSelectionToMenu();
       return;
     }
-    if(e.code==='KeyB' && matchMode !== MATCH_MODE.LAN){
+    if(e.code==='KeyB' && matchMode !== MATCH_MODE.LAN && matchMode !== MATCH_MODE.ARCADE){
       useBot=!useBot;
       matchMode = useBot ? MATCH_MODE.BOT : MATCH_MODE.LOCAL;
       botActive = useBot;
@@ -8208,6 +8979,7 @@ function getTouchControlRole(){
   if(appScene !== APP_SCENE.GAME) return null;
   if(gameState === STATE.PAUSE || gameState === STATE.GAMEOVER) return null;
   if(matchMode === MATCH_MODE.LOCAL) return null;
+  if(matchMode === MATCH_MODE.ARCADE) return 'p1';
   if(matchMode === MATCH_MODE.BOT) return 'p1';
   if(matchMode === MATCH_MODE.LAN){
     if(netRole === 'host') return 'p1';
@@ -8452,6 +9224,77 @@ function resetSelectionState(){
   selectionUsedTouch = false;
 }
 
+function setArcadeSelectionDefaults(){
+  resetSelectionState();
+  const ghostIdx = ROSTER.indexOf('ghost');
+  if(ghostIdx >= 0){
+    sel.p1Index = ghostIdx;
+    sel.p1HasMovedOnce = true;
+    sel.p2Index = ghostIdx;
+    sel.p2HasMovedOnce = true;
+  }
+}
+
+function startArcadeMatchFromSelection(){
+  if(!isArcadeMode()) return;
+  suddenDeathActive = false;
+  const resolveSkin = (index)=>{
+    const chosen = ROSTER[index];
+    return chosen === 'mystery' ? pickMysteryRandomSkin() : chosen;
+  };
+  const p1Skin = resolveSkin(sel.p1Index);
+  const p2Skin = (arcadeContext.mode === ARCADE_MODES.FATALITY) ? 'dummy' : 'theremin';
+  currentBackground = pickWeighted(BACKGROUNDS, 'weight');
+  currentBallType = pickWeighted(BALL_TYPES, 'weight');
+  p1 = makePlayer(W*0.5,'L', p1Skin);
+  const hideDummy = arcadeContext.mode !== ARCADE_MODES.FATALITY;
+  p2 = makePlayer(hideDummy ? W*1.5 : W*0.65,'R', p2Skin);
+  p2.isDummy = true;
+  if(hideDummy){
+    p2.finishHidden = true;
+    p2.hitboxScale = 0.01;
+    p2.hitboxScaleX = 0.01;
+    p2.hitboxScaleY = 0.01;
+    p2.r = 1;
+  }
+  hydraClones.length = 0;
+  directorClones.length = 0;
+  ghostBarriers.length = 0;
+  florBursts.length = 0;
+
+  score.p1=0;
+  score.p2=0;
+  score.target=CONFIG.BASE_POINTS_TO_WIN;
+  resetScoreStreaks();
+  botKills = 0;
+
+  arcadeContext.active = true;
+  arcadeContext.ended = false;
+  arcadeContext.drops = 0;
+  arcadeContext.score = 0;
+  arcadeContext.streak = 0;
+  arcadeContext.bestStreak = 0;
+  arcadeContext.target = null;
+  matchTimerMode = 'countup';
+  matchTimerMs = 0;
+  matchTimerExpired = false;
+
+  setScene(APP_SCENE.GAME);
+  badge.innerText = getArcadeModeLabel();
+  if(arcadeContext.mode === ARCADE_MODES.TARGET){
+    spawnArcadeTarget();
+  }
+  ball.type = currentBallType;
+  resetArcadeBall({ x: p1.x, vy: -680 });
+  gameState = STATE.PLAY;
+  if(arcadeContext.mode === ARCADE_MODES.FATALITY){
+    startArcadeFatalityWindow();
+  }
+  if(!musicMuted){
+    playSong(MUSIC.mkmusic);
+  }
+}
+
 function lockSelectionP1Control(source, details = {}){
   if(gameState !== STATE.SELECT) return;
   if(selectionP1InputPreference) return;
@@ -8468,9 +9311,10 @@ const CONFIRM_HOLD_TIME = 3150; // ms - tiempo quieto para confirmar
 function handleSelection(){
   badge.innerText = getModeLabel();
 
+  const arcadeSingle = isArcadeMode() && arcadeContext.singlePlayer;
   const hostSide = !(matchMode === MATCH_MODE.LAN && netRole === 'client');
   const allowP1Input = (matchMode !== MATCH_MODE.LAN) || netRole === 'host';
-  const allowP2Input = (!useBot) && ((matchMode !== MATCH_MODE.LAN) ? true : netRole === 'client');
+  const allowP2Input = (!useBot) && ((matchMode !== MATCH_MODE.LAN) ? !arcadeSingle : netRole === 'client');
   let p1Moved = false;
   let p2Moved = false;
 
@@ -8528,6 +9372,12 @@ function handleSelection(){
     }
   }
 
+  if(arcadeSingle){
+    sel.p2Locked = true;
+    sel.p2HasMovedOnce = true;
+    sel.p2ConfirmTimer = CONFIRM_HOLD_TIME;
+  }
+
   // ================================
   //   SISTEMA DE CONFIRMACION
   // ================================
@@ -8579,20 +9429,29 @@ function handleSelection(){
   ctx.fillStyle="#fff";
   ctx.font="700 40px system-ui";
   ctx.textAlign="center";
-  ctx.fillText("Violin Beach Kombat (v1.5)", W/2, 90);
+  ctx.fillText("Violin Beach Kombat (v1.6)", W/2, 90);
 
   drawSelectionGrid();
 
   ctx.font="600 18px system-ui";
   ctx.fillStyle="#ccc";
-  ctx.fillText("Seleccione un personaje quedandose quieto 2 segundos", W/2, H-34);
-  ctx.fillText("P1 WASD   -   P2 Flechas   -   B Bot ON/OFF   -   Esc o Botón Pausa: Menú", W/2, H-12);
+  const msg1 = isArcadeMode() ? "Arcade: 1 jugador, confirma quedándote quieto." : "Seleccione un personaje quedandose quieto 2 segundos";
+  const msg2 = isArcadeMode()
+    ? "P1 WASD / mando / touch - Esc o Botón Pausa: Menú"
+    : "P1 WASD   -   P2 Flechas   -   B Bot ON/OFF   -   Esc o Botón Pausa: Menú";
+  ctx.fillText(msg1, W/2, H-34);
+  ctx.fillText(msg2, W/2, H-12);
 
   // ============================
   //  INICIAR PARTIDA SI LISTOS
   // ============================
 
-  if(sel.p1Locked && sel.p2Locked){
+  const readyToStart = sel.p1Locked && (sel.p2Locked || arcadeSingle);
+  if(readyToStart){
+    if(isArcadeMode()){
+      startArcadeMatchFromSelection();
+      return;
+    }
     if(matchMode === MATCH_MODE.LAN){
       if(netRole === 'host'){
         startLanMatchFromSelection();
@@ -8653,6 +9512,7 @@ function applyRemoteSelectionTouch(msg){
 }
 
 function drawSelectionGrid(){
+  const singleArcade = isArcadeMode() && arcadeContext.singlePlayer;
   for(let i=0; i<ROSTER.length; i++){
     const skin = ROSTER[i];
     const stats = getCharStatsSnapshot(skin);
@@ -8678,10 +9538,14 @@ function drawSelectionGrid(){
     if(achStyle?.glow){
       ctx.save();
       ctx.translate(x + CARD_W/2, y + CARD_H*0.58);
-      const glowColor = achStyle.glow.length === 7 ? achStyle.glow + '55' : achStyle.glow;
-      ctx.fillStyle = glowColor;
+      const base = achStyle.glow || '#ffffff';
+      const grad = ctx.createRadialGradient(0, 0, 6, 0, 0, 60);
+      grad.addColorStop(0, hexToRgba(base, 0.66));
+      grad.addColorStop(0.45, hexToRgba(base, 0.4));
+      grad.addColorStop(1, hexToRgba(base, 0.0));
+      ctx.fillStyle = grad;
       ctx.beginPath();
-      ctx.arc(0, 0, 56, 0, TAU);
+      ctx.arc(0, 0, 60, 0, TAU);
       ctx.fill();
       ctx.restore();
     }
@@ -8701,7 +9565,7 @@ function drawSelectionGrid(){
     // ============================
 
     const p1Here = (i === sel.p1Index);
-    const p2Here = (i === sel.p2Index);
+    const p2Here = (!singleArcade && i === sel.p2Index);
 
     // Ambos en la misma tarjeta
     if(p1Here && p2Here){
@@ -8849,6 +9713,7 @@ function drawBackground(){
 }
 /* Red */
 function drawNet(){
+  if(isArcadeMode() && arcadeContext.hideNet) return;
   if(finishState?.fatality?.data?.hideNet) return;
   ctx.save();
   const poleWidth  = CONFIG.NET_THICKNESS;
@@ -8974,6 +9839,11 @@ function handleInput(){
 
   if(!p.finishFrozen){
     handleAbilityInput(p);
+  }
+
+  const skipP2 = isArcadeMode() && arcadeContext.singlePlayer;
+  if(skipP2){
+    return;
   }
 
   // === Jugador 2 o BOT ===
@@ -9295,8 +10165,9 @@ function stepPhysics(dt){
     const maxVx = baseMaxVx * dashCap;
     p.x += clamp(p.vx, -maxVx, maxVx)*dt;
     p.y += p.vy*dt;
-    const minX = (p.side==='L')? 60 : CONFIG.NET_X+40;
-    const maxX = (p.side==='L')? CONFIG.NET_X-40 : W-60;
+    const freeCourt = isArcadeMode() && arcadeContext.freeCourt;
+    const minX = freeCourt ? 60 : (p.side==='L' ? 60 : CONFIG.NET_X+40);
+    const maxX = freeCourt ? W-60 : (p.side==='L' ? CONFIG.NET_X-40 : W-60);
     p.x = clamp(p.x, minX, maxX);
     const gy = CONFIG.GROUND_Y - p.r;
     if(p.y > gy){
@@ -9351,6 +10222,10 @@ function stepPhysics(dt){
       ball.vy = 0;
       ball.groundScheduled = true;
 
+      if(isArcadeMode()){
+        handleArcadeGroundTouch();
+        return;
+      }
 
       // programar resolución del punto tras el tiempo configurado
       ballGroundTimeout = setTimeout(()=>{
@@ -9394,34 +10269,37 @@ function stepPhysics(dt){
   if(ball.x < ball.r){ ball.x = ball.r; ball.vx = Math.abs(ball.vx)*0.9; }
   if(ball.x > W - ball.r){ ball.x = W - ball.r; ball.vx = -Math.abs(ball.vx)*0.9; }
 
-  // Muro central
-  const netLeft = CONFIG.NET_X - CONFIG.NET_THICKNESS/2;
-  const netRight = CONFIG.NET_X + CONFIG.NET_THICKNESS/2;
-  const netTop = CONFIG.GROUND_Y - CONFIG.NET_HEIGHT;
-  const overNet = (ball.y - ball.r) < netTop;
-  if(!overNet){
-    if(ball.x + ball.r > netLeft && ball.x < CONFIG.NET_X && ball.y + ball.r > netTop){
-      ball.x = netLeft - ball.r;
-      ball.vx = -Math.abs(ball.vx)*0.95;
-      //sonido de golpe con la red
-      clearTimeout(ballhitTimeout);
-      ballhitTimeout = setTimeout(()=>{
-      try{ SFX.ballhit.currentTime = 0; SFX.ballhit.play(); }catch(e){}
-      }, 10);
+  const skipNet = isArcadeMode() && arcadeContext.hideNet;
+  if(!skipNet){
+    // Muro central
+    const netLeft = CONFIG.NET_X - CONFIG.NET_THICKNESS/2;
+    const netRight = CONFIG.NET_X + CONFIG.NET_THICKNESS/2;
+    const netTop = CONFIG.GROUND_Y - CONFIG.NET_HEIGHT;
+    const overNet = (ball.y - ball.r) < netTop;
+    if(!overNet){
+      if(ball.x + ball.r > netLeft && ball.x < CONFIG.NET_X && ball.y + ball.r > netTop){
+        ball.x = netLeft - ball.r;
+        ball.vx = -Math.abs(ball.vx)*0.95;
+        //sonido de golpe con la red
+        clearTimeout(ballhitTimeout);
+        ballhitTimeout = setTimeout(()=>{
+        try{ SFX.ballhit.currentTime = 0; SFX.ballhit.play(); }catch(e){}
+        }, 10);
+      }
+      if(ball.x - ball.r < netRight && ball.x > CONFIG.NET_X && ball.y + ball.r > netTop){
+        ball.x = netRight + ball.r;
+        ball.vx = Math.abs(ball.vx)*0.95;
+        //sonido de golpe con la red
+        clearTimeout(ballhitTimeout);
+        ballhitTimeout = setTimeout(()=>{
+        try{ SFX.ballhit.currentTime = 0; SFX.ballhit.play(); }catch(e){}
+        }, 10);
+      }
     }
-    if(ball.x - ball.r < netRight && ball.x > CONFIG.NET_X && ball.y + ball.r > netTop){
-      ball.x = netRight + ball.r;
-      ball.vx = Math.abs(ball.vx)*0.95;
-      //sonido de golpe con la red
-      clearTimeout(ballhitTimeout);
-      ballhitTimeout = setTimeout(()=>{
-      try{ SFX.ballhit.currentTime = 0; SFX.ballhit.play(); }catch(e){}
-      }, 10);
-    }
-  }
 
-  // Muro central — USAR SWEPT COLLISION
-  resolveBallNetCollision(ball, dt);
+    // Muro central - USAR SWEPT COLLISION
+    resolveBallNetCollision(ball, dt);
+  }
   resolveGhostBarriers(ball);
 
 
@@ -9431,6 +10309,10 @@ function stepPhysics(dt){
   for(const clone of hydraClones){
     handlePlayerHit(clone);
   }
+  for(const clone of directorClones){
+    handlePlayerHit(clone);
+  }
+  checkArcadeTargetHit();
 }
 
 function getHitboxAxes(entity){
@@ -9462,6 +10344,7 @@ function handlePlayerHit(p){
 
   if(dist < minD){
     const currentTime = performance.now();
+    const arcadeActive = isArcadeMode();
     clearTimeout(ballhitTimeout);
     ballhitTimeout = setTimeout(()=>{
       try{ SFX.ballhit.currentTime = 0; SFX.ballhit.play(); }catch(e){}
@@ -9477,7 +10360,7 @@ function handlePlayerHit(p){
       p.touchesLeft = (typeof p.touchesLeft === 'number' ? p.touchesLeft : 3) - 1;
     }
     const countsForFoul = !isClone; // hydra mini-clones can touch sin sumar para foul
-    if(countsForFoul && currentTime - hitTracker.lastHitTime > 100){
+    if(countsForFoul && !arcadeActive && currentTime - hitTracker.lastHitTime > 100){
       hitTracker.lastHitTime = currentTime;
       if(hitTracker.lastHitter === p.side){
         if(p.side === 'L') hitTracker.p1Hits++;
@@ -9541,6 +10424,9 @@ function handlePlayerHit(p){
 
     if(ownerPlayer){
       grantAbilityChargeFromHit(ownerPlayer);
+    }
+    if(arcadeActive){
+      handleArcadeHit(ownerPlayer);
     }
     sendBallEvent('hit', { hitter: p.side });
     if(isClone && p.touchesLeft <= 0){
@@ -9646,6 +10532,7 @@ function addPoint(who, options = {}){
       const elapsed = getMatchElapsedMs();
       updateBotKillStats(p1.skin, elapsed);
       saveProgress(progress);
+      registerPointStreak('p1');
       const serveSide = (Math.random() < 0.5) ? 'L' : 'R';
       resetRally(serveSide);
       return 'continue';
@@ -9656,6 +10543,7 @@ function addPoint(who, options = {}){
         gameOver('p2');
         return 'gameover';
       }
+      registerPointStreak('p2');
       resetRally('L');
       return 'continue';
     }
@@ -9718,8 +10606,11 @@ function drawGame(){
   drawNet();
   drawGhostBarriers();
   drawDjFieldOverlays();
+  if(isArcadeMode() && arcadeContext.mode === ARCADE_MODES.TARGET){
+    drawArcadeTarget();
+  }
 
-  // Suelo “contacto”
+  // Suelo "contacto"
   ctx.strokeStyle='#00000011';
   ctx.lineWidth=1;
   ctx.beginPath();
@@ -9969,8 +10860,93 @@ function drawMysteryBombSprite(ctx, radius = 14){
   }
   ctx.restore();
 }
+
+function drawArcadeTarget(){
+  if(!arcadeContext.active || arcadeContext.mode !== ARCADE_MODES.TARGET) return;
+  const t = arcadeContext.target;
+  if(!t) return;
+  ctx.save();
+  ctx.translate(t.x, t.y);
+  const pulse = 0.2 + 0.1*Math.sin(performance.now()/180);
+  ctx.globalAlpha = 0.9;
+  ctx.fillStyle = '#65e5ff';
+  ctx.beginPath();
+  ctx.arc(0, 0, t.r, 0, TAU);
+  ctx.fill();
+  ctx.strokeStyle = '#0f6aa8';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.arc(0, 0, t.r * 0.65, 0, TAU);
+  ctx.stroke();
+  ctx.globalAlpha = 0.55;
+  ctx.beginPath();
+  ctx.arc(0, 0, t.r * (1 + pulse), 0, TAU);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawArcadeHud(){
+  ctx.save();
+  ctx.fillStyle = '#e9f4ff';
+  ctx.textAlign = 'left';
+  ctx.font = '900 26px system-ui';
+  ctx.fillText(getArcadeModeLabel(), 24, 34);
+  const elapsed = (typeof matchTimerMs === 'number' ? matchTimerMs : getMatchElapsedMs()) || 0;
+  ctx.textAlign = 'center';
+  ctx.fillText(formatMsClock(elapsed), W/2, 34);
+
+  if(arcadeContext.mode === ARCADE_MODES.FATALITY){
+    ctx.font = '900 52px system-ui';
+    ctx.fillText(`Fatalities: ${arcadeContext.score || 0}`, W/2, 96);
+    ctx.font = '700 20px system-ui';
+    ctx.fillText('Finish Him activo (practica)', W/2, 126);
+    ctx.restore();
+    return;
+  }
+
+  ctx.textAlign = 'right';
+  ctx.font = '700 18px system-ui';
+  ctx.fillText(`Caidas: ${(arcadeContext.drops || 0)}/${arcadeContext.maxDrops || 0}`, W - 24, 34);
+  ctx.textAlign = 'center';
+  ctx.font = '900 56px system-ui';
+  const label = arcadeContext.mode === ARCADE_MODES.DOMINADAS ? 'Toques' : 'Targets';
+  ctx.fillText(`${label}: ${arcadeContext.score || 0}`, W/2, 96);
+  ctx.font = '700 22px system-ui';
+  ctx.fillText(`Racha max: ${arcadeContext.bestStreak || 0}`, W/2, 126);
+  // barra de stamina estilo principal, colocada a la izquierda
+  const stamY = H * 0.07;
+  drawArcadeStamina(24, stamY, 220, 12, p1, true);
+  ctx.restore();
+
+  function drawArcadeStamina(x, y, w, h, playerRef, alignLeft){
+    const stamina = playerRef && playerRef.stamina;
+    const ratio = stamina ? clamp((stamina.value || 0) / (stamina.max || 1), 0, 1) : 0;
+    const fillW = ratio * w;
+    ctx.save();
+    ctx.fillStyle = '#0b1d33';
+    ctx.globalAlpha = 0.9;
+    ctx.fillRect(x, y, w, h);
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = '#2ad1ff';
+    if(alignLeft){
+      ctx.fillRect(x, y, fillW, h);
+    } else {
+      ctx.fillRect(x + (w - fillW), y, fillW, h);
+    }
+    ctx.strokeStyle = '#0c5c83';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(x, y, w, h);
+    ctx.restore();
+  }
+}
 function drawHUD(){
   ctx.save();
+
+  if(isArcadeMode()){
+    drawArcadeHud();
+    ctx.restore();
+    return;
+  }
 
   // ===============================
   //   CÁLCULO DE VIDA SEGÚN SCORE
@@ -10230,7 +11206,7 @@ function loop(){
   }
 
   const isLanClient = (matchMode === MATCH_MODE.LAN && netRole === 'client');
-  const shouldTickTimer = (gameState === STATE.PLAY && (matchMode !== MATCH_MODE.LAN || netRole === 'host'));
+  const shouldTickTimer = ((gameState === STATE.PLAY) || (isArcadeMode() && arcadeContext.active && !arcadeContext.ended)) && (matchMode !== MATCH_MODE.LAN || netRole === 'host');
   if(shouldTickTimer){
     updateMatchTimer(dt);
   }
@@ -10305,7 +11281,8 @@ function loop(){
       ctx.font = '600 36px system-ui';
       ctx.fillText(`Marcador final: ${info.finalScore}`, W/2, H/2 + 30);
       ctx.font = '400 20px system-ui';
-      ctx.fillText('(Presiona Esc para volver al menú)', W/2, H/2 + 80);
+      const exitMsg = (matchMode === MATCH_MODE.ARCADE) ? 'Presiona Esc para volver a selección (Arcade)' : 'Presiona Esc para volver al menú';
+      ctx.fillText(`(${exitMsg})`, W/2, H/2 + 80);
       ctx.restore();
       break;
   }
