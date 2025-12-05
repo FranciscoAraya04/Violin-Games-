@@ -28,7 +28,32 @@
     --mode-arcade-img: url('https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Gemini_Generated_Image_bdsxtqbdsxtqbdsx.png?raw=true');
   }
   html,body{height:100%;margin:0;background:#0b1420;color:#eee;font-family:'Barlow',system-ui,Segoe UI,Roboto,Arial}
-  .wrap{display:flex;align-items:center;justify-content:center;height:100%}
+  .wrap{display:flex;align-items:center;justify-content:center;height:100%;position:relative;}
+  #hudControls{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    width:100%;
+    max-width:1200px;
+    height:100%;
+    max-height:675px;
+    pointer-events:none;
+    display:flex;
+    align-items:flex-start;
+    justify-content:flex-end;
+    padding-top:10%;
+    padding-right:10%;
+    box-sizing:border-box;
+  }
+  #hudControls .hud-controls-bar{
+    display:flex;
+    gap:8px;
+  }
+  #hudControls .hud-btn{
+    position:static;
+    pointer-events:auto;
+  }
   canvas{background:#87ceeb;box-shadow:0 10px 40px rgba(65, 41, 41, 0.533);border-radius:16px;max-width:96vw;max-height:92vh}
   .hint{
     position:fixed;left:1rem;bottom:1rem;background:#111a;backdrop-filter: blur(4px);
@@ -556,7 +581,13 @@
 <div class="net-status hidden" id="netStatus"></div>
 <button class="hud-btn hidden" id="btnPauseHud">Pausa</button>
 <button class="hud-btn secondary hidden" id="btnExitPause">Salir al menú</button>
-<button class="hud-btn mini hidden" id="btnHudFullscreen" title="Pantalla completa">FS</button>
+<!-- Controles de HUD (se muestran dentro del canvas sólo en pausa) -->
+<div id="hudControls" class="hidden">
+  <div class="hud-controls-bar">
+    <button class="hud-btn mini" id="btnHudFullscreen" title="Pantalla completa">⛶</button>
+    <button class="hud-btn mini" id="btnHudMute" title="Mute música">🔇</button>
+  </div>
+</div>
 
 <div class="ui-layer" id="uiLayer">
   <div class="panel menu-panel" id="menuPanel">
@@ -1035,8 +1066,8 @@ SFX.woosh.volume = 0.8;
 SFX.woosh2.volume = 0.8;
 SFX.ballhit.volume = 0.4;
 SFX.sandhit.volume = 1;
-SFX.pito.volume = 0.7;
-SFX.chelohit.volume = 0.8;
+SFX.pito.volume = 0.5;
+SFX.chelohit.volume = 0.6;
 SFX.harpjump.volume = 0.8;
 SFX.pianonote.volume = 0.4;
 SFX.mineexplode.volume = 0.8;
@@ -1048,13 +1079,22 @@ const MUSIC ={
     beach: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/Relax%20%EF%BD%9C%205%20minutes%20of%20Sand%20and%20Sea%20%EF%BD%9C%20Sounds%20of%20Nature%20%EF%BD%9C%20Sleep%20Sounds%20(1).wav'),
     mkmusic: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/Tarkatan%20War%20Kamp%20%EF%BD%9C%20Mortal%20Kombat%2011%20(2).wav'),
     suddendeathmusic: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/War%20&%20Epic%20(Royalty%20Free%20Music%20For%20YouTube)%20-%20WAR%20by%20@Makai-symphony.mp3'),
+    survival: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/music/Shadow-Fight-2-Act-1-Survival-Th.mp3'),
+    arcade: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/music/Old-Sensei.mp3'),
+    fatalityPractice: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/music/The-Training-Room.mp3'),
 }
 
 MUSIC.beach.volume = 0.3;
 MUSIC.mkmusic.volume = 0.85;
 MUSIC.suddendeathmusic.volume = 0.3;
+MUSIC.survival.volume = 0.5; // ajuste de volumen
+MUSIC.arcade.volume = 0.55; // ajuste de volumen
+MUSIC.fatalityPractice.volume = 0.5; // ajuste de volumen
 MUSIC.beach.loop = true;
 MUSIC.mkmusic.loop = true;
+MUSIC.survival.loop = true;
+MUSIC.arcade.loop = true;
+MUSIC.fatalityPractice.loop = true;
 let musicMuted = false;
 
 // Controla qué sonidos están en reproducción
@@ -1089,6 +1129,41 @@ function stopSong(audioNode) {
   audioNode.currentTime = 0;
   audioNode.removeEventListener('ended', handleEnded);
   ACTIVE_AUDIO.delete(audioNode);
+}
+
+function stopAllMusic(except = null){
+  Object.values(MUSIC).forEach(node=>{
+    if(node && node !== except){
+      stopSong(node);
+    }
+  });
+}
+
+function getCurrentBgm(){
+  if(matchMode === MATCH_MODE.ARCADE){
+    return arcadeContext.mode === ARCADE_MODES.FATALITY ? MUSIC.fatalityPractice : MUSIC.arcade;
+  }
+  if(matchMode === MATCH_MODE.BOT){
+    return MUSIC.survival;
+  }
+  return MUSIC.mkmusic;
+}
+
+function playCurrentMusic(options = {}){
+  if(musicMuted) return;
+  const track = suddenDeathActive ? MUSIC.suddendeathmusic : getCurrentBgm();
+  stopAllMusic(track);
+  playSong(track, options);
+}
+
+function toggleMusicMute(){
+  musicMuted = !musicMuted;
+  if(musicMuted){
+    stopAllMusic();
+  } else {
+    playCurrentMusic({ restart:false });
+  }
+  syncMusicUi();
 }
 
 
@@ -1765,6 +1840,7 @@ const uiRefs = {
   btnTutorialCopy: document.getElementById('btnTutorialCopy'),
   tutorialDownloadStatus: document.getElementById('tutorialDownloadStatus'),
   btnHudFullscreen: document.getElementById('btnHudFullscreen'),
+  btnHudMute: document.getElementById('btnHudMute'),
   btnCreateOffer: document.getElementById('btnCreateOffer'),
   btnCreateAnswer: document.getElementById('btnCreateAnswer'),
   btnApplyAnswer: document.getElementById('btnApplyAnswer'),
@@ -1920,6 +1996,7 @@ function setScene(scene){
     lanPanel.classList.add('hidden');
     menuFocusIndex = 0;
     syncMenuFocus();
+    syncProfileUi();
   } else if(scene === APP_SCENE.NET){
     tutorialOpen = false;
     encyOpen = false;
@@ -2852,6 +2929,13 @@ function syncFullscreenUi(){
   }
 }
 
+function syncMusicUi(){
+  if(uiRefs.btnHudMute){
+    uiRefs.btnHudMute.textContent = musicMuted ? '🔇' : '🔊';
+    uiRefs.btnHudMute.setAttribute('aria-pressed', musicMuted ? 'true' : 'false');
+  }
+}
+
 function syncUiState(){
   const menuLike = (appScene === APP_SCENE.MENU || appScene === APP_SCENE.NET);
   if(cvs){
@@ -2875,8 +2959,17 @@ function syncUiState(){
     const showExit = !menuLike && (gameState === STATE.PAUSE || gameState === STATE.GAMEOVER);
     exitPauseBtn.classList.toggle('hidden', !showExit);
   }
+  const showHudBtns = (gameState === STATE.PAUSE && !menuLike);
+  const hudControls = document.getElementById('hudControls');
+  if(hudControls){
+    hudControls.classList.toggle('hidden', !showHudBtns);
+  }
   if(uiRefs.btnHudFullscreen){
-    uiRefs.btnHudFullscreen.classList.toggle('hidden', !!menuLike);
+    uiRefs.btnHudFullscreen.classList.toggle('hidden', !showHudBtns);
+  }
+  if(uiRefs.btnHudMute){
+    uiRefs.btnHudMute.classList.toggle('hidden', !showHudBtns);
+    if(showHudBtns) syncMusicUi();
   }
   if(touchOverlay){
     const showTouch = selectionUsedTouch && appScene === APP_SCENE.GAME;
@@ -3527,8 +3620,7 @@ function exitArcadeToMenu(){
   setScene(APP_SCENE.MENU);
   gameState = STATE.SELECT;
   badge.innerText = 'Selecciona modo';
-  stopSong(MUSIC.mkmusic);
-  stopSong(MUSIC.suddendeathmusic);
+  stopAllMusic();
 }
 
 function returnToArcadeSelection(){
@@ -3543,8 +3635,7 @@ function returnToArcadeSelection(){
   serveTimeout = null;
   ballGroundTimeout = null;
   if(net.worldTimer){ clearInterval(net.worldTimer); net.worldTimer = null; }
-  stopSong(MUSIC.mkmusic);
-  stopSong(MUSIC.suddendeathmusic);
+  stopAllMusic();
 }
 
 function startArcadeMode(mode){
@@ -3618,6 +3709,7 @@ if(uiRefs.btnEncyBack) uiRefs.btnEncyBack.addEventListener('click', ()=>closeEnc
 if(uiRefs.btnTutorialDownload) uiRefs.btnTutorialDownload.addEventListener('click', ()=>triggerTutorialDownload());
 if(uiRefs.btnTutorialCopy) uiRefs.btnTutorialCopy.addEventListener('click', ()=>copyTutorialLink());
 if(uiRefs.btnHudFullscreen) uiRefs.btnHudFullscreen.addEventListener('click', ()=>toggleFullscreen());
+if(uiRefs.btnHudMute) uiRefs.btnHudMute.addEventListener('click', ()=>toggleMusicMute());
 if(uiRefs.btnBackMenu) uiRefs.btnBackMenu.addEventListener('click', ()=>{ showLobbyPanel(true); });
 if(uiRefs.btnResetLink) uiRefs.btnResetLink.addEventListener('click', ()=>resetNetState());
 if(uiRefs.btnCreateOffer) uiRefs.btnCreateOffer.addEventListener('click', ()=>createHostOffer());
@@ -3876,16 +3968,14 @@ function setPauseState(active){
   if(active){
     if(gameState === STATE.PLAY || gameState === STATE.FINISH){
       gameState = STATE.PAUSE;
-      stopSong(MUSIC.mkmusic);
-      stopSong(MUSIC.beach);
-      stopSong(MUSIC.suddendeathmusic);
+      stopAllMusic();
       badge.innerText = 'Juego en pausa (P para reanudar)';
     }
   } else {
     if(gameState === STATE.PAUSE){
       gameState = STATE.PLAY;
       if(!musicMuted){
-        playSong(MUSIC.mkmusic);
+        playCurrentMusic({ restart:false });
       }
       badge.innerText = '';
     }
@@ -3934,9 +4024,7 @@ function exitSelectionToMenu(){
     resetNetState();
   }
   clearMatchTimer();
-  stopSong(MUSIC.beach);
-  stopSong(MUSIC.mkmusic);
-  stopSong(MUSIC.suddendeathmusic);
+  stopAllMusic();
   resetSelectionState();
   matchMode = MATCH_MODE.LOCAL;
   useBot = false;
@@ -3953,8 +4041,7 @@ function returnToSelectLocal(){
   }
   gameState = STATE.SELECT;
   setScene(APP_SCENE.SELECT);
-  stopSong(MUSIC.mkmusic);
-  stopSong(MUSIC.suddendeathmusic);
+  stopAllMusic();
   clearMatchTimer();
   resetSelectionState();
   badge.innerText = getModeLabel();
@@ -4327,7 +4414,7 @@ function startMatchLocalFromConfig(cfg = {}){
   gameState = STATE.PLAY;
   resetMatchTimer();
   if(!musicMuted){
-    playSong(MUSIC.mkmusic);
+    playCurrentMusic();
   }
   syncUiState();
 }
@@ -4517,9 +4604,7 @@ function applyRemoteWorld(data){
   }
   setScene(APP_SCENE.GAME);
   if(netRole === 'client'){
-    stopSong(MUSIC.mkmusic);
-    stopSong(MUSIC.beach);
-    stopSong(MUSIC.suddendeathmusic);
+    stopAllMusic();
   }
 }
 
@@ -4552,7 +4637,7 @@ const ACHIEVEMENTS = [
   { id:'arcTarget10streak', label:'Target Streak', desc:'10 targets seguidos', check:(s)=> (s.arcade?.targetStreakMax || 0) >= 10 },
 ];
 // Tint al ~30% para mezclar 30% color de logro + 70% fondo base en selección (ajusta el alpha si quieres otro mix).
-const ACH_COLORS = [
+const ACH_COLORS = [ //Colores de los niveles según achivement colors 
   null,
   { tint:'rgba(205,138,58,0.30)', glow:'#cd8a3a' },  // bronce
   { tint:'rgba(80,80,80,0.32)',   glow:'#8a8a8a' },  // hierro
@@ -8311,8 +8396,7 @@ function endArcadeRun(reason='end'){
   badge.innerText = '';
   arcadeContext.active = false;
   gameState = STATE.GAMEOVER;
-  stopSong(MUSIC.mkmusic);
-  stopSong(MUSIC.suddendeathmusic);
+  stopAllMusic();
   syncUiState();
 }
 
@@ -8739,6 +8823,11 @@ addEventListener('keydown', e=>{
       e.preventDefault();
       return;
     }
+    if(appScene === APP_SCENE.MENU && arcadeOpen && e.code === 'Escape'){
+      closeArcadeMenu();
+      e.preventDefault();
+      return;
+    }
     const isPrev = (e.code === 'ArrowLeft' || e.code === 'ArrowUp' || e.code === 'KeyA' || e.code === 'KeyW');
     const isNext = (e.code === 'ArrowRight' || e.code === 'ArrowDown' || e.code === 'KeyD' || e.code === 'KeyS');
     if(isPrev){
@@ -8770,18 +8859,22 @@ addEventListener('keydown', e=>{
     e.preventDefault();
     return;
   }
+  if(appScene === APP_SCENE.MENU && matchMode === MATCH_MODE.ARCADE && e.code === 'Escape'){
+    setScene(APP_SCENE.MENU);
+    badge.innerText = 'Selecciona modo';
+    arcadeOpen = false;
+    if(uiRefs.arcadePanel) uiRefs.arcadePanel.classList.add('hidden');
+    menuFocusIndex = 0;
+    syncMenuFocus();
+    e.preventDefault();
+    return;
+  }
   if(matchMode === MATCH_MODE.LAN && netRole === 'client' && REMOTE_ALLOWED_KEYS.has(e.code)){
     sendNet({ type:'key', code:e.code, down:true });
   }
 
   if(e.code==='KeyM'){
-    musicMuted = !musicMuted;
-    if(musicMuted){
-      stopSong(MUSIC.mkmusic);
-      stopSong(MUSIC.suddendeathmusic);
-    } else if(gameState === STATE.PLAY){
-      playSong(MUSIC.mkmusic);
-    }
+    toggleMusicMute();
   }
 
 if(gameState === STATE.GAMEOVER && (e.code === 'Escape' || e.code === 'KeyS' || e.code === 'ArrowDown')){
@@ -9170,7 +9263,7 @@ function applySelectionIndex(role, index, options = {}){
     playSelectionMoveFx(isP1);
   }
   if(options.playMusic !== false){
-    playSong(MUSIC.beach);
+    if(!musicMuted) playSong(MUSIC.beach);
   }
 }
 
@@ -9328,7 +9421,7 @@ function startArcadeMatchFromSelection(){
     startArcadeFatalityWindow();
   }
   if(!musicMuted){
-    playSong(MUSIC.mkmusic);
+    playCurrentMusic();
   }
 }
 
@@ -9532,7 +9625,7 @@ function handleSelection(){
     gameState = STATE.PLAY;
     resetMatchTimer();
     if(!musicMuted){
-      playSong(MUSIC.mkmusic);
+      playCurrentMusic();
     }
   }
 }
@@ -9578,7 +9671,7 @@ function drawSelectionGrid(){
       const base = achStyle.glow || '#ffffff';
       const lvl = ach.level || 0;
       const innerR = 6 + lvl * 0.8;           // crece leve el centro
-      const outerR = 56 + lvl * 4;            // halo más amplio por nivel
+      const outerR = 56 + lvl * 3;            // halo más amplio por nivel
       const grad = ctx.createRadialGradient(0, 0, innerR, 0, 0, outerR);
       grad.addColorStop(0, hexToRgba(base, 0.68));
       grad.addColorStop(0.45, hexToRgba(base, 0.42));
@@ -11031,7 +11124,7 @@ const inSuddenDeath = suddenDeathActive;
 if (!suddenDeathActive && p1Life === 1 && p2Life === 1) {
     suddenDeathActive = true;
     //musica de sudden death
-    stopSong(MUSIC.mkmusic);
+    stopAllMusic();
     playSong(MUSIC.suddendeathmusic);
 }
 
@@ -11287,7 +11380,8 @@ function loop(){
         sendHostState(t);
       }
       if(!musicMuted && !isLanClient){
-        playSong(MUSIC.mkmusic);
+        const bgm = suddenDeathActive ? MUSIC.suddendeathmusic : getCurrentBgm();
+        playSong(bgm);
       }
       break;
 
