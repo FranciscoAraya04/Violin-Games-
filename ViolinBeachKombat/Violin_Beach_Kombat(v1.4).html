@@ -42,23 +42,23 @@
   .badge{position:absolute;top:.8rem;right:.8rem;background:#111c;padding:.35rem .6rem;border-radius:8px;font:600 .9rem/1 system-ui}
   /* Capas de interfaz */
   .ui-layer{
-    position:fixed;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:auto;z-index:10;
+    position:fixed;inset:0;display:flex;align-items:flex-start;justify-content:center;pointer-events:auto;z-index:10;
     background:linear-gradient(180deg,rgba(2,7,18,0.7),rgba(1,5,12,0.8)),var(--menu-bg);
     background-size:cover;
     background-position:center;
     filter:saturate(95%);
+    padding:24px 12px 96px;
+    box-sizing:border-box;
+    overflow-y:auto;
+    scroll-behavior:smooth;
   }
+  .ui-layer::-webkit-scrollbar{width:10px}
+  .ui-layer::-webkit-scrollbar-thumb{background:#24406b;border-radius:12px}
+  .ui-layer::-webkit-scrollbar-track{background:transparent}
   @media (max-height:780px){
     .ui-layer{
-      align-items:flex-start;
-      justify-content:center;
-      overflow-y:auto;
-      padding:18px 0 72px;
-      scroll-behavior:smooth;
+      padding:18px 10px 80px;
     }
-    .ui-layer::-webkit-scrollbar{width:10px}
-    .ui-layer::-webkit-scrollbar-thumb{background:#24406b;border-radius:12px}
-    .ui-layer::-webkit-scrollbar-track{background:transparent}
   }
   .panel{
     background:rgba(7,12,24,0.92);
@@ -254,7 +254,7 @@
   .glow-level-2::before{opacity:1;background:radial-gradient(circle at 50% 50%, rgba(138,138,138,0.8) 0%, rgba(138,138,138,0.35) 45%, rgba(138,138,138,0) 80%);}
   .glow-level-3::before{opacity:1;background:radial-gradient(circle at 50% 50%, rgba(176,190,197,0.8) 0%, rgba(176,190,197,0.35) 45%, rgba(176,190,197,0) 80%);}
   .glow-level-4::before{opacity:1;background:radial-gradient(circle at 50% 50%, rgba(255,214,102,0.8) 0%, rgba(255,214,102,0.35) 45%, rgba(255,214,102,0) 80%);}
-  .glow-level-5::before{opacity:1;background:radial-gradient(circle at 50% 50%, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.35) 45%, rgba(255,255,255,0) 80%);}
+  .glow-level-5::before{opacity:1;background:radial-gradient(circle at 50% 50%, rgba(255,242,199,0.8) 0%, rgba(255,242,199,0.35) 45%, rgba(255,242,199,0) 80%);}
   .glow-level-6::before{opacity:1;background:radial-gradient(circle at 50% 50%, rgba(120,235,255,0.8) 0%, rgba(120,235,255,0.35) 45%, rgba(120,235,255,0) 80%);}
   .glow-level-7::before{opacity:1;background:radial-gradient(circle at 50% 50%, rgba(142,245,182,0.8) 0%, rgba(142,245,182,0.35) 45%, rgba(142,245,182,0) 80%);}
   .glow-level-8::before{opacity:1;background:radial-gradient(circle at 50% 50%, rgba(255,90,90,0.8) 0%, rgba(255,90,90,0.35) 45%, rgba(255,90,90,0) 80%);}
@@ -263,7 +263,7 @@
   .skin-frame.glow-level-2{box-shadow:0 0 0 2px #8a8a8a, 0 0 22px #8a8a8a77, 0 0 48px #8a8a8a55;}
   .skin-frame.glow-level-3{box-shadow:0 0 0 2px #d0d7dc, 0 0 22px #d0d7dc77, 0 0 48px #d0d7dc55;}
   .skin-frame.glow-level-4{box-shadow:0 0 0 2px #ffd666, 0 0 22px #ffd66677, 0 0 48px #ffd66655;}
-  .skin-frame.glow-level-5{box-shadow:0 0 0 2px #ffffff, 0 0 22px #ffffff77, 0 0 48px #ffffff55;}
+  .skin-frame.glow-level-5{box-shadow:0 0 0 2px #fff2c7, 0 0 22px #fff2c777, 0 0 48px #fff2c755;}
   .skin-frame.glow-level-6{box-shadow:0 0 0 2px #78ebff, 0 0 22px #78ebff77, 0 0 48px #78ebff55;}
   .skin-frame.glow-level-7{box-shadow:0 0 0 2px #7be0a0, 0 0 22px #7be0a077, 0 0 48px #7be0a055;}
   .skin-frame.glow-level-8{box-shadow:0 0 0 2px #ff5a5a, 0 0 22px #ff5a5a77, 0 0 48px #ff5a5a55;}
@@ -743,7 +743,7 @@
       </div>
     </div>
     <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
-      <button class="ui-btn secondary" id="btnBackMenu">Volver al menu</button>
+      <button class="ui-btn secondary" id="btnBackMenu">Volver al lobby</button>
       <button class="ui-btn secondary" id="btnResetLink">Reiniciar enlace</button>
     </div>
   </div>
@@ -945,6 +945,8 @@ function cleanName(name){
   return String(name).replace(/[^\w \-_.]/g,'').trim().slice(0,24);
 }
 wss.on('connection', ws=>{
+  ws.isAlive = true;
+  ws.on('pong', ()=>{ ws.isAlive = true; });
   const id=Math.random().toString(36).slice(2,7);
   peers.set(id, ws);
   try{ ws.send(JSON.stringify({type:'hello', id, name: peerNames.get(id)||null})) }catch(e){}
@@ -974,6 +976,17 @@ wss.on('connection', ws=>{
   });
   ws.on('close', ()=>{ peers.delete(id); peerNames.delete(id); broadcast(); });
 });
+
+// Keep-alive para redes lentas/estrictas
+const pingInterval = setInterval(()=>{
+  wss.clients.forEach(ws=>{
+    if(ws.isAlive === false) return ws.terminate();
+    ws.isAlive = false;
+    try{ ws.ping(); }catch(e){}
+  });
+}, 30000);
+
+wss.on('close', ()=>{ clearInterval(pingInterval); });
 const ips=getLanIps();
 console.log('Lobby WS en puerto '+PORT);
 ips.forEach(ip=>console.log('ws://'+ip+':'+PORT));
@@ -983,7 +996,8 @@ console.log('Ctrl+C para detener el lobby');
       <small>Necesitas un PC en la red. En los móviles usa la IP que imprime la consola (ws://IP_DEL_PC:3000)</small>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
-      <button class="ui-btn secondary" id="btnLobbyBack">Volver a modo manual</button>
+      <button class="ui-btn secondary" id="btnLobbyMenu">Volver al menú</button>
+      <button class="ui-btn low-profile" id="btnLobbyBack">Ir a modo manual (oferta/respuesta)</button>
     </div>
   </div>
 </div>
@@ -1426,7 +1440,7 @@ function getFavoriteChar(){
   let best = null;
   for(const [skin, data] of Object.entries(perChar)){
     const d = data || {};
-    const score = (d.wins || 0) * 1000 + (d.matches || 0) * 10 + (d.points || 0);
+    const score = (d.wins || 0) * 10 + (d.matches || 0) * 30 + (d.points || 0) / 2;
     if(score <= 0) continue;
     if(!best || score > best.score){
       best = { skin, stats: d, score };
@@ -1473,6 +1487,14 @@ function getAchLevelName(level){
     case 9: return 'DARK';
     default: return '';
   }
+}
+
+function getPlayerLevelColor(player){
+  if(!player || !player.skin) return '#e9f4ff';
+  const stats = getCharStatsSnapshot(player.skin);
+  const ach = getCharAchievementData(stats);
+  const style = getAchFrameStyle(ach.level);
+  return style?.glow || '#e9f4ff';
 }
 
 function getCharAchievementData(stats){
@@ -1748,6 +1770,7 @@ const uiRefs = {
   btnApplyAnswer: document.getElementById('btnApplyAnswer'),
   btnOpenLobby: document.getElementById('btnOpenLobby'),
   btnLobbyBack: document.getElementById('btnLobbyBack'),
+  btnLobbyMenu: document.getElementById('btnLobbyMenu'),
   btnLobbyConnect: document.getElementById('btnLobbyConnect'),
   btnLobbyHelp: document.getElementById('btnLobbyHelp'),
   lobbyCode: document.getElementById('lobbyCode'),
@@ -1953,7 +1976,7 @@ function getActiveMenuButtons(){
   } else if(appScene === APP_SCENE.NET){
     const lobbyVisible = lobbyLayer && !lobbyLayer.classList.contains('hidden');
     if(lobbyVisible){
-      ['btnLobbyBack','btnLobbyConnect','btnLobbyHelp'].forEach(id=>{
+      ['btnLobbyMenu','btnLobbyBack','btnLobbyConnect','btnLobbyHelp'].forEach(id=>{
         const el = document.getElementById(id);
         if(el && !el.disabled) buttons.push(el);
       });
@@ -3595,7 +3618,7 @@ if(uiRefs.btnEncyBack) uiRefs.btnEncyBack.addEventListener('click', ()=>closeEnc
 if(uiRefs.btnTutorialDownload) uiRefs.btnTutorialDownload.addEventListener('click', ()=>triggerTutorialDownload());
 if(uiRefs.btnTutorialCopy) uiRefs.btnTutorialCopy.addEventListener('click', ()=>copyTutorialLink());
 if(uiRefs.btnHudFullscreen) uiRefs.btnHudFullscreen.addEventListener('click', ()=>toggleFullscreen());
-if(uiRefs.btnBackMenu) uiRefs.btnBackMenu.addEventListener('click', ()=>{ resetNetState(); setScene(APP_SCENE.MENU); });
+if(uiRefs.btnBackMenu) uiRefs.btnBackMenu.addEventListener('click', ()=>{ showLobbyPanel(true); });
 if(uiRefs.btnResetLink) uiRefs.btnResetLink.addEventListener('click', ()=>resetNetState());
 if(uiRefs.btnCreateOffer) uiRefs.btnCreateOffer.addEventListener('click', ()=>createHostOffer());
 if(uiRefs.btnCreateAnswer) uiRefs.btnCreateAnswer.addEventListener('click', ()=>createClientAnswer());
@@ -3606,6 +3629,7 @@ if(uiRefs.btnApplyAnswer) uiRefs.btnApplyAnswer.addEventListener('click', ()=>{
 });
 if(uiRefs.btnOpenLobby) uiRefs.btnOpenLobby.addEventListener('click', ()=>showLobbyPanel(true));
 if(uiRefs.btnLobbyBack) uiRefs.btnLobbyBack.addEventListener('click', ()=>showLobbyPanel(false));
+if(uiRefs.btnLobbyMenu) uiRefs.btnLobbyMenu.addEventListener('click', ()=>{ resetNetState(); setScene(APP_SCENE.MENU); badge.innerText = 'Selecciona modo'; });
 if(uiRefs.btnLobbyConnect) uiRefs.btnLobbyConnect.addEventListener('click', ()=>connectLobby());
 if(uiRefs.btnLobbyHelp) uiRefs.btnLobbyHelp.addEventListener('click', ()=>showLobbyHelp());
 if(uiRefs.lobbyName) uiRefs.lobbyName.addEventListener('change', ()=>{
@@ -3665,7 +3689,12 @@ function setupPeer(role, options = {}){
   matchMode = MATCH_MODE.LAN;
   net.status = 'connecting';
   const pc = new RTCPeerConnection({
-    iceServers:[{urls:'stun:stun.l.google.com:19302'}]
+    iceServers:[
+      {urls:'stun:stun.l.google.com:19302'},
+      {urls:'stun:stun1.l.google.com:19302'},
+      {urls:'stun:openrelay.metered.ca:80'}
+    ],
+    iceCandidatePoolSize: 8
   });
   net.pc = pc;
   net.ice = [];
@@ -3798,6 +3827,7 @@ async function createClientAnswer(options = {}){
 async function waitIceComplete(pc){
   if(!pc) return;
   if(pc.iceGatheringState === 'complete') return;
+  const timeoutMs = 7000;
   await new Promise(res=>{
     const check = ()=>{
       if(pc.iceGatheringState === 'complete'){
@@ -3806,6 +3836,10 @@ async function waitIceComplete(pc){
       }
     };
     pc.addEventListener('icegatheringstatechange', check);
+    setTimeout(()=>{
+      pc.removeEventListener('icegatheringstatechange', check);
+      res(); // seguimos con los ICE reunidos hasta ahora
+    }, timeoutMs);
   });
 }
 
@@ -4524,7 +4558,7 @@ const ACH_COLORS = [
   { tint:'rgba(80,80,80,0.32)',   glow:'#8a8a8a' },  // hierro
   { tint:'rgba(176,190,197,0.30)', glow:'#d0d7dc' }, // plata
   { tint:'rgba(255,214,102,0.30)', glow:'#ffd666' }, // oro
-  { tint:'rgba(245,245,245,0.32)', glow:'#ffffff' }, // platino
+  { tint:'rgba(255,242,199,0.30)', glow:'#fff2c7' }, // platino
   { tint:'rgba(120,235,255,0.30)', glow:'#78ebff' }, // diamante
   { tint:'rgba(142,245,182,0.30)', glow:'#7be0a0' }, // esmeralda
   { tint:'rgba(255,90,90,0.30)',   glow:'#ff5a5a' }, // rubí
@@ -6827,7 +6861,7 @@ function updateDirectorClones(dt){
       continue;
     }
     const owner = (clone.ownerSide === 'L') ? p1 : p2;
-    const enemy = (clone.side === 'L') ? p1 : p2;
+    const enemy = getOpponentPlayer(owner);
     if(!owner || !enemy){
       directorClones.splice(i,1);
       continue;
@@ -6869,8 +6903,11 @@ function resolveDirectorCloneCollision(clone, enemy){
     enemy.x = clamp(enemy.x, minX, maxX);
     const gy = CONFIG.GROUND_Y - enemy.r;
     enemy.y = clamp(enemy.y, 60, gy);
-    enemy.vx *= 0.2;
-    enemy.vy *= 0.2;
+    const maxPush = (enemy.stats?.maxVx || CONFIG.PLAYER_MAX_VX) * 0.9;
+    enemy.vx = clamp(enemy.vx + nx * maxPush, -maxPush, maxPush);
+    if(ny < -0.1){
+      enemy.vy = Math.min(enemy.vy, ny * maxPush * 0.3);
+    }
   }
 }
 
@@ -8723,13 +8760,13 @@ addEventListener('keydown', e=>{
   if(appScene === APP_SCENE.NET && e.code === 'Escape'){
     const lobbyVisible = lobbyLayer && !lobbyLayer.classList.contains('hidden');
     if(lobbyVisible){
-      showLobbyPanel(false);
+      resetNetState();
+      setScene(APP_SCENE.MENU);
+      badge.innerText = 'Selecciona modo';
       e.preventDefault();
       return;
     }
-    resetNetState();
-    setScene(APP_SCENE.MENU);
-    badge.innerText = 'Selecciona modo';
+    showLobbyPanel(true);
     e.preventDefault();
     return;
   }
@@ -9539,13 +9576,16 @@ function drawSelectionGrid(){
       ctx.save();
       ctx.translate(x + CARD_W/2, y + CARD_H*0.58);
       const base = achStyle.glow || '#ffffff';
-      const grad = ctx.createRadialGradient(0, 0, 6, 0, 0, 60);
-      grad.addColorStop(0, hexToRgba(base, 0.66));
-      grad.addColorStop(0.45, hexToRgba(base, 0.4));
+      const lvl = ach.level || 0;
+      const innerR = 6 + lvl * 0.8;           // crece leve el centro
+      const outerR = 56 + lvl * 4;            // halo más amplio por nivel
+      const grad = ctx.createRadialGradient(0, 0, innerR, 0, 0, outerR);
+      grad.addColorStop(0, hexToRgba(base, 0.68));
+      grad.addColorStop(0.45, hexToRgba(base, 0.42));
       grad.addColorStop(1, hexToRgba(base, 0.0));
       ctx.fillStyle = grad;
       ctx.beginPath();
-      ctx.arc(0, 0, 60, 0, TAU);
+      ctx.arc(0, 0, outerR, 0, TAU);
       ctx.fill();
       ctx.restore();
     }
@@ -11144,12 +11184,25 @@ if(!botActive){
 
   // Etiquetas
   ctx.font = '700 20px system-ui';
-  ctx.fillStyle = '#fff';
+  const p1NameColor = getPlayerLevelColor(p1);
+  const p2NameColor = getPlayerLevelColor(p2);
+  ctx.fillStyle = p1NameColor;
+  ctx.shadowColor = hexToRgba(p1NameColor, 0.55);
+  ctx.shadowBlur = 8;
+  ctx.lineWidth = 3.5;
+  ctx.strokeStyle = 'rgba(0,0,0,0.75)';
   ctx.textAlign = 'left';
-  ctx.fillText(playerNames.p1 || 'P1', 40, 60);
+  const p1Label = playerNames.p1 || 'P1';
+  ctx.strokeText(p1Label, 40, 60);
+  ctx.fillText(p1Label, 40, 60);
 
   ctx.textAlign = 'right';
-  ctx.fillText(botActive ? 'BOT' : (playerNames.p2 || 'P2'), W - 40, 60);
+  ctx.fillStyle = p2NameColor;
+  ctx.shadowColor = hexToRgba(p2NameColor, 0.55);
+  const p2Label = botActive ? 'BOT' : (playerNames.p2 || 'P2');
+  ctx.strokeText(p2Label, W - 40, 60);
+  ctx.fillText(p2Label, W - 40, 60);
+  ctx.shadowBlur = 0;
 
   // Timer de partida
   if(matchTimerMs != null){
@@ -11294,6 +11347,7 @@ function loop(){
 /* Inicio */
 badge.innerText = 'Selecciona modo';
 setScene(APP_SCENE.MENU);
+syncProfileUi();
 gameState = STATE.SELECT;
 resetRally(Math.random()<0.5?'L':'R');
 loop();
