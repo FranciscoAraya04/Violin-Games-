@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Violin Beach Kombat (v1.4)</title>
+<title>Violin Beach Kombat (v1.5)</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600;700&display=swap');
   :root{
@@ -117,6 +117,10 @@
   .lobby-tag:hover{background:#173155}
   .lobby-tag.active{border-color:#45c2ff;background:#12365c;color:#e6f4ff}
   .lobby-status{margin-top:6px;font:600 12px system-ui;color:#9dc6ff}
+  .lobby-scan-wrap{margin-top:6px;color:#9dc6ff;font:600 12px system-ui}
+  .lobby-scan-bar{height:8px;border:1px solid #24406b;background:#0f1a2b;border-radius:6px;overflow:hidden;margin-top:4px}
+  .lobby-scan-fill{height:100%;width:0%;background:#45c2ff;transition:width .15s ease}
+  .lobby-scan-text{margin-top:4px;font:700 12px monospace;color:#c9d9ff}
   .lobby-split{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;margin-top:8px;align-items:start}
   .lobby-peers-col,.lobby-invite-col{min-width:0}
   .lobby-invite{background:#0c1422;border:1px solid #20365c;border-radius:10px;padding:10px;min-height:80px;font:600 13px system-ui;color:#c9d9ff}
@@ -161,6 +165,94 @@
     outline-offset:2px;
     box-shadow:0 0 0 2px #0e1c2f,0 10px 30px #000c;
   }
+  .profile-card{
+    margin-top:12px;
+    background:rgba(8,12,22,0.92);
+    border:1px solid #1c2c46;
+    border-radius:12px;
+    padding:12px 14px;
+    box-shadow:0 12px 30px #000a,0 0 0 1px #10203a;
+  }
+  .profile-top{
+    display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;
+  }
+  .profile-label{font:800 13px 'Barlow',system-ui;color:#9dc6ff;text-transform:uppercase;letter-spacing:0.5px;}
+  .profile-name{font:900 24px/1 'Barlow',system-ui;color:#e9f4ff;}
+  .profile-id{font:600 12px/1.4 'Barlow',system-ui;color:#8fa5c8;}
+  .profile-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;flex:1;}
+  .profile-note{color:#9dc6ff;font:500 12px/1.5 'Barlow',system-ui;margin:6px 0 4px;}
+  .profile-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:6px;}
+  .profile-stat{background:#0c1422;border:1px solid #1f365a;border-radius:10px;padding:10px 12px;box-shadow:0 10px 24px #0007;}
+  .profile-stat-value{font:800 18px/1 'Barlow',system-ui;color:#e9f4ff;}
+  .profile-stat-label{font:600 12px/1.3 'Barlow',system-ui;color:#9dc6ff;}
+  .profile-transfer{margin-top:10px;}
+  .profile-transfer-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+  .stats-panel{
+    background:rgba(7,12,24,0.92);
+    border:1px solid #20365c;
+    box-shadow:0 20px 50px #000a, 0 0 0 1px #0f2038;
+    border-radius:14px;
+    padding:18px 20px 22px;
+    width:min(940px,96vw);
+    color:#e8f2ff;
+  }
+  .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin:12px 0;}
+  .stats-card{background:#0c1422;border:1px solid #1f365a;border-radius:12px;padding:10px 12px;box-shadow:0 10px 30px #0007;}
+  .stats-card h3{margin:0 0 4px;font:800 15px/1.2 'Barlow',system-ui;color:#9dc6ff;text-transform:uppercase;letter-spacing:0.4px;}
+  .stats-card p{margin:0;font:800 22px/1.2 'Barlow',system-ui;color:#e9f4ff;}
+  .profile-fav{
+    margin-top:10px;
+    padding:10px;
+    background:#0d1626;
+    border:1px solid #1f365a;
+    border-radius:10px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .profile-fav canvas{
+    background:#0c1422;
+    border:1px solid #1f365a;
+    border-radius:10px;
+  }
+  .skin-frame{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:112px;
+    height:112px;
+    padding:8px;
+    box-sizing:border-box;
+    border-radius:12px;
+    background:#0c1422;
+    border:1px solid #1f365a;
+    box-shadow:0 0 0 1px #1f365a;
+  }
+  .profile-fav-meta{display:flex;flex-direction:column;gap:4px;min-width:140px;}
+  .profile-fav-label{font:700 12px 'Barlow',system-ui;color:#9dc6ff;text-transform:uppercase;letter-spacing:0.4px;}
+  .profile-fav-name{font:800 18px/1 'Barlow',system-ui;color:#e9f4ff;}
+  .profile-fav-sub{font:600 12px/1.3 'Barlow',system-ui;color:#8fa5c8;}
+  .stat-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 8px;border-radius:8px;background:#122235;border:1px solid #1f365a;color:#cfe1ff;font:700 12px 'Barlow',system-ui;}
+  .char-stats-list{display:flex;flex-direction:column;gap:8px;margin-top:8px;}
+  .char-stat-row{display:flex;align-items:center;gap:10px;background:#0c1422;border:1px solid #1f365a;border-radius:10px;padding:10px 12px;}
+  .char-stat-name{font:800 14px/1.2 'Barlow',system-ui;color:#e9f4ff;}
+  .char-stat-meta{font:600 12px/1.3 'Barlow',system-ui;color:#9dc6ff;}
+  .char-stat-grid{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;}
+  .ency-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-top:10px;}
+  .ency-stat{background:#0c1422;border:1px solid #1f365a;border-radius:10px;padding:8px 10px;box-shadow:0 10px 20px #0007;}
+  .ency-stat-label{font:700 11px/1.2 'Barlow',system-ui;color:#9dc6ff;text-transform:uppercase;letter-spacing:0.4px;}
+  .ency-stat-value{font:800 16px/1.2 'Barlow',system-ui;color:#e9f4ff;}
+  .touch-overlay{
+    position:fixed;inset:0;pointer-events:none;z-index:8;
+  }
+  .touch-overlay .line{
+    position:absolute;background:rgba(160,160,160,0.18);
+    box-shadow:0 0 8px #0006;
+  }
+  .touch-overlay .line.vert{width:1px;height:1px;}
+  .touch-overlay .line.horiz-left,
+  .touch-overlay .line.horiz-right{height:2px;}
   /* Menú principal */
   #menuPanel{
     background:transparent;
@@ -357,13 +449,18 @@
     padding:12px;
     box-shadow:0 12px 28px #0007;
     display:grid;
-    grid-template-columns:96px 1fr;
-    gap:10px;
+    grid-template-columns:140px 1fr;
+    align-items:flex-start;
+    gap:12px;
   }
-  .ency-card canvas{width:96px;height:96px;background:#0c1422;border:1px solid #1b2d4c;border-radius:10px;box-shadow:inset 0 0 18px #0006}
+  .ency-card canvas{width:96px;height:96px;background:#0c1422;border:1px solid #1b2d4c;border-radius:10px;box-shadow:inset 0 0 18px #0006;display:block}
   .ency-card h3{margin:0;font:800 16px/1.2 'Barlow',system-ui;color:#9dc6ff}
   .ency-meta{margin:4px 0;font:700 11px/1.2 'Barlow',system-ui;color:#8fb3ff;letter-spacing:0.5px;text-transform:uppercase}
   .ency-card p{margin:4px 0;font:500 13px/1.45 'Barlow',system-ui;color:#ced9f6}
+  .ency-details{display:none;margin-top:6px}
+  .ency-card.expanded .ency-details{display:block}
+  .ency-body{grid-column:2/3;}
+  .ency-details{grid-column:2/3;}
   .menu-footer{
     text-align:center;
     color:#8aa2c8;
@@ -375,6 +472,11 @@
 <body>
 <div class="wrap">
   <canvas id="game" width="1200" height="675" aria-label="Violin Beach Volley"></canvas>
+</div>
+<div class="touch-overlay hidden" id="touchOverlay">
+  <div class="line vert"></div>
+  <div class="line horiz-left"></div>
+  <div class="line horiz-right"></div>
 </div>
 
 <div class="badge" id="badge"></div>
@@ -396,8 +498,8 @@
           <span class="mode-copy">Duelos 1 vs 1 en el mismo dispositivo.</span>
         </button>
         <button class="mode-card" id="btnLocalBot" style="--mode-img: var(--mode-bot-img);">
-          <span class="mode-tag">Local vs Bot</span>
-          <span class="mode-copy">Entrena o juega contra la IA en la arena.</span>
+          <span class="mode-tag">Supervivencia Bot</span>
+          <span class="mode-copy">Destruye bots infinitos antes de que te dejen sin vida.</span>
         </button>
         <button class="mode-card" id="btnLan" style="--mode-img: var(--mode-lan-img);">
           <span class="mode-tag">PvP LAN / WiFi</span>
@@ -405,11 +507,78 @@
         </button>
       </div>
 <div class="menu-description">Elige un modo para saltar a la selección de personajes y entrar al combate en la playa.</div>
+      <div class="profile-card" id="profileCard">
+        <div class="profile-top">
+          <div>
+            <div class="profile-label">Perfil guardado</div>
+            <div class="profile-name" id="profileName">---</div>
+            <div class="profile-id">ID: <span id="profileId">---</span></div>
+          </div>
+          <div class="profile-actions">
+            <button class="ui-btn low-profile" id="btnEditName">Cambiar nombre</button>
+            <button class="ui-btn low-profile" id="btnExportProgress">Exportar</button>
+            <button class="ui-btn low-profile" id="btnImportProgress">Importar</button>
+            <button class="ui-btn secondary" id="btnResetProgress">Reset</button>
+          </div>
+        </div>
+        <div class="profile-note" id="profileNote">Se guarda en este navegador. Exporta para llevarlo a otro dispositivo.</div>
+        <div class="profile-stats">
+          <div class="profile-stat">
+            <div class="profile-stat-value" id="statTotal">0</div>
+            <div class="profile-stat-label">Partidas</div>
+          </div>
+          <div class="profile-stat">
+            <div class="profile-stat-value" id="statTimePlayed">0h</div>
+            <div class="profile-stat-label">Tiempo jugado</div>
+          </div>
+          <div class="profile-stat">
+            <div class="profile-stat-value" id="statBots">0</div>
+            <div class="profile-stat-label">Bots destruidos</div>
+          </div>
+          <div class="profile-stat">
+            <div class="profile-stat-value" id="statLanKd">0/0</div>
+            <div class="profile-stat-label">K/D LAN</div>
+          </div>
+        </div>
+        <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+          <button class="ui-btn low-profile" id="btnOpenStats">Ver estadísticas</button>
+        </div>
+        <div class="profile-fav">
+          <div class="skin-frame" id="favSkinFrame">
+            <canvas id="favSkinCanvas" width="96" height="96" aria-label="Personaje favorito"></canvas>
+          </div>
+          <div class="profile-fav-meta">
+            <div class="profile-fav-label">Personaje favorito</div>
+            <div class="profile-fav-name" id="favSkinName">-</div>
+            <div class="profile-fav-sub" id="favSkinMeta">Aún sin partidas</div>
+            <div class="char-stat-grid" id="favSkinChips"></div>
+            <div class="char-stat-grid" id="favAchProgress"></div>
+          </div>
+        </div>
+        <div class="profile-transfer hidden" id="profileExportBox">
+          <div class="field">
+            <label>Progreso (copiar y pegar)</label>
+            <textarea id="exportOutput" readonly></textarea>
+            <small>Guarda este texto y pegalo en "Importar" en otro dispositivo.</small>
+          </div>
+        </div>
+        <div class="profile-transfer hidden" id="profileImportBox">
+          <div class="field">
+            <label>Importar progreso</label>
+            <textarea id="importInput" placeholder="{...}"></textarea>
+            <small>Reemplaza el progreso actual al aplicar.</small>
+          </div>
+          <div class="profile-transfer-actions">
+            <button class="ui-btn" id="btnApplyImport">Aplicar import</button>
+            <button class="ui-btn secondary" id="btnCancelImport">Cancelar</button>
+          </div>
+        </div>
+      </div>
       <div class="menu-actions">
         <button class="ui-btn low-profile" id="btnOpenTutorial">Tutorial</button>
         <button class="ui-btn low-profile" id="btnToggleFullscreen">Pantalla completa</button>
       </div>
-      <div class="menu-footer">Violin Beach Kombat v1.4 · 3 de diciembre de 2025 · francisco.araya.work@gmail.com</div>
+      <div class="menu-footer">Violin Beach Kombat v1.5 · 4 de diciembre de 2025 · francisco.araya.work@gmail.com</div>
     </div>
   </div>
 
@@ -459,13 +628,13 @@
       <h1>Cómo jugar Violin Beach Kombat</h1>
       <span class="pill">Tutorial</span>
     </div>
-    <p class="tutorial-note">En móvil: el 1v1 local no es jugable (controles se solapan). Usa PvBot para practicar o LAN/WiFi para jugar con otra persona.</p>
+    <p class="tutorial-note">En móvil: el 1v1 local no es jugable (controles se solapan). Usa Supervivencia Bot para practicar o LAN/WiFi para jugar con otra persona.</p>
     <div class="tutorial-grid">
       <div class="tutorial-section">
         <h2>Modos rápidos</h2>
         <ul>
           <li><b>Local 1v1:</b> ideal en PC/teclado+mandos; en móvil no es práctico.</li>
-          <li><b>PvBot:</b> entrena contra la IA y prueba personajes.</li>
+          <li><b>Supervivencia Bot:</b> destruye bots infinitos y marca tu récord.</li>
           <li><b>LAN / WiFi:</b> conecta dos dispositivos en la misma red.</li>
         </ul>
         <p><b>Conexión LAN/WiFi</b>: comparte Oferta/Respuesta (copiar/pegar) o usa Lobby (sólo con el juego descargado y servidor en la red).</p>
@@ -488,7 +657,7 @@
         </ul>
         <button class="ui-btn low-profile" id="btnOpenEncy" style="margin-top:6px">Abrir enciclopedia de personajes</button>
       </div>
-<div class="tutorial-section">
+      <div class="tutorial-section">
         <h2>Controles</h2>
         <ul>
           <li><b>Teclado P1:</b> W/A/S/D para mover/saltar/agacharse.</li>
@@ -500,9 +669,9 @@
       </div>
       <div class="tutorial-section">
         <h2>Descarga directa (offline)</h2>
-        <p>Descarga el HTML (v1.4) desde el juego para jugar sin navegador o montar el lobby local.</p>
+        <p>Descarga el HTML (v1.5) desde el juego para jugar sin navegador o montar el lobby local.</p>
         <div class="tutorial-download">
-          <input id="tutorialDownloadUrl" type="url" value="https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/refs/heads/main/ViolinBeachKombat/Violin_Beach_Kombat%28v1.4%29.html" />
+          <input id="tutorialDownloadUrl" type="url" value="https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/refs/heads/main/ViolinBeachKombat/Violin_Beach_Kombat%28v1.5%29.html" />
           <button class="mini-btn" id="btnTutorialDownload">Descargar</button>
           <button class="mini-btn secondary" id="btnTutorialCopy">Copiar link</button>
           <small id="tutorialDownloadStatus"></small>
@@ -527,7 +696,7 @@
         <ul>
           <li>Activa pantalla completa para evitar toques accidentales.</li>
           <li>Si el ping sube en LAN, reintenta oferta/respuesta.</li>
-          <li>Practica habilidades en PvBot antes de retar en LAN.</li>
+          <li>Practica habilidades en Supervivencia antes de retar en LAN.</li>
         </ul>
         <button class="ui-btn low-profile" id="btnTutorialBack" style="margin-top:6px">Volver al menú</button>
       </div>
@@ -546,6 +715,38 @@
 
 </div>
 
+<div class="ui-layer hidden" id="statsLayer">
+  <div class="stats-panel" id="statsPanel">
+    <div class="tutorial-hero" style="margin-bottom:8px;">
+      <h1>Estadísticas generales</h1>
+      <span class="pill">Perfil</span>
+    </div>
+    <p style="margin:6px 0 10px;">Resumen rápido de tu progreso. Para ver stats por personaje abre la enciclopedia.</p>
+    <div class="stats-grid">
+      <div class="stats-card">
+        <h3>Partidas totales</h3>
+        <p id="statTotal2">0</p>
+      </div>
+      <div class="stats-card">
+        <h3>Tiempo jugado</h3>
+        <p id="statTimePlayed2">0h</p>
+      </div>
+      <div class="stats-card">
+        <h3>Bots destruidos</h3>
+        <p id="statBots2">0</p>
+      </div>
+      <div class="stats-card">
+        <h3>K/D LAN</h3>
+        <p id="statLanKd2">0/0</p>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="ui-btn" id="btnStatsEncy">Abrir enciclopedia</button>
+      <button class="ui-btn secondary" id="btnStatsBack">Volver</button>
+    </div>
+  </div>
+</div>
+
 <div class="ui-layer hidden" id="lobbyLayer">
 <div class="panel scrollable" id="lobbyPanel">
   <h1>Lobby LAN (opcional)</h1>
@@ -560,6 +761,10 @@
     </div>
     <small>Si tu host es 192.168.x.x, escribe solo “x.x” (ej: 1.13 =&gt; ws://192.168.1.13:3000). También acepta la URL completa.</small>
     <div class="lobby-status" id="lobbyStatus">Estado: sin conectar</div>
+    <div class="lobby-scan-wrap hidden" id="lobbyScanWrap">
+      <div class="lobby-scan-bar"><div class="lobby-scan-fill" id="lobbyScanFill"></div></div>
+      <div class="lobby-scan-text" id="lobbyScanText"></div>
+    </div>
     <div class="lobby-split">
       <div class="lobby-peers-col">
         <div class="field">
@@ -864,15 +1069,15 @@ function pickWeighted(list, weightKey='weight'){
   return items[items.length-1].it;
 }
 
-const BALL_TYPES = [
+const BALL_TYPES = [ //tipos de pelotas disponibles
   // gradiente: stops: [ [offset,color], ... ], seam color, radius multiplier (1 = default)
   { name:'Classic', stops:[[0,'#fff8'],[1,'#f2742a']], seam:'#fff', rMul:1 , weight: 2.0 },
   { name:'Fire',    stops:[[0,'#fff8'],[1,'#ff4c00']], seam:'#ffddb3', rMul:1.05, weight: 2.0 },
   { name:'Ice',     stops:[[0,'#fff8'],[1,'#00d4ff']], seam:'#b3f0ff', rMul:1.1, weight: 2.0 },
   { name:'Blue',    stops:[[0,'#fff8'],[1,'#2aa6ff']], seam:'#e6f7ff', rMul:1.15, weight: 2.0 },
   { name:'Dark',    stops:[[0,'#fff8'],[1,'#7a4bff']], seam:'#fff3', rMul:1.2, weight: 2.0 },
-  { name:'Mystery', stops:[[0,'#fc5b'],[1,'#f94b']], seam:'#fc35', rMul:2.5, weight: 0.01 },
-  { name:'tenis', stops:[[0,'#fff8'],[1,'#f2f2f2']], seam:'#ffffff', rMul:0.4 , weight: 0.5 },
+  { name:'Mystery', stops:[[0,'#fc5b'],[1,'#f94b']], seam:'#fc35', rMul:2.5, weight: 0.1 },
+  { name:'tenis', stops:[[0,'#fff8'],[1,'#f2f2f2']], seam:'#ffffff', rMul:0.4 , weight: 0.3 },
 ];
 
 // Estado actual elegido al iniciar la partida
@@ -881,6 +1086,317 @@ let currentBallType = null;
 
 // ← AÑADE ESTO: asignar un fondo por defecto para la selección
 currentBackground = BACKGROUNDS[3]; // índice 3 = 'Real Beach' (la foto)
+
+/* Progreso y perfil (LocalStorage) */
+const PROGRESS_KEY = 'vbk_progress_v1';
+const PROGRESS_VERSION = 1;
+const CHAR_DEFAULT_STATS = {
+  matches: 0,
+  wins: 0,
+  losses: 0,
+  abilityUses: 0,
+  points: 0,
+  fatalities: 0,
+  botKillsTotal: 0,
+  best20TimeMs: null,
+  lanMatches: 0,
+  fouls: 0
+};
+
+function genUserId(){
+  if(window.crypto && typeof window.crypto.randomUUID === 'function'){
+    return window.crypto.randomUUID();
+  }
+  return 'vbk-' + Math.random().toString(16).slice(2) + Math.random().toString(16).slice(2);
+}
+
+function sanitizeUserName(name){
+  if(!name) return '';
+  return String(name).replace(/[^\w \-_.]/g,'').trim().slice(0, 24);
+}
+
+function createBaseProgress(){
+  return {
+    version: PROGRESS_VERSION,
+    user: { id: genUserId(), name: 'Jugador' },
+  stats: {
+    matches: { total:0, local:0, bot:0, lan:0 },
+    totalHits: 0,
+    hitsByChar: {},
+    perChar: {},
+    timePlayedMs: 0,
+    botKillsTotal: 0,
+    lanKd: { wins:0, losses:0 },
+    totalFatalities: 0
+  },
+  badges: [],
+  skins: [],
+  loadout: {},
+  achievements: []
+  };
+}
+
+function normalizeProgress(data, base = createBaseProgress()){
+  const merged = { ...base, ...(data || {}) };
+  merged.version = PROGRESS_VERSION;
+  merged.user = { ...base.user, ...(data?.user || {}) };
+  if(!merged.user.id) merged.user.id = genUserId();
+  if(!merged.user.name) merged.user.name = 'Jugador';
+  const stats = data?.stats || {};
+  const matches = { total:0, local:0, bot:0, lan:0, ...(stats.matches || {}) };
+  merged.stats = {
+    ...base.stats,
+    ...stats,
+    matches
+  };
+  if(!merged.stats.hitsByChar) merged.stats.hitsByChar = {};
+  if(!merged.stats.perChar || typeof merged.stats.perChar !== 'object') merged.stats.perChar = {};
+  if(!merged.stats.timePlayedMs) merged.stats.timePlayedMs = 0;
+  if(!merged.stats.botKillsTotal) merged.stats.botKillsTotal = 0;
+  if(!merged.stats.lanKd || typeof merged.stats.lanKd !== 'object') merged.stats.lanKd = { wins:0, losses:0 };
+  if(typeof merged.stats.lanKd.wins !== 'number') merged.stats.lanKd.wins = 0;
+  if(typeof merged.stats.lanKd.losses !== 'number') merged.stats.lanKd.losses = 0;
+  if(typeof merged.stats.totalFatalities !== 'number') merged.stats.totalFatalities = 0;
+  for(const [skin, data] of Object.entries(merged.stats.perChar)){
+    merged.stats.perChar[skin] = { ...CHAR_DEFAULT_STATS, ...(data || {}) };
+    for(const key of Object.keys(CHAR_DEFAULT_STATS)){
+      if(key === 'best20TimeMs'){
+        const v = merged.stats.perChar[skin][key];
+        merged.stats.perChar[skin][key] = (typeof v === 'number' && !Number.isNaN(v)) ? v : null;
+      } else if(typeof merged.stats.perChar[skin][key] !== 'number' || Number.isNaN(merged.stats.perChar[skin][key])){
+        merged.stats.perChar[skin][key] = CHAR_DEFAULT_STATS[key];
+      }
+    }
+  }
+  merged.badges = Array.isArray(data?.badges) ? data.badges : [];
+  merged.skins = Array.isArray(data?.skins) ? data.skins : [];
+  merged.loadout = { ...base.loadout, ...(data?.loadout || {}) };
+  merged.achievements = Array.isArray(data?.achievements) ? data.achievements : [];
+  return merged;
+}
+
+function loadProgress(){
+  try{
+    const raw = localStorage.getItem(PROGRESS_KEY);
+    if(!raw) return createBaseProgress();
+    const parsed = JSON.parse(raw);
+    return normalizeProgress(parsed);
+  }catch(err){
+    console.warn('No pude cargar progreso', err);
+    return createBaseProgress();
+  }
+}
+
+let progress = loadProgress();
+
+function saveProgress(next = progress){
+  progress = normalizeProgress(next);
+  try{
+    localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress));
+  }catch(err){
+    console.warn('No pude guardar progreso', err);
+  }
+  if(typeof syncProfileUi === 'function') syncProfileUi();
+}
+
+function exportProgressData(){
+  try{
+    return JSON.stringify(progress);
+  }catch(err){
+    return '';
+  }
+}
+
+function importProgressData(text){
+  if(text == null) throw new Error('Progreso vacio');
+  const trimmed = String(text).trim();
+  if(!trimmed) throw new Error('Progreso vacio');
+  let parsed = null;
+  try{
+    parsed = JSON.parse(trimmed);
+  }catch(err){
+    throw new Error('JSON invalido');
+  }
+  saveProgress(parsed);
+}
+
+function resetProgressData(){
+  saveProgress(createBaseProgress());
+}
+
+function ensureCharStats(skin){
+  if(!skin) return null;
+  if(!progress.stats.perChar) progress.stats.perChar = {};
+  if(!progress.stats.perChar[skin]) progress.stats.perChar[skin] = { ...CHAR_DEFAULT_STATS };
+  const entry = progress.stats.perChar[skin];
+  for(const key of Object.keys(CHAR_DEFAULT_STATS)){
+    if(typeof entry[key] !== 'number' || Number.isNaN(entry[key])){
+      entry[key] = CHAR_DEFAULT_STATS[key];
+    }
+  }
+  return entry;
+}
+
+function addCharStat(skin, key, delta=1){
+  if(!skin || !(key in CHAR_DEFAULT_STATS)) return;
+  const entry = ensureCharStats(skin);
+  if(!entry) return;
+  entry[key] = (entry[key] || 0) + (delta || 0);
+}
+
+function updateBotKillStats(skin, elapsedMs=0){
+  const entry = ensureCharStats(skin);
+  if(!entry) return;
+  entry.botKillsTotal = (entry.botKillsTotal || 0) + 1;
+  if(botKills === 20){
+    if(entry.best20TimeMs == null || (typeof elapsedMs === 'number' && elapsedMs > 0 && elapsedMs < entry.best20TimeMs)){
+      entry.best20TimeMs = elapsedMs;
+    }
+  }
+}
+
+function addFoulStat(skin){
+  if(!skin) return;
+  const entry = ensureCharStats(skin);
+  if(!entry) return;
+  entry.fouls = (entry.fouls || 0) + 1;
+}
+
+function getSkinLabel(skin){
+  const profile = getSkinProfile(skin);
+  return profile?.label || (skin ? skin.toUpperCase() : '-');
+}
+
+function getFavoriteChar(){
+  const perChar = progress?.stats?.perChar || {};
+  let best = null;
+  for(const [skin, data] of Object.entries(perChar)){
+    const d = data || {};
+    const score = (d.wins || 0) * 1000 + (d.matches || 0) * 10 + (d.points || 0);
+    if(score <= 0) continue;
+    if(!best || score > best.score){
+      best = { skin, stats: d, score };
+    }
+  }
+  return best;
+}
+
+function getCharStatsSnapshot(skin){
+  if(!skin) return { ...CHAR_DEFAULT_STATS };
+  const entry = ensureCharStats(skin) || { ...CHAR_DEFAULT_STATS };
+  return { ...CHAR_DEFAULT_STATS, ...entry };
+}
+
+function formatKd(stats){
+  const wins = stats?.wins || 0;
+  const losses = stats?.losses || 0;
+  const kd = losses > 0 ? (wins / losses) : (wins > 0 ? '∞' : 0);
+  const kdNum = typeof kd === 'number' ? kd.toFixed(2) : kd;
+  const denom = wins + losses;
+  const pct = denom > 0 ? ((wins / denom) * 100).toFixed(1) : '0.0';
+  return { kd: kdNum, fraction: `${wins}/${losses}`, pct };
+}
+
+function getAchievementLevel(){
+  const count = Array.isArray(progress?.achievements) ? progress.achievements.length : 0;
+  return Math.min(count, ACH_COLORS.length - 1);
+}
+
+function getAchFrameStyle(level){
+  return ACH_COLORS[level] || null;
+}
+
+function getCharAchievementData(stats){
+  const s = stats || {};
+  const botKills = s.botKillsTotal || 0;
+  const best20 = (typeof s.best20TimeMs === 'number') ? s.best20TimeMs : null;
+  const lan = s.lanMatches || 0;
+  const fatals = s.fatalities || 0;
+  let met = 0;
+  if(botKills >= 50) met++;
+  if(botKills >= 100) met++;
+  if(botKills >= 500) met++;
+  if(botKills >= 1000) met++;
+  if(best20 !== null && best20 <= 120000) met++;
+  if(lan >= 5) met++;
+  if(fatals >= 10) met++;
+  const level = Math.min(met, ACH_COLORS.length - 1);
+  const lines = [
+    `Bots: ${botKills} / 50 / 100 / 500 / 1000`,
+    `20 bots <2: ${best20 !== null ? formatMsClock(best20) : '--'}`,
+    `LAN: ${lan}/5`,
+    `Fatalities: ${fatals}/10`,
+    `Fouls: ${s.fouls || 0}`
+  ];
+  return { level, lines, botKills, best20, lan, fatals, fouls: s.fouls || 0, met };
+}
+
+function unlockAchievement(id){
+  if(!id) return false;
+  if(!Array.isArray(progress.achievements)) progress.achievements = [];
+  if(progress.achievements.includes(id)) return false;
+  progress.achievements.push(id);
+  saveProgress(progress);
+  return true;
+}
+
+function evaluateAchievements(context = {}){
+  const stats = progress?.stats || {};
+  for(const ach of ACHIEVEMENTS){
+    if(ach && typeof ach.check === 'function'){
+      if(ach.check(stats, context)){
+        unlockAchievement(ach.id);
+      }
+    }
+  }
+}
+
+function applyPostGameStats(winnerKey, elapsedMs=0, context = {}){
+  const stats = progress?.stats;
+  if(!stats) return;
+  const botRun = context.botKillsRun || 0;
+  const lanPlayed = context.isLan ? 1 : 0;
+  const fatalityCount = context.wasFatality ? 1 : 0;
+
+  if(elapsedMs > 0){
+    stats.timePlayedMs = (stats.timePlayedMs || 0) + elapsedMs;
+  }
+  if(matchMode === MATCH_MODE.BOT){
+    stats.botKillsTotal = (stats.botKillsTotal || 0) + botRun;
+  }
+  if(matchMode === MATCH_MODE.LAN){
+    const kd = stats.lanKd || { wins:0, losses:0 };
+    const isP1Winner = winnerKey === 'p1';
+    const myWin = (netRole === 'host' && isP1Winner) || (netRole === 'client' && !isP1Winner);
+    if(myWin) kd.wins = (kd.wins || 0) + 1;
+    else kd.losses = (kd.losses || 0) + 1;
+    stats.lanKd = kd;
+    const winnerSkin = (winnerKey === 'p1') ? p1?.skin : p2?.skin;
+    const loserSkin = (winnerKey === 'p1') ? p2?.skin : p1?.skin;
+    if(winnerSkin){
+      const entry = ensureCharStats(winnerSkin);
+      if(entry) entry.lanMatches = (entry.lanMatches || 0) + 1;
+    }
+    if(loserSkin){
+      const entry = ensureCharStats(loserSkin);
+      if(entry) entry.lanMatches = (entry.lanMatches || 0) + 1;
+    }
+  }
+  if(fatalityCount){
+    stats.totalFatalities = (stats.totalFatalities || 0) + fatalityCount;
+    const skin = (winnerKey === 'p1') ? p1?.skin : p2?.skin;
+    if(skin && !(botActive && winnerKey === 'p2')){
+      addCharStat(skin, 'fatalities', fatalityCount);
+    }
+  }
+  evaluateAchievements({
+    botKillsRun: botRun,
+    elapsedMs,
+    lanPlayed,
+    fatalityCount
+  });
+  saveProgress(progress);
+}
 
 /* Utilidades */
 const TAU = Math.PI*2;
@@ -899,6 +1415,12 @@ const menuPanel = document.getElementById('menuPanel');
 const lanPanel = document.getElementById('lanPanel');
 const encyPanel = document.getElementById('encyPanel');
 const tutorialPanel = document.getElementById('tutorialPanel');
+const touchOverlay = document.getElementById('touchOverlay');
+const touchOverlayLines = touchOverlay ? {
+  vert: touchOverlay.querySelector('.line.vert'),
+  horizLeft: touchOverlay.querySelector('.line.horiz-left'),
+  horizRight: touchOverlay.querySelector('.line.horiz-right')
+} : {};
 const lobbyLayer = document.getElementById('lobbyLayer');
 const lobbyPanel = document.getElementById('lobbyPanel');
 const pauseHudBtn = document.getElementById('btnPauseHud');
@@ -915,6 +1437,39 @@ const uiRefs = {
   btnLocalPvp: document.getElementById('btnLocalPvp'),
   btnLocalBot: document.getElementById('btnLocalBot'),
   btnLan: document.getElementById('btnLan'),
+  profileCard: document.getElementById('profileCard'),
+  profileName: document.getElementById('profileName'),
+  profileId: document.getElementById('profileId'),
+  profileNote: document.getElementById('profileNote'),
+  statTotal: document.getElementById('statTotal'),
+  statTimePlayed: document.getElementById('statTimePlayed'),
+  statBots: document.getElementById('statBots'),
+  statLanKd: document.getElementById('statLanKd'),
+  favSkinCanvas: document.getElementById('favSkinCanvas'),
+  favSkinName: document.getElementById('favSkinName'),
+  favSkinMeta: document.getElementById('favSkinMeta'),
+  favSkinChips: document.getElementById('favSkinChips'),
+  favAchProgress: document.getElementById('favAchProgress'),
+  charStatsList: document.getElementById('charStatsList'),
+  btnOpenStats: document.getElementById('btnOpenStats'),
+  statsLayer: document.getElementById('statsLayer'),
+  statsPanel: document.getElementById('statsPanel'),
+  statTotal2: document.getElementById('statTotal2'),
+  statTimePlayed2: document.getElementById('statTimePlayed2'),
+  statBots2: document.getElementById('statBots2'),
+  statLanKd2: document.getElementById('statLanKd2'),
+  btnStatsBack: document.getElementById('btnStatsBack'),
+  btnStatsEncy: document.getElementById('btnStatsEncy'),
+  profileExportBox: document.getElementById('profileExportBox'),
+  profileImportBox: document.getElementById('profileImportBox'),
+  exportOutput: document.getElementById('exportOutput'),
+  importInput: document.getElementById('importInput'),
+  btnEditName: document.getElementById('btnEditName'),
+  btnExportProgress: document.getElementById('btnExportProgress'),
+  btnImportProgress: document.getElementById('btnImportProgress'),
+  btnApplyImport: document.getElementById('btnApplyImport'),
+  btnCancelImport: document.getElementById('btnCancelImport'),
+  btnResetProgress: document.getElementById('btnResetProgress'),
   btnToggleFullscreen: document.getElementById('btnToggleFullscreen'),
   btnOpenTutorial: document.getElementById('btnOpenTutorial'),
   btnTutorialBack: document.getElementById('btnTutorialBack'),
@@ -937,6 +1492,9 @@ const uiRefs = {
   lobbyCode: document.getElementById('lobbyCode'),
   lobbyName: document.getElementById('lobbyName'),
   lobbyStatus: document.getElementById('lobbyStatus'),
+  lobbyScanWrap: document.getElementById('lobbyScanWrap'),
+  lobbyScanFill: document.getElementById('lobbyScanFill'),
+  lobbyScanText: document.getElementById('lobbyScanText'),
   lobbyPeers: document.getElementById('lobbyPeers'),
   lobbyInviteBox: document.getElementById('lobbyInviteBox'),
   lobbyHelpText: document.getElementById('lobbyHelpText'),
@@ -956,13 +1514,41 @@ let netRole = null; // 'host' o 'client'
 let tutorialOpen = false;
 let encyOpen = false;
 let encyReturnTarget = 'menu';
+let selectionUsedTouch = false;
 let lobbySocket = null;
 let lobbyId = null;
 let lobbyPeers = [];
 let lobbyNames = {};
-let lobbyDesiredName = '';
+let lobbyDesiredName = sanitizeUserName(progress?.user?.name) || '';
 let lobbySelectedPeer = null;
 let lobbyPendingInviteFrom = null;
+const LOBBY_SCAN_PORT = 3000;
+// Aquí está la lista de prioridad de IP a buscar lobby (whitelist editable)
+const LOBBY_SCAN_WHITELIST = [
+  // Ejemplos: '192.168.100.220', '192.168.1.13', '1.13'
+  '1.13','192.168.100.220',
+];
+const LOBBY_SCAN_TIMEOUT = 800;       // quick scan
+const LOBBY_SCAN_GAP = 6;
+const LOBBY_SCAN_MAX_CONCURRENCY = 12;
+let lobbyScanState = {
+  active:false, token:0, queue:[],
+  inFlight:0, attempts:0, total:0, foundUrl:'', timer:null, lastStatusTs:0,
+  current:''
+};
+
+function getStoredPlayerName(){
+  return sanitizeUserName(progress?.user?.name) || 'Jugador 1';
+}
+
+function syncLobbyNameFromProfile(force=false){
+  const name = getStoredPlayerName();
+  if(!name) return;
+  if(force || !lobbyDesiredName) lobbyDesiredName = name;
+  if(uiRefs.lobbyName && (force || !uiRefs.lobbyName.value)){
+    uiRefs.lobbyName.value = name;
+  }
+}
 
 const net = {
   pc: null,
@@ -986,7 +1572,7 @@ const net = {
   lastHostStateSent: 0
 };
 
-let playerNames = { p1:'Jugador 1', p2:'Jugador 2' };
+let playerNames = { p1:getStoredPlayerName(), p2:'Jugador 2' };
 function setPlayerNames(names = {}){
   if(names.p1){
     const clean = String(names.p1).trim().slice(0, 24);
@@ -998,7 +1584,7 @@ function setPlayerNames(names = {}){
   }
 }
 function resetPlayerNames(){
-  playerNames = { p1:'Jugador 1', p2:'Jugador 2' };
+  playerNames = { p1:getStoredPlayerName(), p2:'Jugador 2' };
 }
 
 function setScene(scene){
@@ -1007,6 +1593,7 @@ function setScene(scene){
   if(scene === APP_SCENE.MENU){
     if(tutorialPanel) tutorialPanel.classList.toggle('hidden', !tutorialOpen || encyOpen);
     if(uiRefs.encyPanel) uiRefs.encyPanel.classList.toggle('hidden', !encyOpen);
+    if(uiRefs.statsLayer) uiRefs.statsLayer.classList.add('hidden');
     uiLayer.classList.remove('hidden');
     menuPanel.classList.toggle('hidden', tutorialOpen || encyOpen);
     lanPanel.classList.add('hidden');
@@ -1015,15 +1602,21 @@ function setScene(scene){
   } else if(scene === APP_SCENE.NET){
     tutorialOpen = false;
     encyOpen = false;
+    if(uiRefs.statsLayer) uiRefs.statsLayer.classList.add('hidden');
     if(tutorialPanel) tutorialPanel.classList.add('hidden');
     if(uiRefs.encyPanel) uiRefs.encyPanel.classList.add('hidden');
     uiLayer.classList.remove('hidden');
     menuPanel.classList.add('hidden');
-    lanPanel.classList.remove('hidden');
+    lanPanel.classList.add('hidden');
+    if(lobbyLayer) lobbyLayer.classList.remove('hidden');
     menuFocusIndex = 0;
     syncMenuFocus();
   } else {
     uiLayer.classList.add('hidden');
+  }
+  if(scene !== APP_SCENE.MENU){
+    toggleProfileExport(false);
+    toggleProfileImport(false);
   }
   syncUiState();
 }
@@ -1041,8 +1634,13 @@ function getActiveMenuButtons(){
         const el = document.getElementById(id);
         if(el && !el.disabled) buttons.push(el);
       });
+    } else if(uiRefs.statsLayer && !uiRefs.statsLayer.classList.contains('hidden')){
+      ['btnStatsBack','btnStatsEncy'].forEach(id=>{
+        const el = document.getElementById(id);
+        if(el && !el.disabled) buttons.push(el);
+      });
     } else {
-      ['btnLocalPvp','btnLocalBot','btnLan','btnOpenTutorial','btnToggleFullscreen'].forEach(id=>{
+      ['btnLocalPvp','btnLocalBot','btnLan','btnOpenTutorial','btnToggleFullscreen','btnEditName','btnExportProgress','btnImportProgress','btnOpenStats'].forEach(id=>{
         const el = document.getElementById(id);
         if(el && !el.disabled) buttons.push(el);
       });
@@ -1091,6 +1689,277 @@ function activateMenuFocus(){
   }
 }
 
+const PROFILE_NOTE_DEFAULT = 'Se guarda en este navegador. Exporta para llevarlo a otro dispositivo.';
+
+function setProfileNote(text){
+  if(uiRefs.profileNote){
+    uiRefs.profileNote.textContent = text || PROFILE_NOTE_DEFAULT;
+  }
+}
+
+function toggleProfileExport(show){
+  if(!uiRefs.profileExportBox) return;
+  uiRefs.profileExportBox.classList.toggle('hidden', !show);
+  if(show && uiRefs.exportOutput){
+    uiRefs.exportOutput.value = exportProgressData();
+    try{
+      uiRefs.exportOutput.focus();
+      uiRefs.exportOutput.select();
+    }catch(err){}
+  }
+}
+
+function toggleProfileImport(show){
+  if(!uiRefs.profileImportBox) return;
+  uiRefs.profileImportBox.classList.toggle('hidden', !show);
+  if(show && uiRefs.importInput){
+    uiRefs.importInput.value = '';
+    uiRefs.importInput.focus();
+  }
+}
+
+function renderFavoriteSkin(){
+  if(!uiRefs.favSkinName || !uiRefs.favSkinMeta) return;
+  const fav = getFavoriteChar() || { skin: ROSTER[0], stats: CHAR_DEFAULT_STATS };
+  const name = fav ? getSkinLabel(fav.skin) : '-';
+  const stats = fav?.stats || null;
+   const ach = getCharAchievementData(stats || {});
+  const style = getAchFrameStyle(ach.level);
+  if(uiRefs.favSkinFrame){
+    if(style){
+      uiRefs.favSkinFrame.style.boxShadow = `0 0 0 2px ${style.glow}aa, 0 0 16px ${style.glow}88`;
+      uiRefs.favSkinFrame.style.borderColor = style.glow + '99';
+    } else {
+      uiRefs.favSkinFrame.style.boxShadow = '0 0 0 1px #1f365a';
+      uiRefs.favSkinFrame.style.borderColor = '#1f365a';
+    }
+  }
+  uiRefs.favSkinName.textContent = name;
+  uiRefs.favSkinMeta.textContent = stats
+    ? `${stats.matches || 0} partidas · ${stats.wins || 0} victorias · Nivel ${ach.level}/6`
+    : 'Aún sin partidas';
+
+  if(uiRefs.favSkinChips){
+    uiRefs.favSkinChips.innerHTML = '';
+    if(stats){
+      const chips = [
+        { label:`W ${stats.wins || 0}` },
+        { label:`L ${stats.losses || 0}` },
+        { label:`Hab ${stats.abilityUses || 0}` },
+        { label:`Pts ${stats.points || 0}` },
+        { label:`Fatal ${stats.fatalities || 0}` },
+        { label:`Fouls ${stats.fouls || 0}` }
+      ];
+      chips.forEach(ch=>{
+        const span = document.createElement('span');
+        span.className = 'stat-chip';
+        span.textContent = ch.label;
+        uiRefs.favSkinChips.appendChild(span);
+      });
+    }
+  }
+  if(uiRefs.favAchProgress){
+    uiRefs.favAchProgress.innerHTML = '';
+    ach.lines.forEach(line=>{
+      const span = document.createElement('span');
+      span.className = 'stat-chip';
+      span.textContent = line;
+      uiRefs.favAchProgress.appendChild(span);
+    });
+  }
+
+  const cvs = uiRefs.favSkinCanvas;
+  if(cvs){
+    const ctx = cvs.getContext('2d');
+    ctx.clearRect(0,0,cvs.width,cvs.height);
+    if(fav){
+      ctx.save();
+      ctx.translate(cvs.width/2, cvs.height/2 + 6);
+  drawSkin(ctx, fav.skin, { r: Math.min(cvs.width, cvs.height) * 0.32, player:{ skin: fav.skin } });
+  ctx.restore();
+}
+  }
+}
+
+function renderCharStatsList(){
+  const list = uiRefs.charStatsList;
+  if(!list) return;
+  list.innerHTML = '';
+  const perChar = progress?.stats?.perChar || {};
+  const entries = Object.entries(perChar)
+    .map(([skin, data])=>({ skin, stats: data || {} }))
+    .filter(entry=>{
+      const s = entry.stats;
+      return (s.matches||0) > 0 || (s.points||0) > 0 || (s.abilityUses||0) > 0 || (s.fatalities||0) > 0;
+    })
+    .sort((a,b)=>{
+      const aw = a.stats.wins || 0, bw = b.stats.wins || 0;
+      if(bw !== aw) return bw - aw;
+      const am = a.stats.matches || 0, bm = b.stats.matches || 0;
+      if(bm !== am) return bm - am;
+      const ap = a.stats.points || 0, bp = b.stats.points || 0;
+      return bp - ap;
+    });
+  if(!entries.length){
+    const empty = document.createElement('div');
+    empty.className = 'char-stat-meta';
+    empty.textContent = 'Aún sin partidas registradas.';
+    list.appendChild(empty);
+    return;
+  }
+  entries.slice(0, 8).forEach(entry=>{
+    const row = document.createElement('div');
+    row.className = 'char-stat-row';
+    const name = document.createElement('div');
+    name.className = 'char-stat-name';
+    name.textContent = getSkinLabel(entry.skin);
+    const meta = document.createElement('div');
+    meta.className = 'char-stat-meta';
+    meta.textContent = `${entry.stats.matches || 0} partidas · ${entry.stats.wins || 0}W/${entry.stats.losses || 0}L · ${entry.stats.points || 0} pts`;
+    const chips = document.createElement('div');
+    chips.className = 'char-stat-grid';
+    const chipData = [
+      `Hab ${entry.stats.abilityUses || 0}`,
+      `Fatal ${entry.stats.fatalities || 0}`
+    ];
+    chipData.forEach(txt=>{
+      const span = document.createElement('span');
+      span.className = 'stat-chip';
+      span.textContent = txt;
+      chips.appendChild(span);
+    });
+    row.appendChild(name);
+    row.appendChild(meta);
+    row.appendChild(chips);
+    list.appendChild(row);
+  });
+}
+
+function syncProfileUi(noteText){
+  try{
+    if(uiRefs.profileName) uiRefs.profileName.textContent = getStoredPlayerName();
+    if(uiRefs.profileId) uiRefs.profileId.textContent = progress?.user?.id || '-';
+    const matches = progress?.stats?.matches || {};
+    if(uiRefs.statTotal) uiRefs.statTotal.textContent = matches.total ?? 0;
+    const timeMs = progress?.stats?.timePlayedMs || 0;
+    const timeHours = (timeMs/3600000).toFixed(1);
+    if(uiRefs.statTimePlayed) uiRefs.statTimePlayed.textContent = `${timeHours}h`;
+    if(uiRefs.statBots) uiRefs.statBots.textContent = progress?.stats?.botKillsTotal || 0;
+    const kdLan = progress?.stats?.lanKd || { wins:0, losses:0 };
+    const kdVal = kdLan.losses > 0 ? (kdLan.wins / kdLan.losses).toFixed(2) : (kdLan.wins > 0 ? '∞' : '0.00');
+    if(uiRefs.statLanKd) uiRefs.statLanKd.textContent = `${kdLan.wins}/${kdLan.losses} (${kdVal})`;
+    // Stats panel mirrors
+    if(uiRefs.statTotal2) uiRefs.statTotal2.textContent = matches.total ?? 0;
+    if(uiRefs.statTimePlayed2) uiRefs.statTimePlayed2.textContent = `${timeHours}h`;
+    if(uiRefs.statBots2) uiRefs.statBots2.textContent = progress?.stats?.botKillsTotal || 0;
+    if(uiRefs.statLanKd2) uiRefs.statLanKd2.textContent = `${kdLan.wins}/${kdLan.losses} (${kdVal})`;
+    if(noteText){
+      setProfileNote(noteText);
+    } else if(uiRefs.profileNote && !uiRefs.profileNote.textContent){
+      setProfileNote(PROFILE_NOTE_DEFAULT);
+    }
+    if(uiRefs.profileExportBox && !uiRefs.profileExportBox.classList.contains('hidden') && uiRefs.exportOutput){
+      uiRefs.exportOutput.value = exportProgressData();
+    }
+    renderFavoriteSkin();
+    syncLobbyNameFromProfile();
+  }catch(err){
+    console.warn('No pude actualizar el perfil', err);
+  }
+}
+
+function handleNameChange(){
+  const next = prompt('Escribe tu nombre de jugador', getStoredPlayerName());
+  const clean = sanitizeUserName(next);
+  if(!clean){
+    setProfileNote('Nombre sin cambios.');
+    return;
+  }
+  progress.user.name = clean;
+  saveProgress(progress);
+  resetPlayerNames();
+  syncLobbyNameFromProfile(true);
+  setProfileNote('Nombre guardado.');
+}
+
+function handleExportProgress(){
+  toggleProfileImport(false);
+  toggleProfileExport(true);
+  setProfileNote('Copia y pega tu progreso.');
+}
+
+function handleImportProgress(){
+  toggleProfileExport(false);
+  toggleProfileImport(true);
+  setProfileNote('Pega el progreso y aplica.');
+}
+
+function applyImportProgress(){
+  if(!uiRefs.importInput) return;
+  try{
+    importProgressData(uiRefs.importInput.value);
+    resetPlayerNames();
+    syncLobbyNameFromProfile(true);
+    toggleProfileImport(false);
+    setProfileNote('Progreso importado.');
+    syncProfileUi();
+  }catch(err){
+    setProfileNote(err?.message || 'No pude importar.');
+  }
+}
+
+function handleResetProgress(){
+  const confirmReset = window.confirm('Esto borra el progreso local. Continuar?');
+  if(!confirmReset) return;
+  resetProgressData();
+  resetPlayerNames();
+  syncLobbyNameFromProfile(true);
+  toggleProfileExport(false);
+  toggleProfileImport(false);
+  setProfileNote('Progreso reiniciado.');
+  syncProfileUi();
+}
+
+function recordCharacterOutcome(winnerKey, options = {}){
+  const winner = winnerKey === 'p1' ? p1 : p2;
+  const loserKey = getOpponentKey(winnerKey);
+  const loser = loserKey === 'p1' ? p1 : p2;
+  const winnerSkin = winner?.skin;
+  const loserSkin = loser?.skin;
+  let winnerPoints = score?.[winnerKey] || 0;
+  let loserPoints = score?.[loserKey] || 0;
+
+  if(winnerPoints === 0 && loserPoints === 0 && options.finalScore){
+    const parts = String(options.finalScore).split('-').map(x=>parseInt(x.trim(),10));
+    if(parts.length === 2 && !parts.some(n=>Number.isNaN(n))){
+      winnerPoints = winnerKey === 'p1' ? parts[0] : parts[1];
+      loserPoints = winnerKey === 'p1' ? parts[1] : parts[0];
+    }
+  }
+
+  if(winnerSkin && !(botActive && winner === p2)){
+    addCharStat(winnerSkin, 'wins', 1);
+    addCharStat(winnerSkin, 'matches', 1);
+    if(winnerPoints) addCharStat(winnerSkin, 'points', winnerPoints);
+    if(options.fatality) addCharStat(winnerSkin, 'fatalities', 1);
+  }
+  if(loserSkin && !(botActive && loser === p2)){
+    addCharStat(loserSkin, 'losses', 1);
+    addCharStat(loserSkin, 'matches', 1);
+    if(loserPoints) addCharStat(loserSkin, 'points', loserPoints);
+  }
+}
+
+function registerMatchPlayed(){
+  if(!progress || !progress.stats) return;
+  const key = (matchMode === MATCH_MODE.BOT) ? 'bot' : (matchMode === MATCH_MODE.LAN ? 'lan' : 'local');
+  const matches = progress.stats.matches || { total:0, local:0, bot:0, lan:0 };
+  matches[key] = (matches[key] || 0) + 1;
+  matches.total = (matches.total || 0) + 1;
+  progress.stats.matches = matches;
+  saveProgress(progress);
+}
+
 function showLobbyPanel(show){
   if(!lobbyLayer || !lanPanel) return;
   if(show){
@@ -1098,8 +1967,10 @@ function showLobbyPanel(show){
     lobbyLayer.classList.remove('hidden');
     updateNetStatus('Modo lobby: conecta si tienes el servidor activo', 'info');
     updateLobbyUi();
+    startLobbyAutoScan();
   } else {
     lobbyLayer.classList.add('hidden');
+    stopLobbyAutoScan();
     lanPanel.classList.remove('hidden');
     updateNetStatus('', 'info');
   }
@@ -1108,6 +1979,7 @@ function showLobbyPanel(show){
 function openTutorial(){
   tutorialOpen = true;
   encyOpen = false;
+  if(uiRefs.statsLayer) uiRefs.statsLayer.classList.add('hidden');
   encyReturnTarget = 'menu';
   if(uiRefs.encyPanel) uiRefs.encyPanel.classList.add('hidden');
   if(uiRefs.btnOpenEncy) uiRefs.btnOpenEncy.textContent = 'Abrir enciclopedia de personajes';
@@ -1119,6 +1991,7 @@ function openTutorial(){
 function closeTutorial(){
   tutorialOpen = false;
   encyOpen = false;
+  if(uiRefs.statsLayer) uiRefs.statsLayer.classList.add('hidden');
   if(uiRefs.encyPanel) uiRefs.encyPanel.classList.add('hidden');
   if(uiRefs.btnOpenEncy) uiRefs.btnOpenEncy.textContent = 'Abrir enciclopedia de personajes';
   if(tutorialPanel) tutorialPanel.classList.add('hidden');
@@ -1130,6 +2003,7 @@ function openEncy(target='menu'){
   encyReturnTarget = target;
   encyOpen = true;
   tutorialOpen = false;
+  if(uiRefs.statsLayer) uiRefs.statsLayer.classList.add('hidden');
   if(tutorialPanel) tutorialPanel.classList.add('hidden');
   if(menuPanel) menuPanel.classList.add('hidden');
   if(uiRefs.encyPanel) uiRefs.encyPanel.classList.remove('hidden');
@@ -1146,11 +2020,80 @@ function closeEncy(){
     tutorialOpen = true;
     if(tutorialPanel) tutorialPanel.classList.remove('hidden');
     if(menuPanel) menuPanel.classList.add('hidden');
+  } else if(encyReturnTarget === 'stats'){
+    if(uiRefs.statsLayer) uiRefs.statsLayer.classList.remove('hidden');
+    if(menuPanel) menuPanel.classList.add('hidden');
   } else {
     tutorialOpen = false;
     if(menuPanel) menuPanel.classList.remove('hidden');
   }
   syncMenuFocus();
+}
+
+function openStats(){
+  if(uiRefs.statsLayer) uiRefs.statsLayer.classList.remove('hidden');
+  if(menuPanel) menuPanel.classList.add('hidden');
+  if(tutorialPanel) tutorialPanel.classList.add('hidden');
+  if(uiRefs.encyPanel) uiRefs.encyPanel.classList.add('hidden');
+  encyOpen = false;
+  tutorialOpen = false;
+  encyReturnTarget = 'menu';
+  syncProfileUi();
+  syncMenuFocus();
+}
+
+function closeStats(){
+  if(uiRefs.statsLayer) uiRefs.statsLayer.classList.add('hidden');
+  if(menuPanel) menuPanel.classList.remove('hidden');
+  syncMenuFocus();
+}
+
+function positionTouchOverlay(){
+  if(!touchOverlay || touchOverlay.classList.contains('hidden') || !cvs) return;
+  const rect = cvs.getBoundingClientRect();
+  const w = rect.width;
+  const h = rect.height;
+  const left = rect.left;
+  const top = rect.top;
+  const role = getTouchControlRole() || 'p1';
+
+  const movementIsLeft = (role !== 'p2'); // para P2 en móvil, el movimiento va a la derecha
+  const moveCenterX = movementIsLeft ? (left + w * 0.25) : (left + w * 0.75);
+  const jumpLen = w * 0.125; // 25% de la mitad
+  const jumpY = top + h * 0.75; // separación salto/habilidad
+
+  if(touchOverlayLines.vert){
+    const lineH = h * 0.25;
+    touchOverlayLines.vert.style.left = `${moveCenterX}px`;
+    touchOverlayLines.vert.style.top = `${top + h * 0.75}px`;
+    touchOverlayLines.vert.style.height = `${lineH}px`;
+  }
+
+  if(movementIsLeft){
+    // salto/habilidad en derecha
+    if(touchOverlayLines.horizRight){
+      touchOverlayLines.horizRight.style.left = `${left + w - jumpLen}px`;
+      touchOverlayLines.horizRight.style.top = `${jumpY}px`;
+      touchOverlayLines.horizRight.style.width = `${jumpLen}px`;
+      touchOverlayLines.horizRight.style.opacity = '1';
+    }
+    if(touchOverlayLines.horizLeft){
+      touchOverlayLines.horizLeft.style.width = '0px';
+      touchOverlayLines.horizLeft.style.opacity = '0';
+    }
+  } else {
+    // salto/habilidad en izquierda
+    if(touchOverlayLines.horizLeft){
+      touchOverlayLines.horizLeft.style.left = `${left}px`;
+      touchOverlayLines.horizLeft.style.top = `${jumpY}px`;
+      touchOverlayLines.horizLeft.style.width = `${jumpLen}px`;
+      touchOverlayLines.horizLeft.style.opacity = '1';
+    }
+    if(touchOverlayLines.horizRight){
+      touchOverlayLines.horizRight.style.width = '0px';
+      touchOverlayLines.horizRight.style.opacity = '0';
+    }
+  }
 }
 
 function updateTutorialDownloadStatus(msg, tone='info'){
@@ -1172,7 +2115,7 @@ async function triggerTutorialDownload(){
     const objectUrl = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = objectUrl;
-    a.download = url.split('/').pop() || 'Violin_Beach_Kombat_v1.4.html';
+    a.download = url.split('/').pop() || 'Violin_Beach_Kombat_v1.5.html';
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -1183,7 +2126,7 @@ async function triggerTutorialDownload(){
     // Fallback: intento directo con atributo download
     const a = document.createElement('a');
     a.href = url;
-    a.download = url.split('/').pop() || 'Violin_Beach_Kombat_v1.4.html';
+    a.download = url.split('/').pop() || 'Violin_Beach_Kombat_v1.5.html';
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -1221,9 +2164,18 @@ function renderEncyCards(){
   list.innerHTML = '';
   const data = buildEncyRoster();
   data.forEach(entry=>{
+    const charStats = getCharStatsSnapshot(entry.skin);
+    const ach = getCharAchievementData(charStats);
+    const style = getAchFrameStyle(ach.level);
     const card = document.createElement('div');
     card.className = 'ency-card';
 
+    const frame = document.createElement('div');
+    frame.className = 'skin-frame';
+    if(style){
+      frame.style.boxShadow = `0 0 0 2px ${style.glow}aa, 0 0 16px ${style.glow}88`;
+      frame.style.borderColor = style.glow + '99';
+    }
     const cv = document.createElement('canvas');
     cv.width = 120; cv.height = 120;
     const ctx = cv.getContext('2d');
@@ -1231,25 +2183,79 @@ function renderEncyCards(){
     ctx.translate(cv.width/2, cv.height/2);
     drawSkin(ctx, entry.skin, { r:34, player:{ skin: entry.skin } });
     ctx.restore();
+    frame.appendChild(cv);
 
     const body = document.createElement('div');
+    body.className = 'ency-body';
     const title = document.createElement('h3');
     title.textContent = entry.label;
     const meta = document.createElement('div');
     meta.className = 'ency-meta';
-    meta.textContent = `${entry.abilityLabel} · Fatality: ${entry.fatalityKey.toUpperCase()}`;
     const ability = document.createElement('p');
-    ability.innerHTML = `<b>${entry.abilityLabel}:</b> ${entry.abilityDesc}`;
-    const fatal = document.createElement('p');
-    fatal.innerHTML = `<b>Fatality:</b> ${entry.fatalityDesc}`;
+    let fatal = null;
+
+    if(entry.skin === 'mystery'){
+      meta.textContent = 'Selección al azar · ???';
+      ability.innerHTML = '<b>Azar:</b> Esta ficha elige un luchador aleatorio. Algunos dicen que, muy de vez en cuando, no es tan aleatorio.';
+    } else {
+      meta.textContent = `${entry.abilityLabel} · Fatality: ${entry.fatalityKey.toUpperCase()}`;
+      ability.innerHTML = `<b>${entry.abilityLabel}:</b> ${entry.abilityDesc}`;
+      fatal = document.createElement('p');
+      fatal.innerHTML = `<b>Fatality:</b> ${entry.fatalityDesc}`;
+    }
 
     body.appendChild(title);
     body.appendChild(meta);
     body.appendChild(ability);
-    body.appendChild(fatal);
+    if(fatal) body.appendChild(fatal);
+    const stats = getCharStatsSnapshot(entry.skin);
+    const kd = formatKd(stats);
+    const statsBox = document.createElement('div');
+    statsBox.className = 'ency-stats';
+    const makeStat = (label, value)=>{
+      const box = document.createElement('div');
+      box.className = 'ency-stat';
+      const l = document.createElement('div');
+      l.className = 'ency-stat-label';
+      l.textContent = label;
+      const v = document.createElement('div');
+      v.className = 'ency-stat-value';
+      v.textContent = value;
+      box.appendChild(l);
+      box.appendChild(v);
+      return box;
+    };
+    statsBox.appendChild(makeStat('Partidas', stats.matches || 0));
+    statsBox.appendChild(makeStat('Victorias', stats.wins || 0));
+    statsBox.appendChild(makeStat('Derrotas', stats.losses || 0));
+    statsBox.appendChild(makeStat('K/D', `${kd.fraction} (${kd.kd}) · ${kd.pct}%`));
+    statsBox.appendChild(makeStat('Puntos', stats.points || 0));
+    statsBox.appendChild(makeStat('Hab. usadas', stats.abilityUses || 0));
+    statsBox.appendChild(makeStat('Fatalities', stats.fatalities || 0));
+    statsBox.appendChild(makeStat('Bots', charStats.botKillsTotal || 0));
+    statsBox.appendChild(makeStat('20 bots', charStats.best20TimeMs ? formatMsClock(charStats.best20TimeMs) : '--'));
+    statsBox.appendChild(makeStat('LAN', charStats.lanMatches || 0));
+    statsBox.appendChild(makeStat('Fouls', charStats.fouls || 0));
+    body.appendChild(statsBox);
+    const progress = document.createElement('div');
+    progress.className = 'char-stat-grid';
+    ach.lines.forEach(line=>{
+      const span = document.createElement('span');
+      span.className = 'stat-chip';
+      span.textContent = line;
+      progress.appendChild(span);
+    });
+    const details = document.createElement('div');
+    details.className = 'ency-details';
+    details.appendChild(statsBox);
+    details.appendChild(progress);
 
-    card.appendChild(cv);
+    card.appendChild(frame);
     card.appendChild(body);
+    card.appendChild(details);
+    card.addEventListener('click', ()=>{
+      card.classList.toggle('expanded');
+    });
     list.appendChild(card);
   });
 }
@@ -1306,7 +2312,7 @@ function syncFullscreenUi(){
   }
   if(uiRefs.btnHudFullscreen){
     uiRefs.btnHudFullscreen.disabled = !supported;
-    uiRefs.btnHudFullscreen.textContent = active ? '🗖' : '⛶'; // fullscreen icon and exit fullscreen icon
+    uiRefs.btnHudFullscreen.textContent = active ? '—' : '⛶'; // fullscreen icon and exit fullscreen icon
     uiRefs.btnHudFullscreen.setAttribute('aria-pressed', active ? 'true' : 'false');
   }
 }
@@ -1336,6 +2342,11 @@ function syncUiState(){
   }
   if(uiRefs.btnHudFullscreen){
     uiRefs.btnHudFullscreen.classList.toggle('hidden', !!menuLike);
+  }
+  if(touchOverlay){
+    const showTouch = selectionUsedTouch && appScene === APP_SCENE.GAME;
+    touchOverlay.classList.toggle('hidden', !showTouch);
+    if(showTouch) positionTouchOverlay();
   }
   if(menuLike){
     clearTouchKeys();
@@ -1448,17 +2459,20 @@ function updateLobbyUi(){
   if(!uiRefs.lobbyStatus || !uiRefs.lobbyPeers) return;
   const connected = !!lobbySocket && lobbySocket.readyState === WebSocket.OPEN;
   const peers = lobbyPeers.filter(id=>id && id !== lobbyId);
-  const peersText = connected && peers.length ? '' : (connected ? 'Nadie disponible' : 'Lista vacía');
-  uiRefs.lobbyStatus.textContent = connected
+  const peersText = connected && peers.length ? '' : (connected ? 'Nadie disponible' : 'Lista vacia');
+  const scanning = lobbyScanState.active && !connected;
+  const statusText = connected
     ? `Lobby conectado (${displayPeerName(lobbyId) || lobbyId || 'sin id'})`
-    : 'Estado: sin conectar (usa copiar/pegar)';
+    : (scanning ? formatScanStatus() : 'Estado: sin conectar (usa copiar/pegar)');
+  uiRefs.lobbyStatus.textContent = statusText;
+  if(scanning) updateLobbyScanStatus(true); else updateLobbyScanBar();
   uiRefs.lobbyPeers.innerHTML = peersText;
   if(connected){
     peers.forEach(id=>{
       const btn = document.createElement('div');
       btn.className = 'lobby-tag';
       const label = displayPeerName(id);
-      btn.textContent = id === lobbyId ? `${label || id} (tú)` : (label || id);
+      btn.textContent = id === lobbyId ? `${label || id} (tu)` : (label || id);
       if(id === lobbySelectedPeer) btn.classList.add('active');
       btn.onclick = ()=>{ if(id !== lobbyId) startLobbyOffer(id); };
       uiRefs.lobbyPeers.appendChild(btn);
@@ -1466,6 +2480,7 @@ function updateLobbyUi(){
   }
   renderLobbyInviteBox();
 }
+
 
 function setLobbyStatus(msg){
   if(uiRefs.lobbyStatus && msg) uiRefs.lobbyStatus.textContent = msg;
@@ -1495,6 +2510,176 @@ function renderLobbyInviteBox(){
   } else {
     uiRefs.lobbyInviteBox.textContent = 'Sin invitaciones';
   }
+}
+
+function shortLobbyHost(url){
+  try{
+    const u = new URL(url);
+    return u.host || url;
+  }catch(e){
+    return url;
+  }
+}
+
+function formatScanStatus(){
+  const total = lobbyScanState.total || (lobbyScanState.queue.length + lobbyScanState.inFlight + lobbyScanState.attempts);
+  const done = lobbyScanState.attempts;
+  if(!total) return 'Buscando lobby (192.168.x.x)';
+  const extra = lobbyScanState.current ? ` (probando ${lobbyScanState.current})` : '';
+  return `Buscando lobby (192.168.x.x) ${done}/${total}${extra}`;
+}
+
+function updateLobbyScanBar(){
+  if(!uiRefs.lobbyScanWrap || !uiRefs.lobbyScanFill || !uiRefs.lobbyScanText) return;
+  const active = lobbyScanState.active;
+  uiRefs.lobbyScanWrap.classList.toggle('hidden', !active);
+  const total = lobbyScanState.total || (lobbyScanState.queue.length + lobbyScanState.inFlight + lobbyScanState.attempts);
+  const done = lobbyScanState.attempts;
+  const pct = total ? Math.min(100, Math.round((done / total) * 100)) : 0;
+  uiRefs.lobbyScanFill.style.width = `${pct}%`;
+  uiRefs.lobbyScanText.textContent = total ? `${done}/${total}` : '';
+}
+
+function updateLobbyScanStatus(force=false){
+  if(!uiRefs.lobbyStatus) return;
+  if(!lobbyScanState.active) return;
+  if(lobbySocket && lobbySocket.readyState !== WebSocket.CLOSED && lobbySocket.readyState !== WebSocket.CLOSING) return;
+  const nowTs = performance.now();
+  if(!force && nowTs - lobbyScanState.lastStatusTs < 350) return;
+  uiRefs.lobbyStatus.textContent = formatScanStatus();
+  updateLobbyScanBar();
+  lobbyScanState.lastStatusTs = nowTs;
+}
+
+function buildLobbyScanQueue(){
+  const queue = [];
+  const seen = new Set();
+  const addUrl = (url)=>{
+    if(!url || seen.has(url)) return;
+    seen.add(url);
+    queue.push(url);
+  };
+  const normalizeEntry = (entry)=>{
+    const text = (entry || '').trim();
+    if(!text) return '';
+    if(/^wss?:\/\//i.test(text)) return text;
+    if(/^\d{1,3}\.\d{1,3}$/.test(text)){
+      const [a,b] = text.split('.').map(Number);
+      if(a>=0 && a<=254 && b>=0 && b<=254) return `ws://192.168.${a}.${b}:${LOBBY_SCAN_PORT}`;
+    }
+  if(/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(text)){
+    return `ws://${text}:${LOBBY_SCAN_PORT}`;
+  }
+  return '';
+  };
+  // whitelist primero (editable)
+  LOBBY_SCAN_WHITELIST.forEach(entry=>addUrl(normalizeEntry(entry)));
+  // también intenta lo que esté tipeado en el input actual, por si el usuario lo puso ahí
+  if(uiRefs.lobbyCode && uiRefs.lobbyCode.value){
+    addUrl(normalizeEntry(uiRefs.lobbyCode.value));
+  }
+  // quick scan de pocos candidatos comunes (sin barrido completo)
+  const thirds = [0,1,100];
+  const hosts = [1,2,3,10,13,20,50,80,100,120,150,180,200,220,240];
+  thirds.forEach(t=>{
+    hosts.forEach(h=>{
+      addUrl(`ws://192.168.${t}.${h}:${LOBBY_SCAN_PORT}`);
+    });
+  });
+  return queue;
+}
+
+function stopLobbyAutoScan(){
+  lobbyScanState.active = false;
+  lobbyScanState.queue = [];
+  lobbyScanState.inFlight = 0;
+  lobbyScanState.foundUrl = '';
+  lobbyScanState.total = 0;
+  lobbyScanState.current = '';
+  lobbyScanState.lastStatusTs = performance.now();
+  if(lobbyScanState.timer){ clearTimeout(lobbyScanState.timer); lobbyScanState.timer = null; }
+  lobbyScanState.token++;
+  updateLobbyScanBar();
+}
+
+function startLobbyAutoScan(){
+  if(lobbyScanState.active) return;
+  const lobbyVisible = lobbyLayer && !lobbyLayer.classList.contains('hidden');
+  if(!lobbyVisible) return;
+  if(lobbySocket && lobbySocket.readyState !== WebSocket.CLOSED && lobbySocket.readyState !== WebSocket.CLOSING) return;
+  lobbyScanState.queue = buildLobbyScanQueue();
+  lobbyScanState.inFlight = 0;
+  lobbyScanState.attempts = 0;
+  lobbyScanState.total = lobbyScanState.queue.length;
+  lobbyScanState.foundUrl = '';
+  lobbyScanState.current = '';
+  lobbyScanState.token++;
+  lobbyScanState.active = true;
+  updateLobbyScanStatus(true);
+  pumpLobbyScan(lobbyScanState.token);
+}
+
+function pumpLobbyScan(token){
+  if(!lobbyScanState.active || token !== lobbyScanState.token) return;
+  if(lobbySocket && lobbySocket.readyState !== WebSocket.CLOSED && lobbySocket.readyState !== WebSocket.CLOSING){
+    stopLobbyAutoScan();
+    return;
+  }
+  while(lobbyScanState.inFlight < LOBBY_SCAN_MAX_CONCURRENCY && lobbyScanState.queue.length){
+    const url = lobbyScanState.queue.shift();
+    lobbyScanState.current = url.replace(/^wss?:\/\//,'');
+    lobbyScanState.inFlight++;
+    probeLobbyCandidate(url, token);
+  }
+  if(lobbyScanState.queue.length && lobbyScanState.timer == null){
+    lobbyScanState.timer = setTimeout(()=>{
+      lobbyScanState.timer = null;
+      pumpLobbyScan(token);
+    }, LOBBY_SCAN_GAP);
+  } else if(!lobbyScanState.queue.length && lobbyScanState.inFlight === 0){
+    updateNetStatus('Auto-scan: revise 192.168.x.x y no encontre lobby', 'warn');
+    stopLobbyAutoScan();
+    updateLobbyUi();
+  }
+  updateLobbyScanStatus();
+}
+
+function probeLobbyCandidate(url, token){
+  let settled = false;
+  const settle = (ok)=>{
+    if(settled) return;
+    settled = true;
+    lobbyScanState.inFlight = Math.max(0, lobbyScanState.inFlight - 1);
+    lobbyScanState.attempts++;
+    if(token !== lobbyScanState.token) return;
+    if(ok === true){
+      handleLobbyScanHit(url);
+    } else {
+      pumpLobbyScan(token);
+    }
+    updateLobbyScanStatus();
+  };
+  try{
+    const ws = new WebSocket(url);
+    const timer = setTimeout(()=>settle(false), LOBBY_SCAN_TIMEOUT);
+    ws.onopen = ()=>{ clearTimeout(timer); try{ ws.close(); }catch(e){} settle(true); };
+    ws.onerror = ()=>{ clearTimeout(timer); settle(false); };
+    ws.onclose = ()=>{ clearTimeout(timer); settle(false); };
+  }catch(err){
+    settle(false);
+  }
+}
+
+function handleLobbyScanHit(url){
+  if(!lobbyScanState.active) return;
+  stopLobbyAutoScan();
+  const host = shortLobbyHost(url);
+  updateNetStatus(`Encontre lobby en ${host}, conectando...`, 'ok');
+  const parts = host.match(/^192\.168\.(\d+)\.(\d+)/);
+  if(uiRefs.lobbyCode && parts){
+    uiRefs.lobbyCode.value = `${parts[1]}.${parts[2]}`;
+  }
+  connectLobby({ url, reason:'auto' });
 }
 
 function acceptLobbyInvite(){
@@ -1532,28 +2717,41 @@ function showLobbyHelp(){
   }
 }
 
-function connectLobby(preferCode=false){
-  const url = resolveLobbyUrl();
+function connectLobby(options = {}){
+  const opts = (typeof options === 'object' && !Array.isArray(options)) ? options : {};
+  const preferCode = (typeof options === 'boolean') ? options : !!opts.preferCode;
+  const url = opts.url || resolveLobbyUrl(preferCode);
+  const reason = opts.reason || (opts.url ? 'auto' : 'manual');
+  const shortHost = url ? shortLobbyHost(url) : '';
+  const lobbyVisible = lobbyLayer && !lobbyLayer.classList.contains('hidden');
   const { name } = getLobbyInputs();
   const finalName = setLocalLobbyName(name || genDefaultLobbyName());
   if(uiRefs.lobbyName && !uiRefs.lobbyName.value && finalName){
     uiRefs.lobbyName.value = finalName;
   }
   if(!url){
-    updateNetStatus('Ingresa el código corto o la URL del lobby', 'warn');
+    updateNetStatus('Ingresa el codigo corto o la URL del lobby', 'warn');
     return;
   }
+  const isAuto = reason === 'auto';
+  const lobbyVisibleNow = ()=>!!(lobbyLayer && !lobbyLayer.classList.contains('hidden'));
   try{
+    stopLobbyAutoScan();
     lobbyNames = {};
     lobbySelectedPeer = null;
     lobbyPendingInviteFrom = null;
     renderLobbyInviteBox();
     if(lobbySocket){ try{ lobbySocket.close(); }catch(e){} }
     lobbySocket = new WebSocket(url);
-    setLobbyStatus('Conectando al lobby...');
-    updateNetStatus('Intentando conectar al lobby...', 'info');
+    setLobbyStatus(isAuto && shortHost ? `Conectando a ${shortHost}...` : 'Conectando al lobby...');
+    updateNetStatus(isAuto && shortHost
+      ? `Intentando conectar al lobby detectado (${shortHost})...`
+      : 'Intentando conectar al lobby...', 'info');
     lobbySocket.onopen = ()=>{
-      updateNetStatus('Lobby conectado. Si falla el P2P, usa copiar/pegar.', 'ok');
+      stopLobbyAutoScan();
+      updateNetStatus(isAuto && shortHost
+        ? `Lobby encontrado en ${shortHost}. Si falla el P2P, usa copiar/pegar.`
+        : 'Lobby conectado. Si falla el P2P, usa copiar/pegar.', 'ok');
       setLobbyStatus(`Lobby conectado (${lobbyId || lobbyDesiredName || 'sin id'})`);
       lobbyPendingInviteFrom = null;
       renderLobbyInviteBox();
@@ -1561,9 +2759,12 @@ function connectLobby(preferCode=false){
       sendLobbyNameIfAny();
     };
     lobbySocket.onerror = ()=>{
-      updateNetStatus('No se pudo conectar al lobby. Usa copiar/pegar.', 'warn');
+      updateNetStatus(isAuto && shortHost
+        ? `No se pudo conectar a ${shortHost}. Buscare otro...`
+        : 'No se pudo conectar al lobby. Usa copiar/pegar.', 'warn');
       lobbySocket = null;
       updateLobbyUi();
+      if(lobbyVisibleNow()) startLobbyAutoScan();
     };
     lobbySocket.onclose = ()=>{
       lobbySocket = null;
@@ -1571,6 +2772,7 @@ function connectLobby(preferCode=false){
       lobbyPeers = [];
       lobbyNames = {};
       updateLobbyUi();
+      if(lobbyVisibleNow()) startLobbyAutoScan();
     };
     lobbySocket.onmessage = ev=>{
       let msg; try{ msg = JSON.parse(ev.data); }catch(e){ return; }
@@ -1578,9 +2780,9 @@ function connectLobby(preferCode=false){
     };
   }catch(err){
     updateNetStatus('Error abriendo lobby. Usa copiar/pegar.', 'warn');
+    if(lobbyVisible) startLobbyAutoScan();
   }
 }
-
 function handleLobbyMessage(msg){
   if(!msg || typeof msg !== 'object') return;
   if(msg.type === 'hello'){
@@ -1715,6 +2917,7 @@ function resetNetState(options = {}){
   if(net.channel){ try{ net.channel.close(); }catch(e){} }
   if(net.pc){ try{ net.pc.close(); }catch(e){} }
   if(!keepLobby){
+    stopLobbyAutoScan();
     resetPlayerNames();
     if(lobbySocket){ try{ lobbySocket.close(); }catch(e){} }
     lobbySocket = null;
@@ -1725,6 +2928,7 @@ function resetNetState(options = {}){
     lobbySelectedPeer = null;
     lobbyPendingInviteFrom = null;
   }
+  clearMatchTimer();
   Object.assign(net, {
     pc:null,
     channel:null,
@@ -1777,7 +2981,7 @@ function openLanMenu(){
   resetNetState();
   setScene(APP_SCENE.NET);
   badge.innerText = 'Modo: LAN';
-  showLobbyPanel(false);
+  showLobbyPanel(true);
   updateLobbyUi();
 }
 
@@ -1786,13 +2990,22 @@ function getModeLabel(){
     const side = (netRole === 'host') ? 'Host (P1 azul)' : (netRole === 'client' ? 'Invitado (P2 rojo)' : 'LAN');
     return `Modo: ${side}`;
   }
-  if(matchMode === MATCH_MODE.BOT) return 'Modo: P1 vs BOT';
+  if(matchMode === MATCH_MODE.BOT) return 'Modo: Supervivencia Bot';
   return 'Modo: 1 vs 1';
 }
 
 if(uiRefs.btnLocalPvp) uiRefs.btnLocalPvp.addEventListener('click', ()=>startLocalMode('pvp'));
 if(uiRefs.btnLocalBot) uiRefs.btnLocalBot.addEventListener('click', ()=>startLocalMode('bot'));
 if(uiRefs.btnLan) uiRefs.btnLan.addEventListener('click', ()=>openLanMenu());
+if(uiRefs.btnOpenStats) uiRefs.btnOpenStats.addEventListener('click', ()=>openStats());
+if(uiRefs.btnStatsBack) uiRefs.btnStatsBack.addEventListener('click', ()=>closeStats());
+if(uiRefs.btnStatsEncy) uiRefs.btnStatsEncy.addEventListener('click', ()=>{ closeStats(); openEncy('menu'); });
+if(uiRefs.btnEditName) uiRefs.btnEditName.addEventListener('click', ()=>handleNameChange());
+if(uiRefs.btnExportProgress) uiRefs.btnExportProgress.addEventListener('click', ()=>handleExportProgress());
+if(uiRefs.btnImportProgress) uiRefs.btnImportProgress.addEventListener('click', ()=>handleImportProgress());
+if(uiRefs.btnApplyImport) uiRefs.btnApplyImport.addEventListener('click', ()=>applyImportProgress());
+if(uiRefs.btnCancelImport) uiRefs.btnCancelImport.addEventListener('click', ()=>{ toggleProfileImport(false); setProfileNote(PROFILE_NOTE_DEFAULT); });
+if(uiRefs.btnResetProgress) uiRefs.btnResetProgress.addEventListener('click', ()=>handleResetProgress());
 if(uiRefs.btnToggleFullscreen) uiRefs.btnToggleFullscreen.addEventListener('click', ()=>toggleFullscreen());
 if(uiRefs.btnOpenTutorial) uiRefs.btnOpenTutorial.addEventListener('click', ()=>openTutorial());
 if(uiRefs.btnTutorialBack) uiRefs.btnTutorialBack.addEventListener('click', ()=>closeTutorial());
@@ -1815,7 +3028,13 @@ if(uiRefs.btnLobbyBack) uiRefs.btnLobbyBack.addEventListener('click', ()=>showLo
 if(uiRefs.btnLobbyConnect) uiRefs.btnLobbyConnect.addEventListener('click', ()=>connectLobby());
 if(uiRefs.btnLobbyHelp) uiRefs.btnLobbyHelp.addEventListener('click', ()=>showLobbyHelp());
 if(uiRefs.lobbyName) uiRefs.lobbyName.addEventListener('change', ()=>{
-  setLocalLobbyName(uiRefs.lobbyName.value || '');
+  const cleaned = sanitizeUserName(uiRefs.lobbyName.value || '');
+  if(cleaned){
+    progress.user.name = cleaned;
+    saveProgress(progress);
+    resetPlayerNames();
+  }
+  setLocalLobbyName(cleaned || uiRefs.lobbyName.value || '');
   sendLobbyNameIfAny();
   updateLobbyUi();
 });
@@ -1832,6 +3051,13 @@ if(exitPauseBtn) exitPauseBtn.addEventListener('click', ()=>requestEscapeToMenu(
 ['fullscreenchange','webkitfullscreenchange','msfullscreenchange'].forEach(evt=>{
   document.addEventListener(evt, syncFullscreenUi);
 });
+
+addEventListener('resize', ()=>{
+  resizeCanvas();
+  positionTouchOverlay();
+});
+
+saveProgress(progress);
 
 function buildSignalPayload(desc, ice){
   return btoa(JSON.stringify({ sdp: desc, ice }));
@@ -2084,6 +3310,7 @@ function exitSelectionToMenu(){
   if(matchMode === MATCH_MODE.LAN){
     resetNetState();
   }
+  clearMatchTimer();
   stopSong(MUSIC.beach);
   stopSong(MUSIC.mkmusic);
   stopSong(MUSIC.suddendeathmusic);
@@ -2101,6 +3328,7 @@ function returnToSelectLocal(){
   setScene(APP_SCENE.SELECT);
   stopSong(MUSIC.mkmusic);
   stopSong(MUSIC.suddendeathmusic);
+  clearMatchTimer();
   resetSelectionState();
   badge.innerText = getModeLabel();
   ball = { x: W/2, y: 200, vx: 0, vy: 0, r: CONFIG.BALL_RADIUS };
@@ -2219,6 +3447,21 @@ function handleNetMessage(data){
     case 'gameOver':
       if(netRole === 'client'){
         window._winnerInfo = data.info || window._winnerInfo;
+        let winnerKey = (score.p1 >= score.p2) ? 'p1' : 'p2';
+        if(data.info?.finalScore){
+          const parts = String(data.info.finalScore).split('-').map(x=>parseInt(x.trim(),10));
+          if(parts.length === 2 && !parts.some(n=>Number.isNaN(n))){
+            if(parts[0] > parts[1]) winnerKey = 'p1';
+            else if(parts[1] > parts[0]) winnerKey = 'p2';
+          }
+        }
+        applyPostGameStats(winnerKey, getMatchElapsedMs(), {
+          botKillsRun: botKills,
+          wasFatality: !!data.info?.fatality,
+          isLan: true
+        });
+        recordCharacterOutcome(winnerKey, { fatality: !!data.info?.fatality, finalScore: data.info?.finalScore });
+        registerMatchPlayed();
         gameState = STATE.GAMEOVER;
         syncUiState();
       }
@@ -2328,7 +3571,12 @@ function sendHostState(now){
   const interval = 40;
   if(now - net.lastHostStateSent < interval) return;
   net.lastHostStateSent = now;
-  sendNet({ type:'hostState', p1: serializeHostPlayerState(), t: now });
+  sendNet({
+    type:'hostState',
+    p1: serializeHostPlayerState(),
+    timer: { ms: matchTimerMs, mode: matchTimerMode, expired: matchTimerExpired },
+    t: now
+  });
 }
 
 function applyClientState(msg){
@@ -2374,6 +3622,11 @@ function applyHostState(msg){
   }
   if(state.status){
     p1.status = { ...(p1.status||{}), ...state.status };
+  }
+  if(msg.timer){
+    matchTimerMs = (typeof msg.timer.ms === 'number' || msg.timer.ms === null) ? msg.timer.ms : matchTimerMs;
+    matchTimerMode = msg.timer.mode || matchTimerMode;
+    matchTimerExpired = !!msg.timer.expired;
   }
 }
 
@@ -2439,11 +3692,13 @@ function startMatchLocalFromConfig(cfg = {}){
   score.p2 = cfg.score?.p2 ?? 0;
   score.target = cfg.scoreTarget ?? CONFIG.BASE_POINTS_TO_WIN;
   resetScoreStreaks();
+  botKills = 0;
 
   ball.type = currentBallType;
 
   resetRally(cfg.serve || (Math.random()<0.5 ? 'L':'R'));
   gameState = STATE.PLAY;
+  resetMatchTimer();
   if(!musicMuted){
     playSong(MUSIC.mkmusic);
   }
@@ -2487,6 +3742,7 @@ function serializeWorldState(){
     t: performance.now(),
     gameState,
     score,
+    matchTimer: { ms: matchTimerMs, mode: matchTimerMode, expired: matchTimerExpired },
     ball: {
       x: ball.x, y: ball.y, vx: ball.vx, vy: ball.vy, r: ball.r,
       typeIndex: Math.max(0, BALL_TYPES.indexOf(ball.type || currentBallType || BALL_TYPES[0])),
@@ -2618,6 +3874,11 @@ function applyRemoteWorld(data){
   Object.assign(drumMine, data.drumMine || { attached:false, pulse:0, owner:null });
   Object.assign(mysteryBomb, data.mysteryBomb || { attached:false, pulse:0, owner:null });
   suddenDeathActive = !!data.suddenDeathActive;
+   if(data.matchTimer){
+     matchTimerMs = (typeof data.matchTimer.ms === 'number' || data.matchTimer.ms === null) ? data.matchTimer.ms : matchTimerMs;
+     matchTimerMode = data.matchTimer.mode || matchTimerMode;
+     matchTimerExpired = !!data.matchTimer.expired;
+   }
   if(data.finishState){
     finishState.active = !!data.finishState.active;
     finishState.stage = data.finishState.stage || finishState.stage;
@@ -2646,6 +3907,120 @@ const STATE = {
 };
 let gameState = STATE.SELECT;
 let useBot = false;
+let matchTimerMs = null;          // ms restantes (countdown) o acumuladas (countup)
+let matchTimerMode = 'countdown'; // 'countdown' | 'countup'
+let matchTimerExpired = false;
+const ACHIEVEMENTS = [
+  { id:'bots50', label:'50 bots', desc:'Derrota 50 bots', check:(s)=> (s.botKillsTotal || 0) >= 50 },
+  { id:'bots100', label:'100 bots', desc:'Derrota 100 bots', check:(s)=> (s.botKillsTotal || 0) >= 100 },
+  { id:'bots500', label:'500 bots', desc:'Derrota 500 bots', check:(s)=> (s.botKillsTotal || 0) >= 500 },
+  { id:'bots1000', label:'1000 bots', desc:'Derrota 1000 bots', check:(s)=> (s.botKillsTotal || 0) >= 1000 },
+  { id:'bots20fast', label:'Speed Bot', desc:'20 bots en < 2:00', check:(s,ctx)=> (ctx?.botKillsRun || 0) >= 20 && (ctx?.elapsedMs || 0) <= 120000 },
+  { id:'lan5', label:'LAN 5', desc:'Juega 5 partidas LAN', check:(s,ctx)=> ((s.matches?.lan || 0) + (ctx?.lanPlayed || 0)) >= 5 },
+  { id:'fatal10', label:'Fatalist', desc:'10 fatalities', check:(s,ctx)=> ((s.totalFatalities || 0) + (ctx?.fatalityCount || 0)) >= 10 },
+];
+// Tint al ~30% para mezclar 30% color de logro + 70% fondo base en selección (ajusta el alpha si quieres otro mix).
+const ACH_COLORS = [
+  null,
+  { tint:'rgba(205,138,58,0.3)', glow:'#cd8a3a' },   // bronce
+  { tint:'rgba(176,190,197,0.3)', glow:'#d0d7dc' },  // plata
+  { tint:'rgba(255,214,102,0.3)', glow:'#ffd666' },  // oro
+  { tint:'rgba(120,235,255,0.3)', glow:'#78ebff' },  // diamante
+  { tint:'rgba(255,90,90,0.3)', glow:'#ff5a5a' },    // rubí
+  { tint:'rgba(120,62,156,0.3)', glow:'#a765ff' }    // obsidiana/violeta
+];
+
+function scoreToLifeGlobal(myScore, oppScore){
+  const base = CONFIG.BASE_POINTS_TO_WIN;
+  if(myScore < base-1 || oppScore < base-1){
+    return Math.max(0, base - oppScore);
+  }
+  if(myScore === oppScore){
+    return 1;
+  }
+  const diff = myScore - oppScore;
+  if(Math.abs(diff) === 1){
+    return (diff > 0) ? 2 : 1;
+  }
+  if(Math.abs(diff) >= 2){
+    return (diff > 0) ? 0 : 0;
+  }
+  return 1;
+}
+
+function getLifeSnapshot(){
+  const MAX_SEGMENTS = 10;
+  const p1Score = score.p1;
+  const p2Score = score.p2;
+  const bonusP1 = p1?.lifeBonusAmount || 0;
+  const bonusP2 = p2?.lifeBonusAmount || 0;
+  const p1Life = clamp(scoreToLifeGlobal(p1Score, p2Score) + bonusP1, 0, MAX_SEGMENTS);
+  const p2Life = clamp(scoreToLifeGlobal(p2Score, p1Score) + bonusP2, 0, MAX_SEGMENTS);
+  return { p1Life, p2Life };
+}
+
+function resetMatchTimer(){
+  matchTimerExpired = false;
+  if(matchMode === MATCH_MODE.BOT){
+    matchTimerMode = 'countup';
+    matchTimerMs = 0;
+  } else {
+    matchTimerMode = 'countdown';
+    matchTimerMs = 180000; // 3 minutos
+  }
+}
+
+function clearMatchTimer(){
+  matchTimerMs = null;
+  matchTimerExpired = false;
+}
+
+function onMatchTimerExpired(){
+  if(matchTimerExpired) return;
+  matchTimerExpired = true;
+  if(matchTimerMode !== 'countdown') return;
+  const { p1Life, p2Life } = getLifeSnapshot();
+  if(p1Life === p2Life){
+    suddenDeathActive = true;
+    matchTimerMs = null;
+    return;
+  }
+  const winnerKey = p1Life > p2Life ? 'p1' : 'p2';
+  if(gameState === STATE.PLAY){
+    startFinishSequence(winnerKey);
+  }
+}
+
+function updateMatchTimer(dt){
+  if(matchTimerMs == null) return;
+  if(matchTimerMode === 'countdown'){
+    matchTimerMs = Math.max(0, matchTimerMs - dt * 1000);
+    if(matchTimerMs <= 0){
+      onMatchTimerExpired();
+    }
+  } else if(matchTimerMode === 'countup'){
+    matchTimerMs += dt * 1000;
+  }
+}
+
+function getMatchElapsedMs(){
+  if(matchTimerMode === 'countup'){
+    return matchTimerMs != null ? Math.max(0, matchTimerMs) : 0;
+  }
+  if(matchTimerMode === 'countdown'){
+    const base = 180000;
+    const remaining = matchTimerMs != null ? matchTimerMs : base;
+    return Math.max(0, base - remaining);
+  }
+  return 0;
+}
+
+function formatMsClock(ms){
+  const total = Math.max(0, Math.floor(ms/1000));
+  const minutes = Math.floor(total/60);
+  const seconds = total % 60;
+  return `${minutes}:${String(seconds).padStart(2,'0')}`;
+}
 
 /* Roster de skins dibujadas por código */
 const ROSTER = [
@@ -5180,6 +6555,10 @@ function activatePlayerAbility(player){
   ability.active = true;
   ability.remainingMs = ability.def.duration;
   ability.def.onActivate(player, ability);
+  if(!(botActive && player === p2)){
+    addCharStat(player.skin, 'abilityUses', 1);
+    saveProgress(progress);
+  }
 
   if(ability.remainingMs <= 0){
     concludeAbility(player);
@@ -6026,6 +7405,7 @@ ball.prevX = ball.x;
 ball.prevY = ball.y;
 
 let score = { p1:0, p2:0, target: CONFIG.BASE_POINTS_TO_WIN };
+let botKills = 0;
 let hitTracker = {lastHitter: null, p1Hits: 0, p2Hits: 0, lastHitTime: 0 };
 let scoreStreak = { p1:0, p2:0 };
 let suddenDeathActive = false;
@@ -6109,10 +7489,13 @@ function gameOver(who, options = {}){
   if(ballGroundTimeout){ clearTimeout(ballGroundTimeout); ballGroundTimeout = null; }
   ball.groundScheduled = false;
   ball.fireEffect = null;
+  const elapsedMs = getMatchElapsedMs();
 
   // Determinar ganador y puntaje final
   const winner = (who === 'p1') ? (playerNames.p1 || 'Jugador 1') : (botActive ? 'BOT' : (playerNames.p2 || 'Jugador 2'));
-  const finalScore = `${score.p1} - ${score.p2}`;
+  const finalScore = botActive
+    ? `Bots: ${botKills} · Tiempo: ${formatMsClock(elapsedMs)}`
+    : `${score.p1} - ${score.p2}`;
   gameState = STATE.GAMEOVER;
 
   // Guardar para mostrar
@@ -6123,10 +7506,18 @@ function gameOver(who, options = {}){
     banner: options.banner || (options.fatality ? 'Fatality' : null),
     fatality: !!options.fatality
   };
+  applyPostGameStats(who, elapsedMs, {
+    botKillsRun: botKills,
+    wasFatality: !!options.fatality,
+    isLan: matchMode === MATCH_MODE.LAN
+  });
+  recordCharacterOutcome(who, { fatality: !!options.fatality, finalScore });
+  registerMatchPlayed();
   clearTouchKeys();
   if(matchMode === MATCH_MODE.LAN && netRole === 'host'){
     sendNet({ type:'gameOver', info: window._winnerInfo });
   }
+  matchTimerMs = null;
   resetScoreStreaks();
   syncUiState();
 }
@@ -6827,18 +8218,18 @@ function getTouchControlRole(){
 
 function mapTouchAction(role, x, y, rect){
   const halfW = rect.width / 2;
-  const halfH = rect.height / 2;
+  const jumpLine = rect.height * 0.75;
   if(role === 'p1'){
     if(x < halfW){
       return (x < halfW / 2) ? 'left' : 'right';
     }
-    return (y < halfH) ? 'jump' : 'ability';
+    return (y < jumpLine) ? 'jump' : 'ability';
   }
   if(role === 'p2'){
     if(x >= halfW){
       return (x < halfW + halfW / 2) ? 'left' : 'right';
     }
-    return (y < halfH) ? 'jump' : 'ability';
+    return (y < jumpLine) ? 'jump' : 'ability';
   }
   return null;
 }
@@ -6954,11 +8345,13 @@ function applySelectionIndex(role, index, options = {}){
       const pref = options.source === 'gamepad' ? 'gamepad' : 'keyboard';
       lockSelectionP1Control(pref, options.details);
     }
+    if(options.source === 'touch') selectionUsedTouch = true;
     sel.p1Index = index;
     sel.p1Locked = false;
     sel.p1ConfirmTimer = 0;
     sel.p1HasMovedOnce = true;
   } else {
+    if(options.source === 'touch') selectionUsedTouch = true;
     sel.p2Index = index;
     sel.p2Locked = false;
     sel.p2ConfirmTimer = 0;
@@ -7056,6 +8449,7 @@ function resetSelectionState(){
   sel = createDefaultSelectionState();
   selectionP1InputPreference = null;
   selectionP1GamepadIndex = null;
+  selectionUsedTouch = false;
 }
 
 function lockSelectionP1Control(source, details = {}){
@@ -7185,7 +8579,7 @@ function handleSelection(){
   ctx.fillStyle="#fff";
   ctx.font="700 40px system-ui";
   ctx.textAlign="center";
-  ctx.fillText("Violin Beach Kombat (v1.4)", W/2, 90);
+  ctx.fillText("Violin Beach Kombat (v1.5)", W/2, 90);
 
   drawSelectionGrid();
 
@@ -7235,10 +8629,12 @@ function handleSelection(){
     resetScoreStreaks();
 
     ball.type = currentBallType;
+    botKills = 0;
 
     resetRally(Math.random()<0.5 ? 'L':'R');
     setScene(APP_SCENE.GAME);
     gameState = STATE.PLAY;
+    resetMatchTimer();
     if(!musicMuted){
       playSong(MUSIC.mkmusic);
     }
@@ -7259,13 +8655,17 @@ function applyRemoteSelectionTouch(msg){
 function drawSelectionGrid(){
   for(let i=0; i<ROSTER.length; i++){
     const skin = ROSTER[i];
+    const stats = getCharStatsSnapshot(skin);
+    const ach = getCharAchievementData(stats);
+    const achStyle = getAchFrameStyle(ach.level);
+    const cardTint = '#10131aee'; // Fondo base oscuro; el color de nivel se aplica como glow interno
     const col = i % GRID_COLS;
     const row = Math.floor(i / GRID_COLS);
     const x = GRID_PAD_X + col * SPACING_X;
     const y = GRID_PAD_Y + row * SPACING_Y;
 
     // --- Card base ---
-    ctx.fillStyle = '#10131aee';
+    ctx.fillStyle = cardTint;
     ctx.strokeStyle = '#ffffff22';
     ctx.lineWidth = 2;
     roundRect(ctx, x, y, CARD_W, CARD_H, 12);
@@ -7275,6 +8675,16 @@ function drawSelectionGrid(){
 
 
     // --- Skin render ---
+    if(achStyle?.glow){
+      ctx.save();
+      ctx.translate(x + CARD_W/2, y + CARD_H*0.58);
+      const glowColor = achStyle.glow.length === 7 ? achStyle.glow + '55' : achStyle.glow;
+      ctx.fillStyle = glowColor;
+      ctx.beginPath();
+      ctx.arc(0, 0, 56, 0, TAU);
+      ctx.fill();
+      ctx.restore();
+    }
     ctx.save();
     ctx.translate(x + CARD_W/2, y + CARD_H*0.58);
     drawSkin(ctx, skin, {r:36});
@@ -8080,6 +9490,7 @@ function handlePlayerHit(p){
 
       if(hitTracker.p1Hits >= 4){
         try{ SFX.pito.currentTime = 0; SFX.pito.play(); }catch(e){}
+        if(!(botActive && p === p2)) addFoulStat(p1.skin);
         setFoul(`${playerNames.p1}: Foul`, 2500);
         addPoint('p2');
         resetRally('R');
@@ -8088,6 +9499,7 @@ function handlePlayerHit(p){
       }
       if(hitTracker.p2Hits >= 4){
         try{ SFX.pito.currentTime = 0; SFX.pito.play(); }catch(e){}
+        if(!(botActive && p === p1) && !(botActive && p === p2)) addFoulStat(p2.skin);
         setFoul(botActive ? 'BOT: Foul' : `${playerNames.p2}: Foul`, 2500);
         addPoint('p1');
         resetRally('L');
@@ -8218,17 +9630,38 @@ function addPoint(who, options = {}){
   if(matchMode === MATCH_MODE.LAN && netRole === 'client'){
     return 'pending';
   }
+  if(matchMode === MATCH_MODE.BOT){
+    if(who === 'p1'){
+      botKills++;
+      score.p1 = 0;
+      // Respawn bot con skin aleatoria y enfriamiento de habilidad
+      const candidates = ROSTER.filter(id => id !== p2.skin);
+      const nextSkin = candidates[Math.floor(Math.random() * Math.max(1, candidates.length))] || p2.skin;
+      applySkinProfile(p2, nextSkin);
+      if(p2.ability){
+        p2.ability.active = false;
+        p2.ability.cooldownMs = Math.max(p2.ability.cooldownMs || 0, 1000);
+        p2.ability.remainingMs = 0;
+      }
+      const elapsed = getMatchElapsedMs();
+      updateBotKillStats(p1.skin, elapsed);
+      saveProgress(progress);
+      const serveSide = (Math.random() < 0.5) ? 'L' : 'R';
+      resetRally(serveSide);
+      return 'continue';
+    } else {
+      score.p2++;
+      const lifeLeft = scoreToLifeGlobal(0, score.p2);
+      if(lifeLeft <= 0){
+        gameOver('p2');
+        return 'gameover';
+      }
+      resetRally('L');
+      return 'continue';
+    }
+  }
   if(who==='p1') {
     score.p1++;
-    // 🔁 Si el BOT pierde un punto, cambia su skin al siguiente del roster
-    if(botActive){
-      const currentIndex = ROSTER.indexOf(p2.skin);
-      const nextIndex = (currentIndex + 1) % ROSTER.length;
-      applySkinProfile(p2, ROSTER[nextIndex]);
-      if(p2.stamina){
-        p2.stamina.value = Math.min(p2.stamina.max, p2.stamina.value + 200);
-      }
-    }
   } else {
     score.p2++;
   }
@@ -8544,43 +9977,7 @@ function drawHUD(){
   // ===============================
   const p1Score = score.p1;
   const p2Score = score.p2;
-
-  // vida base: 10 "trozos"
-function scoreToLife(myScore, oppScore){
-  const base = CONFIG.BASE_POINTS_TO_WIN;
-
-  // ----------------------------
-  // 1) MODO NORMAL (antes del 9–9)
-  // ----------------------------
-  if(myScore < base-1 || oppScore < base-1){
-    // vida = (10 - puntos del rival), evitando pasar de 10
-    return Math.max(0, base - oppScore);
-  }
-
-  // ----------------------------
-  // 2) MODO DEUCE / VENTAJA
-  //    (desde 9–9 en adelante)
-  // ----------------------------
-
-  // Empate → ambos con 1 vida
-  if(myScore === oppScore){
-    return 1;
-  }
-
-  const diff = myScore - oppScore;
-
-  // Ventaja simple → ganador = 2 vidas, perdedor = 1
-  if(Math.abs(diff) === 1){
-    return (diff > 0) ? 2 : 1;
-  }
-
-  // Victoria → perdedor = 0 vidas
-  if(Math.abs(diff) >= 2){
-    return (diff > 0) ? 0 : 0;
-  }
-
-  return 1; // fallback
-}
+  const scoreToLife = scoreToLifeGlobal;
 
   const MAX_SEGMENTS = 10;
 
@@ -8731,21 +10128,35 @@ function handleLifeBasedAbilities(playerRef, lifeSegments, maxSegments){
   }
 
 const lifeWidth = inSuddenDeath ? (W * 0.28) : (W * 0.38);
-if(!inSuddenDeath){
-  drawLifeBar(40, 15, lifeWidth, 10, p1Life, true);
-  drawLifeBar(W - 40 - lifeWidth, 15, lifeWidth, 10, p2Life, false);
-} else {
-  const barHeight = 16;
-  drawSuddenDeathBar(40, 12, lifeWidth, barHeight, p1Life, true);
-  drawSuddenDeathBar(W - 40 - lifeWidth, 12, lifeWidth, barHeight, p2Life, false);
+if(!botActive){
+  if(!inSuddenDeath){
+    drawLifeBar(40, 15, lifeWidth, 10, p1Life, true);
+    drawLifeBar(W - 40 - lifeWidth, 15, lifeWidth, 10, p2Life, false);
+  } else {
+    const barHeight = 16;
+    drawSuddenDeathBar(40, 12, lifeWidth, barHeight, p1Life, true);
+    drawSuddenDeathBar(W - 40 - lifeWidth, 12, lifeWidth, barHeight, p2Life, false);
 
+    ctx.save();
+    ctx.font = '700 28px system-ui';
+    ctx.fillStyle = '#ff4444';
+    ctx.shadowColor = '#ff1111';
+    ctx.shadowBlur = 10 + Math.sin(performance.now()/150)*6;
+    ctx.textAlign = 'center';
+    ctx.fillText('SUDDEN DEATH', W/2, 54);
+    ctx.restore();
+  }
+} else {
+  // Supervivencia: barra solo P1 y contador de bots destruidos a la derecha
+  drawLifeBar(40, 15, lifeWidth, 10, p1Life, true);
   ctx.save();
-  ctx.font = '700 28px system-ui';
-  ctx.fillStyle = '#ff4444';
-  ctx.shadowColor = '#ff1111';
-  ctx.shadowBlur = 10 + Math.sin(performance.now()/150)*6;
-  ctx.textAlign = 'center';
-  ctx.fillText('SUDDEN DEATH', W/2, 54);
+  ctx.textAlign = 'right';
+  ctx.font = '900 20px system-ui';
+  ctx.fillStyle = '#ff6b6b';
+  ctx.shadowColor = '#a30000';
+  ctx.shadowBlur = 6;
+  ctx.fillText(`Bots destruidos: ${botKills}`, W - 40, 30);
+  ctx.shadowBlur = 0;
   ctx.restore();
 }
 
@@ -8763,6 +10174,25 @@ if(!inSuddenDeath){
 
   ctx.textAlign = 'right';
   ctx.fillText(botActive ? 'BOT' : (playerNames.p2 || 'P2'), W - 40, 60);
+
+  // Timer de partida
+  if(matchTimerMs != null){
+    const ms = Math.max(0, matchTimerMs);
+    const totalSeconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    const text = matchTimerMode === 'countup'
+      ? `⏱ ${minutes}:${String(seconds).padStart(2,'0')}`
+      : `${minutes}:${String(seconds).padStart(2,'0')}`;
+    ctx.textAlign = 'center';
+    ctx.font = '900 26px system-ui';
+    const warn = (matchTimerMode === 'countdown' && ms <= 30000 && !suddenDeathActive);
+    ctx.fillStyle = warn ? '#ffdf5c' : '#e9f4ff';
+    ctx.shadowColor = warn ? '#ffb300' : '#000';
+    ctx.shadowBlur = warn ? 10 : 0;
+    ctx.fillText(text, W/2, 48);
+    ctx.shadowBlur = 0;
+  }
 
   // Foul
   if (foulTimer > 0 && foulMessage) {
@@ -8800,6 +10230,10 @@ function loop(){
   }
 
   const isLanClient = (matchMode === MATCH_MODE.LAN && netRole === 'client');
+  const shouldTickTimer = (gameState === STATE.PLAY && (matchMode !== MATCH_MODE.LAN || netRole === 'host'));
+  if(shouldTickTimer){
+    updateMatchTimer(dt);
+  }
 
   switch(gameState){
     case STATE.SELECT:
