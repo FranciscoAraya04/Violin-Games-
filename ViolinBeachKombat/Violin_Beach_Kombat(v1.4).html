@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Violin Beach Kombat (v1.6)</title>
+<title>Violin Beach Kombat (v1.7)</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600;700&display=swap');
   :root{
@@ -693,8 +693,9 @@
       <div class="menu-actions">
         <button class="ui-btn low-profile" id="btnOpenTutorial">Tutorial</button>
         <button class="ui-btn low-profile" id="btnToggleFullscreen">Pantalla completa</button>
+        <button class="ui-btn low-profile" id="btnMenuMute">🔊 Música</button>
       </div>
-      <div class="menu-footer">Violin Beach Kombat v1.6 · diciembre de 2025 · francisco.araya.work@gmail.com</div>
+      <div class="menu-footer">Violin Beach Kombat v1.7 · diciembre de 2025 · francisco.araya.work@gmail.com</div>
     </div>
   </div>
 
@@ -731,6 +732,34 @@
           <span>Dummy fuera del roster</span>
         </div>
         <button class="ui-btn low-profile" id="btnArcadeFatality">Entrar a fatality practice</button>
+      </div>
+      <div class="arcade-card">
+        <h3>Bossfight</h3>
+        <p>Enfrenta a Rock en 3 fases con targets y proyectiles especiales.</p>
+        <div class="arcade-meta">
+          <span>60 de vida · empuje radial</span>
+          <span>Targets, meteoritos y rocas rodantes</span>
+        </div>
+        <button class="ui-btn low-profile" id="btnArcadeBossfight">Elegir boss</button>
+      </div>
+    </div>
+    <div class="arcade-card hidden" id="bossfightBox" style="margin-top:8px;">
+      <h3>Selecci�n de boss</h3>
+      <p>Abre el selector de personaje y luego pelea contra el boss elegido.</p>
+      <div class="field">
+        <label>Boss disponible</label>
+        <select id="bossfightSelect">
+          <option value="rock" selected>Rock (60 HP, empuje radial)</option>
+        </select>
+      </div>
+      <div class="arcade-meta">
+        <span>Fase 1: con malla hasta bajar vida a 2/3</span>
+        <span>Fase 2: targets sin malla, drop 5= -1 vida</span>
+        <span>Fase 3: meteoritos y boulders, 5 toques = -1 HP boss</span>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;">
+        <button class="ui-btn" id="btnBossfightPlay">Lucha</button>
+        <button class="ui-btn secondary" id="btnBossfightClose">Cerrar</button>
       </div>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
@@ -825,9 +854,9 @@
       </div>
       <div class="tutorial-section">
         <h2>Descarga directa (offline)</h2>
-        <p>Descarga el HTML (v1.6) desde el juego para jugar sin navegador o montar el lobby local.</p>
+        <p>Descarga el HTML (v1.7) desde el juego para jugar sin navegador o montar el lobby local.</p>
         <div class="tutorial-download">
-          <input id="tutorialDownloadUrl" type="url" value="https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/refs/heads/main/ViolinBeachKombat/Violin_Beach_Kombat%28v1.6%29.html" />
+          <input id="tutorialDownloadUrl" type="url" value="https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/refs/heads/main/ViolinBeachKombat/Violin_Beach_Kombat%28v1.7%29.html" />
           <button class="mini-btn" id="btnTutorialDownload">Descargar</button>
           <button class="mini-btn secondary" id="btnTutorialCopy">Copiar link</button>
           <small id="tutorialDownloadStatus"></small>
@@ -1095,6 +1124,7 @@ const MUSIC ={
     arcade: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/music/Ready-Set-Slice-Fruit-Ninja-Musi.mp3'),
     arcade2: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/music/Tribes-Tribulations.mp3'),
     arcade3: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/music/Age-of-War-Theme-Soundtrack.mp3'),
+    bossfight: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/music/Onslaught%20%EF%BC%9A%20Bloons%20Tower%20Defense%206%20(Video%20Game%20Soundtrack).mp3'),
     fatalityPractice: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/music/The-Training-Room.mp3'),
     versus2: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/music/Lin-Kuei-Temple-Mortal-Kombat-X.mp3'),
     versus3: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/music/Outworld-Marketplace-Mortal-Komb.mp3'),
@@ -1112,6 +1142,7 @@ MUSIC.survival3.volume = 0.30; // ajuste de volumen
 MUSIC.arcade.volume = 0.3; // ajuste de volumen
 MUSIC.arcade2.volume = 0.3; // ajuste de volumen
 MUSIC.arcade3.volume = 0.3; // ajuste de volumen
+MUSIC.bossfight.volume = 0.2; // ajuste de volumen
 MUSIC.fatalityPractice.volume = 0.5; // ajuste de volumen
 MUSIC.versus2.volume = 0.85; // ajuste de volumen
 MUSIC.versus3.volume = 0.85; // ajuste de volumen
@@ -1126,6 +1157,7 @@ MUSIC.survival3.loop = false; // se reproducen en secuencia, no en loop
 MUSIC.arcade.loop = true;
 MUSIC.arcade2.loop = true;
 MUSIC.arcade3.loop = true;
+MUSIC.bossfight.loop = true;
 MUSIC.fatalityPractice.loop = true;
 MUSIC.versus2.loop = true;
 MUSIC.versus3.loop = true;
@@ -1235,6 +1267,7 @@ function playUiBackSound(){
 function getCurrentBgm(){
   if(matchMode === MATCH_MODE.ARCADE){
     if(arcadeContext.mode === ARCADE_MODES.FATALITY) return MUSIC.fatalityPractice;
+    if(arcadeContext.mode === ARCADE_MODES.BOSS) return MUSIC.bossfight;
     const pool = [
       { node: MUSIC.arcade, weight: 8 },
       { node: MUSIC.arcade2, weight: 9 },
@@ -1390,12 +1423,21 @@ function loadBackgroundImage(name, url) {
   IMAGES[name] = img;
 }
 
+function loadImageAsset(name, url){
+  if(!url) return;
+  const img = new Image();
+  img.src = url;
+  IMAGES[name] = img;
+}
+
 // Cargar las imágenes que usarás
 loadBackgroundImage('beachPhoto', 'https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/beach.avif');
 loadBackgroundImage('beachPhoto_night', 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/beach_nighted.png?raw=true');
 loadBackgroundImage('beachPhoto_weather', 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/beach_weather.jpg?raw=true');
 //cargamos la calavera con flor
 loadBackgroundImage('skullflower', 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Captura%20de%20pantalla%202025-11-16%20154153-Photoroom.png?raw=true')
+// Fondo especial Rock
+loadBackgroundImage('rockStage', 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/images/RockBackgroundStage.png?raw=true');
 
 // Presets de fondos y pelotas (selección aleatoria al empezar partida)
 const BACKGROUNDS = [
@@ -1455,6 +1497,15 @@ const BACKGROUNDS = [
     sun: { visible: false },
     moon: { visible: false },
     weight: 10.0
+  },
+  {
+    name: 'Rock Stage',
+    skyVariant: 0,
+    imageKey: 'rockStage',
+    isPhoto: true,
+    sun: { visible: false },
+    moon: { visible: false },
+    weight: 0.0
   }
 ];
 
@@ -1481,6 +1532,52 @@ const BALL_TYPES = [ //tipos de pelotas disponibles
   { name:'Mystery', stops:[[0,'#fc5b'],[1,'#f94b']], seam:'#fc35', rMul:2.5, weight: 0.1 },
   { name:'tenis', stops:[[0,'#fff8'],[1,'#f2f2f2']], seam:'#ffffff', rMul:0.4 , weight: 0.3 },
 ];
+
+// Config de bosses y assets (rellena las URLs con las fotos del repo)
+const BOSS_ASSETS = {
+  rock: {
+    // URL de la imagen del boss (cuerpo principal). Pon aqu� la foto de Rock.
+    spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/images/Rock%20Skin.png?raw=true',
+    spriteScale: 1.25,
+    hitboxScale: 1.32,
+    // Tama�o/hitbox cuando Rock sea jugable como easter egg (m�s peque�o/nerfeado)
+    playableScale: 0.92,
+    playableHitboxScale: 1.02,
+    // URL de meteorito que cae desde el cielo.
+    meteorUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/images/Rock%20Meteorite.png?raw=true',
+    meteorRadius: 44,
+    // URL de roca rodante (boulder) horizontal.
+    boulderUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/images/Rock%20Boulder.png?raw=true',
+    boulderRadius: 52
+  }
+};
+
+const BOSS_CONFIG = {
+  rock: {
+    id: 'rock',
+    label: 'Rock',
+    maxHp: 60,
+    phaseThresholds: { phase2: 2/3, phase3: 1/3 }, // vida restante para pasar de fase
+    phase1DamagePerGround: 5,      // da�o al boss por rally ganado en fase 1
+    phase2DamagePerTarget: 2,      // da�o al boss por target en fase 2
+    hitsPerHpPhase3: 5,            // golpes en fase 3 por cada punto de vida del boss
+    dropLimit: 5,                  // ca�das antes de perder 1 vida del jugador en fases 2-3
+    push: { force: 2200, cooldownMs: 5200, radius: 420 },
+    projectiles: {
+      meteor: { intervalMs: 1500, fallVy: 520, vxRange: [-160, 160], knockback: 2200 },
+      boulder: { intervalMs: 2400, speed: 460, knockback: 1400 }
+    }
+  }
+};
+
+function loadBossAssets(){
+  Object.entries(BOSS_ASSETS).forEach(([id, asset])=>{
+    loadImageAsset(`boss_${id}`, asset.spriteUrl);
+    loadImageAsset(`boss_${id}_meteor`, asset.meteorUrl);
+    loadImageAsset(`boss_${id}_boulder`, asset.boulderUrl);
+  });
+}
+loadBossAssets();
 
 // Estado actual elegido al iniciar la partida
 let currentBackground = null;
@@ -1509,7 +1606,10 @@ const CHAR_DEFAULT_STATS = {
   arcadeTargetHitsMax: 0,
   arcadeTargetTotal: 0,
   arcadeTargetStreakMax: 0,
-  arcadeFatalities: 0
+  arcadeFatalities: 0,
+  arcadeBossRuns: 0,
+  arcadeBossWins: 0,
+  arcadeBossRockWins: 0
 };
 
 function genUserId(){
@@ -1538,10 +1638,22 @@ function createBaseProgress(){
     lanKd: { wins:0, losses:0 },
     totalFatalities: 0,
     totalFouls: 0,
-    arcade: { runs:0, dominadasMax:0, dominadasTotal:0, targetHitsMax:0, targetTotal:0, targetStreakMax:0, fatalityPractice:0 }
+    arcade: {
+      runs:0,
+      dominadasMax:0,
+      dominadasTotal:0,
+      targetHitsMax:0,
+      targetTotal:0,
+      targetStreakMax:0,
+      fatalityPractice:0,
+      bossRuns:0,
+      bossWins:0,
+      rockWins:0
+    }
   },
   badges: [],
   skins: [],
+  unlocks: {},
   loadout: {},
   achievements: []
   };
@@ -1569,7 +1681,18 @@ function normalizeProgress(data, base = createBaseProgress()){
   if(typeof merged.stats.lanKd.losses !== 'number') merged.stats.lanKd.losses = 0;
   if(typeof merged.stats.totalFatalities !== 'number') merged.stats.totalFatalities = 0;
   if(typeof merged.stats.totalFouls !== 'number') merged.stats.totalFouls = 0;
-  const arcadeDefault = { runs:0, dominadasMax:0, dominadasTotal:0, targetHitsMax:0, targetTotal:0, targetStreakMax:0, fatalityPractice:0 };
+  const arcadeDefault = {
+    runs:0,
+    dominadasMax:0,
+    dominadasTotal:0,
+    targetHitsMax:0,
+    targetTotal:0,
+    targetStreakMax:0,
+    fatalityPractice:0,
+    bossRuns:0,
+    bossWins:0,
+    rockWins:0
+  };
   const arcadeStats = { ...arcadeDefault, ...(data?.stats?.arcade || {}) };
   for(const key of Object.keys(arcadeDefault)){
     if(typeof arcadeStats[key] !== 'number' || Number.isNaN(arcadeStats[key])){
@@ -1590,6 +1713,7 @@ function normalizeProgress(data, base = createBaseProgress()){
   }
   merged.badges = Array.isArray(data?.badges) ? data.badges : [];
   merged.skins = Array.isArray(data?.skins) ? data.skins : [];
+  merged.unlocks = { ...(base.unlocks || {}), ...(data?.unlocks || {}) };
   merged.loadout = { ...base.loadout, ...(data?.loadout || {}) };
   merged.achievements = Array.isArray(data?.achievements) ? data.achievements : [];
   return merged;
@@ -1764,6 +1888,7 @@ function getCharAchievementData(stats){
   const targetMax = s.arcadeTargetHitsMax || 0;
   const targetTotal = s.arcadeTargetTotal || 0;
   const targetStreak = s.arcadeTargetStreakMax || 0;
+  const rockWins = s.arcadeBossRockWins || s.arcadeBossWins || 0;
 
   const lines = [];
   const pushLine = (text, done)=>{ lines.push({ text, done }); };
@@ -1803,6 +1928,10 @@ function getCharAchievementData(stats){
   const targetStreakDone = targetStreak >= 10;
   if(targetStreakDone) met++;
   pushLine(`Targets seguidos: ${targetStreak}/10`, targetStreakDone);
+
+  const rockDone = rockWins >= 1;
+  if(rockDone) met++;
+  pushLine(`Rock Slayer: ${rockWins}/1`, rockDone);
 
   const level = Math.min(met, ACH_COLORS.length - 1);
   return {
@@ -1887,7 +2016,18 @@ function applyPostGameStats(winnerKey, elapsedMs=0, context = {}){
 function applyArcadeProgress(result = {}){
   if(!progress?.stats) return;
   const stats = progress.stats;
-  const arcadeDefault = { runs:0, dominadasMax:0, dominadasTotal:0, targetHitsMax:0, targetTotal:0, targetStreakMax:0, fatalityPractice:0 };
+  const arcadeDefault = {
+    runs:0,
+    dominadasMax:0,
+    dominadasTotal:0,
+    targetHitsMax:0,
+    targetTotal:0,
+    targetStreakMax:0,
+    fatalityPractice:0,
+    bossRuns:0,
+    bossWins:0,
+    rockWins:0
+  };
   const arc = { ...arcadeDefault, ...(stats.arcade || {}) };
   arc.runs = (arc.runs || 0) + 1;
   if(result.mode === ARCADE_MODES.DOMINADAS){
@@ -1899,6 +2039,14 @@ function applyArcadeProgress(result = {}){
     arc.targetStreakMax = Math.max(arc.targetStreakMax || 0, result.bestStreak || 0);
   } else if(result.mode === ARCADE_MODES.FATALITY){
     arc.fatalityPractice = (arc.fatalityPractice || 0) + (result.fatalities || 1);
+  } else if(result.mode === ARCADE_MODES.BOSS){
+    arc.bossRuns = (arc.bossRuns || 0) + 1;
+    if(result.bossWin){
+      arc.bossWins = (arc.bossWins || 0) + 1;
+    }
+    if(result.bossId === 'rock' && result.bossWin){
+      arc.rockWins = (arc.rockWins || 0) + 1;
+    }
   }
   stats.arcade = arc;
   if(typeof result.elapsedMs === 'number' && result.elapsedMs > 0){
@@ -1918,10 +2066,20 @@ function applyArcadeProgress(result = {}){
         entry.arcadeTargetStreakMax = Math.max(entry.arcadeTargetStreakMax || 0, result.bestStreak || 0);
       } else if(result.mode === ARCADE_MODES.FATALITY){
         entry.arcadeFatalities = (entry.arcadeFatalities || 0) + (result.fatalities || 1);
+      } else if(result.mode === ARCADE_MODES.BOSS){
+        entry.arcadeBossRuns = (entry.arcadeBossRuns || 0) + 1;
+        if(result.bossWin){
+          entry.arcadeBossWins = (entry.arcadeBossWins || 0) + 1;
+          if(result.bossId === 'rock'){
+            entry.arcadeBossRockWins = (entry.arcadeBossRockWins || 0) + 1;
+          }
+        }
       }
     }
   }
-  evaluateAchievements();
+  evaluateAchievements({
+    rockDefeated: !!(result.bossWin && result.bossId === 'rock')
+  });
   saveProgress(progress);
 }
 
@@ -1970,6 +2128,11 @@ const uiRefs = {
   btnArcadeDominadas: document.getElementById('btnArcadeDominadas'),
   btnArcadeTarget: document.getElementById('btnArcadeTarget'),
   btnArcadeFatality: document.getElementById('btnArcadeFatality'),
+  btnArcadeBossfight: document.getElementById('btnArcadeBossfight'),
+  bossfightBox: document.getElementById('bossfightBox'),
+  bossfightSelect: document.getElementById('bossfightSelect'),
+  btnBossfightPlay: document.getElementById('btnBossfightPlay'),
+  btnBossfightClose: document.getElementById('btnBossfightClose'),
   profileCard: document.getElementById('profileCard'),
   profileName: document.getElementById('profileName'),
   profileId: document.getElementById('profileId'),
@@ -2012,6 +2175,7 @@ const uiRefs = {
   btnOpenTutorial: document.getElementById('btnOpenTutorial'),
   btnTutorialBack: document.getElementById('btnTutorialBack'),
   btnOpenEncy: document.getElementById('btnOpenEncy'),
+  btnMenuMute: document.getElementById('btnMenuMute'),
   btnEncyBack: document.getElementById('btnEncyBack'),
   encyPanel: document.getElementById('encyPanel'),
   encyList: document.getElementById('encyList'),
@@ -2055,6 +2219,8 @@ let netRole = null; // 'host' o 'client'
 let tutorialOpen = false;
 let encyOpen = false;
 let arcadeOpen = false;
+let bossUiOpen = false;
+let bossSelectedId = 'rock';
 let encyReturnTarget = 'menu';
 let selectionUsedTouch = false;
 let lobbySocket = null;
@@ -2114,7 +2280,7 @@ const net = {
   lastHostStateSent: 0
 };
 
-const ARCADE_MODES = { DOMINADAS:'dominadas', TARGET:'target', FATALITY:'fatality' };
+const ARCADE_MODES = { DOMINADAS:'dominadas', TARGET:'target', FATALITY:'fatality', BOSS:'boss' };
 function createArcadeContext(){
   return {
     active: false,
@@ -2130,7 +2296,9 @@ function createArcadeContext(){
     freeCourt: true,
     startMs: 0,
     ended: false,
-    lastHitAt: 0
+    lastHitAt: 0,
+    bossId: 'rock',
+    bossFight: null
   };
 }
 let arcadeContext = createArcadeContext();
@@ -2144,8 +2312,46 @@ function getArcadeModeLabel(mode = arcadeContext.mode){
     case ARCADE_MODES.DOMINADAS: return 'Arcade: Dominadas';
     case ARCADE_MODES.TARGET: return 'Arcade: Target';
     case ARCADE_MODES.FATALITY: return 'Arcade: Fatality practice';
+    case ARCADE_MODES.BOSS: return 'Arcade: Bossfight';
     default: return 'Arcade';
   }
+}
+
+function getBossDef(id){
+  return BOSS_CONFIG[id] || BOSS_CONFIG.rock;
+}
+function getBossAssets(id){
+  return BOSS_ASSETS[id] || BOSS_ASSETS.rock;
+}
+function createBossFightState(bossId='rock'){
+  const def = getBossDef(bossId);
+  const assets = getBossAssets(bossId);
+  const toPhase2 = Math.max(1, Math.floor((def.maxHp || 1) * (def.phaseThresholds?.phase2 ?? (2/3))));
+  const toPhase3 = Math.max(1, Math.floor((def.maxHp || 1) * (def.phaseThresholds?.phase3 ?? (1/3))));
+  return {
+    id: bossId,
+    label: def.label || bossId,
+    maxHp: def.maxHp || 1,
+    hp: def.maxHp || 1,
+    phase: 1,
+    thresholds: {
+      phase2: toPhase2,
+      phase3: Math.max(1, Math.min(toPhase2 - 1, toPhase3))
+    },
+    dropLimit: def.dropLimit || 5,
+    hitsPerHpPhase3: def.hitsPerHpPhase3 || 5,
+    phase3Hits: 0,
+    targetHits: 0,
+    dropResets: 0,
+    playerLives: CONFIG.BASE_POINTS_TO_WIN,
+    projectiles: [],
+    assets,
+    config: def,
+    lastPushAt: performance.now() - (def.push?.cooldownMs || 0),
+    nextMeteorAt: 0,
+    nextBoulderAt: 0,
+    startedAt: performance.now()
+  };
 }
 
 let playerNames = { p1:getStoredPlayerName(), p2:'Jugador 2' };
@@ -2197,6 +2403,7 @@ function setScene(scene){
     toggleProfileExport(false);
     toggleProfileImport(false);
     arcadeOpen = false;
+    closeBossfightBox();
     if(uiRefs.arcadePanel) uiRefs.arcadePanel.classList.add('hidden');
   }
   syncUiState();
@@ -2231,10 +2438,17 @@ function getActiveMenuButtons(){
         if(el && !el.disabled) buttons.push(el);
       });
     } else {
-      ['btnLocalPvp','btnLocalBot','btnLan','btnArcade','btnOpenTutorial','btnToggleFullscreen','btnEditName','btnExportProgress','btnImportProgress','btnOpenStats'].forEach(id=>{
-        const el = document.getElementById(id);
-        if(el && !el.disabled) buttons.push(el);
-      });
+      if(arcadeOpen){
+        ['btnArcadeDominadas','btnArcadeTarget','btnArcadeFatality','btnArcadeBossfight','btnArcadeBack','btnBossfightPlay','btnBossfightClose'].forEach(id=>{
+          const el = document.getElementById(id);
+          if(el && !el.disabled && !el.classList.contains('hidden')) buttons.push(el);
+        });
+      } else {
+        ['btnLocalPvp','btnLocalBot','btnLan','btnArcade','btnOpenTutorial','btnToggleFullscreen','btnMenuMute','btnEditName','btnExportProgress','btnImportProgress','btnOpenStats'].forEach(id=>{
+          const el = document.getElementById(id);
+          if(el && !el.disabled) buttons.push(el);
+        });
+      }
     }
   } else if(appScene === APP_SCENE.NET){
     const lobbyVisible = lobbyLayer && !lobbyLayer.classList.contains('hidden');
@@ -2738,16 +2952,37 @@ function registerMatchPlayed(){
   saveProgress(progress);
 }
 
+function setBossSelection(id){
+  const exists = getBossDef(id);
+  bossSelectedId = exists ? id : 'rock';
+  if(uiRefs.bossfightSelect){
+    uiRefs.bossfightSelect.value = bossSelectedId;
+  }
+}
+
+function openBossfightBox(){
+  bossUiOpen = true;
+  if(uiRefs.bossfightBox) uiRefs.bossfightBox.classList.remove('hidden');
+  if(uiRefs.bossfightSelect) uiRefs.bossfightSelect.value = bossSelectedId;
+}
+
+function closeBossfightBox(){
+  bossUiOpen = false;
+  if(uiRefs.bossfightBox) uiRefs.bossfightBox.classList.add('hidden');
+}
+
 function openArcadeMenu(){
   tutorialOpen = false;
   encyOpen = false;
   arcadeOpen = true;
+  closeBossfightBox();
   setScene(APP_SCENE.MENU);
   badge.innerText = 'Arcade';
 }
 
 function closeArcadeMenu(){
   arcadeOpen = false;
+  closeBossfightBox();
   if(uiRefs.arcadePanel) uiRefs.arcadePanel.classList.add('hidden');
   setScene(APP_SCENE.MENU);
   badge.innerText = 'Selecciona modo';
@@ -2914,7 +3149,7 @@ async function triggerTutorialDownload(){
     const objectUrl = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = objectUrl;
-    a.download = url.split('/').pop() || 'Violin_Beach_Kombat_v1.6.html';
+    a.download = url.split('/').pop() || 'Violin_Beach_Kombat_v1.7.html';
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -2925,7 +3160,7 @@ async function triggerTutorialDownload(){
     // Fallback: intento directo con atributo download
     const a = document.createElement('a');
     a.href = url;
-    a.download = url.split('/').pop() || 'Violin_Beach_Kombat_v1.6.html';
+    a.download = url.split('/').pop() || 'Violin_Beach_Kombat_v1.7.html';
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -3122,6 +3357,11 @@ function syncMusicUi(){
     uiRefs.btnHudMute.textContent = musicMuted ? '🔇' : '🔊';
     uiRefs.btnHudMute.setAttribute('aria-pressed', musicMuted ? 'true' : 'false');
   }
+  if(uiRefs.btnMenuMute){
+    uiRefs.btnMenuMute.textContent = musicMuted ? '🔇 Música' : '🔊 Música';
+    uiRefs.btnMenuMute.setAttribute('aria-pressed', musicMuted ? 'true' : 'false');
+    uiRefs.btnMenuMute.setAttribute('aria-label', musicMuted ? 'Activar música' : 'Silenciar música');
+  }
 }
 
 function syncUiState(){
@@ -3180,6 +3420,7 @@ function syncUiState(){
     syncMenuFocus();
   }
   syncFullscreenUi();
+  syncMusicUi();
 }
 
 function updateNetStatus(msg, tone='info'){
@@ -3801,6 +4042,7 @@ function startLocalMode(mode){
 
 function resetArcadeState(){
   arcadeContext = createArcadeContext();
+  clearHazardProjectiles();
 }
 
 function exitArcadeToMenu(){
@@ -3808,6 +4050,7 @@ function exitArcadeToMenu(){
   arcadeContext.ended = true;
   resetArcadeState();
   arcadeOpen = false;
+  closeBossfightBox();
   if(uiRefs.arcadePanel) uiRefs.arcadePanel.classList.add('hidden');
   matchMode = MATCH_MODE.LOCAL;
   useBot = false;
@@ -3835,13 +4078,43 @@ function returnToArcadeSelection(){
   stopAllMusic();
 }
 
-function startArcadeMode(mode){
+function returnToArcadeModeMenu(){
+  resetArcadeState();
+  resetSelectionState();
+  resetMusicSelection();
+  closeBossfightBox();
+  clearMatchTimer();
+  clearTimeout(serveTimeout);
+  clearTimeout(ballGroundTimeout);
+  serveTimeout = null;
+  ballGroundTimeout = null;
+  matchMode = MATCH_MODE.ARCADE;
+  useBot = false;
+  botActive = false;
+  netRole = null;
+  arcadeOpen = true;
+  gameState = STATE.SELECT;
+  stopAllMusic();
+  setScene(APP_SCENE.MENU);
+  badge.innerText = 'Arcade';
+  ensureMenuMusic();
+}
+
+function startArcadeMode(mode, options = {}){
   resetArcadeState();
   arcadeContext.mode = mode || ARCADE_MODES.DOMINADAS;
-  arcadeContext.singlePlayer = true;
+  arcadeContext.singlePlayer = arcadeContext.mode !== ARCADE_MODES.BOSS;
   arcadeContext.hideNet = true;
   arcadeContext.freeCourt = true;
   arcadeContext.maxDrops = arcadeContext.mode === ARCADE_MODES.FATALITY ? Infinity : 5;
+  if(arcadeContext.mode === ARCADE_MODES.BOSS){
+    arcadeContext.bossId = options?.bossId || bossSelectedId || 'rock';
+    arcadeContext.hideNet = false;
+    arcadeContext.freeCourt = false;
+    arcadeContext.singlePlayer = true;
+    arcadeContext.maxDrops = Infinity;
+    closeBossfightBox();
+  }
   matchMode = MATCH_MODE.ARCADE;
   useBot = false;
   botActive = false;
@@ -3850,6 +4123,9 @@ function startArcadeMode(mode){
   setArcadeSelectionDefaults();
   if(arcadeContext.mode === ARCADE_MODES.FATALITY){
     setPlayerNames({ p2:'Dummy' });
+  } else if(arcadeContext.mode === ARCADE_MODES.BOSS){
+    const bossDef = getBossDef(arcadeContext.bossId);
+    setPlayerNames({ p2: bossDef?.label || 'Boss' });
   } else {
     setPlayerNames({ p2:'Arcade' });
   }
@@ -3891,6 +4167,10 @@ if(uiRefs.btnArcadeBack) uiRefs.btnArcadeBack.addEventListener('click', ()=>{ pl
 if(uiRefs.btnArcadeDominadas) uiRefs.btnArcadeDominadas.addEventListener('click', ()=>startArcadeMode(ARCADE_MODES.DOMINADAS));
 if(uiRefs.btnArcadeTarget) uiRefs.btnArcadeTarget.addEventListener('click', ()=>startArcadeMode(ARCADE_MODES.TARGET));
 if(uiRefs.btnArcadeFatality) uiRefs.btnArcadeFatality.addEventListener('click', ()=>startArcadeMode(ARCADE_MODES.FATALITY));
+if(uiRefs.btnArcadeBossfight) uiRefs.btnArcadeBossfight.addEventListener('click', ()=>openBossfightBox());
+if(uiRefs.btnBossfightClose) uiRefs.btnBossfightClose.addEventListener('click', ()=>{ playUiBackSound(); closeBossfightBox(); });
+if(uiRefs.bossfightSelect) uiRefs.bossfightSelect.addEventListener('change', (e)=>setBossSelection(e.target.value));
+if(uiRefs.btnBossfightPlay) uiRefs.btnBossfightPlay.addEventListener('click', ()=>startArcadeMode(ARCADE_MODES.BOSS, { bossId: bossSelectedId }));
 if(uiRefs.btnOpenStats) uiRefs.btnOpenStats.addEventListener('click', ()=>openStats());
 if(uiRefs.btnStatsBack) uiRefs.btnStatsBack.addEventListener('click', ()=>{ playUiBackSound(); closeStats(); });
 if(uiRefs.btnStatsEncy) uiRefs.btnStatsEncy.addEventListener('click', ()=>{ closeStats(); openEncy('menu'); });
@@ -3901,6 +4181,7 @@ if(uiRefs.btnApplyImport) uiRefs.btnApplyImport.addEventListener('click', ()=>ap
 if(uiRefs.btnCancelImport) uiRefs.btnCancelImport.addEventListener('click', ()=>{ toggleProfileImport(false); setProfileNote(PROFILE_NOTE_DEFAULT); });
 if(uiRefs.btnResetProgress) uiRefs.btnResetProgress.addEventListener('click', ()=>handleResetProgress());
 if(uiRefs.btnToggleFullscreen) uiRefs.btnToggleFullscreen.addEventListener('click', ()=>toggleFullscreen());
+if(uiRefs.btnMenuMute) uiRefs.btnMenuMute.addEventListener('click', ()=>toggleMusicMute());
 if(uiRefs.btnOpenTutorial) uiRefs.btnOpenTutorial.addEventListener('click', ()=>openTutorial());
 if(uiRefs.btnTutorialBack) uiRefs.btnTutorialBack.addEventListener('click', ()=>{ playUiBackSound(); closeTutorial(); });
 if(uiRefs.btnOpenEncy) uiRefs.btnOpenEncy.addEventListener('click', ()=>openEncy(tutorialOpen ? 'tutorial' : 'menu'));
@@ -4217,11 +4498,11 @@ function requestPauseToggle(){
 
 function requestEscapeToMenu(){
   if(matchMode === MATCH_MODE.ARCADE){
-    arcadeOpen = true;
-    resetSelectionState();
-    setScene(APP_SCENE.MENU);
-    badge.innerText = 'Arcade';
-    ensureMenuMusic();
+    if(gameState === STATE.SELECT && appScene === APP_SCENE.SELECT){
+      returnToArcadeModeMenu();
+    } else {
+      returnToArcadeSelection();
+    }
     return;
   }
   if(matchMode === MATCH_MODE.LAN && netRole === 'client'){
@@ -4237,7 +4518,7 @@ function requestEscapeToMenu(){
 function exitSelectionToMenu(){
   if(gameState !== STATE.SELECT || appScene !== APP_SCENE.SELECT) return;
   if(matchMode === MATCH_MODE.ARCADE){
-    exitArcadeToMenu();
+    returnToArcadeModeMenu();
     return;
   }
   if(matchMode === MATCH_MODE.LAN){
@@ -4256,7 +4537,7 @@ function exitSelectionToMenu(){
 
 function returnToSelectLocal(){
   if(matchMode === MATCH_MODE.ARCADE){
-    exitArcadeToMenu();
+    returnToArcadeSelection();
     return;
   }
   resetMusicSelection();
@@ -4624,6 +4905,8 @@ function startMatchLocalFromConfig(cfg = {}){
   directorClones.length = 0;
   ghostBarriers.length = 0;
   florBursts.length = 0;
+  clearHazardProjectiles();
+  arcadeContext.bossFight = isBossMode ? (arcadeContext.bossFight || createBossFightState(bossId)) : null;
 
   score.p1 = cfg.score?.p1 ?? 0;
   score.p2 = cfg.score?.p2 ?? 0;
@@ -4858,6 +5141,7 @@ const ACHIEVEMENTS = [
   { id:'arcDom500', label:'Dominadas 500', desc:'500 dominadas en total', check:(s)=> (s.arcade?.dominadasTotal || 0) >= 500 },
   { id:'arcTarget100', label:'Target Hunter', desc:'100 targets en total', check:(s)=> (s.arcade?.targetTotal || 0) >= 100 },
   { id:'arcTarget10streak', label:'Target Streak', desc:'10 targets seguidos', check:(s)=> (s.arcade?.targetStreakMax || 0) >= 10 },
+  { id:'bossRock', label:'Rock Slayer', desc:'Derrota a Rock en Bossfight', check:(s,ctx)=> ((s.arcade?.rockWins || 0) >= 1) || !!ctx?.rockDefeated },
 ];
 // Tint al ~30% para mezclar 30% color de logro + 70% fondo base en selección (ajusta el alpha si quieres otro mix).
 const ACH_COLORS = [ //Colores de los niveles según achivement colors 
@@ -4978,7 +5262,7 @@ function formatMsClock(ms){
 }
 
 /* Roster de skins dibujadas por código */
-const ROSTER = [
+const BASE_ROSTER = [
   'violin',
   'metal',
   'dj',
@@ -4996,6 +5280,25 @@ const ROSTER = [
   'mystery'
 ];
 
+function buildRosterForProgress(prog){
+  const unlocked = !!(prog?.unlocks?.rockPlayable);
+  if(!unlocked) return [...BASE_ROSTER];
+  const list = [...BASE_ROSTER];
+  list.splice(5, 0, 'rock');      // Rock en posición 6 (1-index)
+  list.splice(11, 0, 'mystery');  // Mystery en posición 12
+  list.push('mystery');           // Mystery extra en posición 18 (además del de 17)
+  return list;
+}
+
+function refreshRosterFromProgress(){
+  const unlocked = !!(progress?.unlocks?.rockPlayable);
+  ROSTER = buildRosterForProgress(progress);
+  GRID_COLS = unlocked ? 6 : GRID_COLS_BASE;
+  GRID_PAD_X = (W - (GRID_COLS-1)*SPACING_X - CARD_W) / 2;
+}
+
+let ROSTER = buildRosterForProgress(progress);
+
 /* Controles y perfiles de personajes */
 const PLAYER_CONTROLS = {
   L: { left:'KeyA', right:'KeyD', up:'KeyW', ability:'KeyS' },
@@ -5007,6 +5310,7 @@ const ghostBarriers = [];
 const hydraClones = [];
 const directorClones = [];
 const florBursts = [];
+const hazardProjectiles = [];
 const drumMine = { attached:false, owner:null, pulse:0 };
 const mysteryBomb = { attached:false, owner:null, pulse:0 };
 const MYSTERY_CATEGORY_POOLS = {
@@ -5052,8 +5356,13 @@ function pickMysteryRandomSkin(exclude = null){
     skin: id,
     weight: id === 'mystery' ? Math.max(0, MYSTERY_EASTER_EGG_WEIGHT) : 1
   })).filter(entry => entry.skin !== exclude && entry.weight > 0);
-  const selected = pickWeighted(entries, 'weight');
-  return selected?.skin || (entries[0]?.skin) || 'violin';
+  const secrets = [];
+  if(progress?.unlocks?.rockPlayable){
+    secrets.push({ skin:'rock', weight: 0.9 });
+  }
+  const pool = [...entries, ...secrets].filter(entry => entry.skin !== exclude && entry.weight > 0);
+  const selected = pickWeighted(pool, 'weight');
+  return selected?.skin || (pool[0]?.skin) || 'violin';
 }
 const MYSTERY_COMMAND_PATTERNS = {
   defense: ['back','back','down'],
@@ -5248,6 +5557,7 @@ const ABILITIES = {
     cooldown: 40,
     staminaCost: 30,
     staminaGain: 120,
+    hitChargePercent: 1,
     description: 'Racha de puntos para clonar a la Hydra al activarse.',
     staminaProfile: { max: 120, regen: 25, start: 60 },
     onActivate(player){
@@ -5340,6 +5650,39 @@ const ABILITIES = {
     onDeactivate(player, ability){
       stopMysteryMimic(player, ability);
     }
+  }),
+  rockBossPush: defineAbility({
+    id: 'rockBossPush',
+    label: 'Empuje Radial',
+    duration: 160,
+    cooldown: BOSS_CONFIG.rock?.push?.cooldownMs ?? 5200,
+    staminaCost: 35,
+    description: 'Pulso radial de Rock (usado por el boss).',
+    staminaProfile: { max: 100, regen: 40, start: 100 },
+    onActivate(player, ability){
+      const def = getBossDef('rock') || {};
+      const force = def.push?.force || 2000;
+      const target = player?.side === 'L' ? p2 : p1;
+      if(target){
+        applyRadialPush(target, { x: player.x, y: player.y }, force, { extraX: force*0.35, extraY: force*0.35, allowHighSpeed:true, highMult:6, highDuration:0.8 });
+        pushTowardsNearestWall(target, force*0.9, force*0.45, { allowHighSpeed:true, highMult:6, highDuration:0.8 });
+      }
+      triggerScreenShake(20, 520);
+      ability.runtime = ability.runtime || {};
+      ability.runtime.cooldownOverride = def.push?.cooldownMs ?? 5200;
+    }
+  }),
+  rockMeteorRain: defineAbility({ //acá está la habilidad de rock
+    id: 'rockMeteorRain',
+    label: 'Lluvia Rocosa',
+    duration: 500,
+    cooldown: 1000,
+    staminaCost: 40,
+    description: 'Invoca 3 meteoritos breves hacia el lado rival (versi�n nerfeada).',
+    staminaProfile: { max: 100, regen: 30, start: 100 },
+    onActivate(player){
+      triggerRockMeteorRain(player);
+    }
   })
 };
 
@@ -5360,7 +5703,8 @@ const SKIN_FATALITY_MAP = {
   queen: 'queen',
   director: 'director',
   dj: 'dj',
-  mystery: 'mystery'
+  mystery: 'mystery',
+  rock: 'default'
 };
 const FINISH_INPUT_PATTERN = ['back','forward','back','forward','jump'];
 const FATALITY_LORE = {
@@ -5410,7 +5754,8 @@ function defineAbility(def){
 
 function buildSkinLibrary(){
   const library = {};
-  for(const id of ROSTER){
+  const pool = Array.from(new Set([...BASE_ROSTER, 'rock', 'mystery']));
+  for(const id of pool){
     library[id] = createSkinProfile(id);
   }
 
@@ -5472,6 +5817,14 @@ function buildSkinLibrary(){
 
   library.mystery = createSkinProfile('mystery', {
     abilityId: 'mysteryCipher'
+  });
+
+  const rockAsset = getBossAssets('rock') || {};
+  library.rock = createSkinProfile('rock', {
+    label: 'Rock',
+    radius: CONFIG.PLAYER_RADIUS * (rockAsset.playableScale || 1),
+    hitboxScale: rockAsset.playableHitboxScale || CONFIG.PLAYER_HITBOX_SCALE,
+    abilityId: 'rockMeteorRain'
   });
 
   return library;
@@ -7058,7 +7411,7 @@ function spawnHydraClone(player, options = {}){
 
 function updateHydraClones(dt){
   const gy = CONFIG.GROUND_Y;
-  const allowFreeCourt = isArcadeMode() && (arcadeContext.mode === ARCADE_MODES.DOMINADAS || arcadeContext.mode === ARCADE_MODES.TARGET);
+  const allowFreeCourt = isArcadeMode() && (arcadeContext.mode === ARCADE_MODES.DOMINADAS || arcadeContext.mode === ARCADE_MODES.TARGET || (arcadeContext.mode === ARCADE_MODES.BOSS && arcadeContext.freeCourt));
   const groups = { L: [], R: [] };
   for(const clone of hydraClones){
     const side = clone.ownerSide || clone.side;
@@ -7476,6 +7829,22 @@ function updatePlayerRuntime(player, dt){
   const regenBase = player.stamina.regen || 0;
   const regen = regenBlocked ? 0 : regenBase * STAMINA_REGEN_SCALE;
   player.stamina.value = clamp(player.stamina.value + regen * dt, 0, player.stamina.max);
+  if(player.status?.knockbackTimer){
+    player.status.knockbackTimer = Math.max(0, player.status.knockbackTimer - dt);
+    if(player.status.knockbackTimer <= 0){
+      player.status.knockbackBoost = 1;
+    }
+  }
+  if(player.status?.knockForce){
+    const kf = player.status.knockForce;
+    if(kf.timer > 0){
+      player.vx += (kf.fx || 0) * dt;
+      player.vy += (kf.fy || 0) * dt;
+      kf.timer -= dt;
+    } else {
+      player.status.knockForce = null;
+    }
+  }
   if(player.lifeBonusTimer){
     player.lifeBonusTimer -= dt * 1000;
     if(player.lifeBonusTimer <= 0){
@@ -8325,6 +8694,26 @@ case 'flor': {
   break;
 }
 
+case 'rock': {
+  const R = b.r;
+  const key = `boss_${b.player?.skin || 'rock'}`;
+  const img = IMAGES[key];
+  ctx.save();
+  if(img && img.complete){
+    ctx.drawImage(img, -R, -R, R*2, R*2);
+  } else {
+    ctx.fillStyle = '#8a7768';
+    ctx.beginPath();
+    ctx.arc(0,0,R,0,TAU);
+    ctx.fill();
+    ctx.strokeStyle = '#5b4638';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+  }
+  ctx.restore();
+  break;
+}
+
 default:
   ctx.fillStyle='#999';
   ctx.beginPath(); ctx.arc(0,0,R,0,TAU); ctx.fill();
@@ -8454,6 +8843,7 @@ function resetRally(servingTo='L'){
 
 function gameOver(who, options = {}){
   if(finishState.active) return;
+  clearHazardProjectiles();
   if(matchMode === MATCH_MODE.ARCADE){
     endArcadeRun(options.reason || 'end');
     return;
@@ -8499,6 +8889,348 @@ function gameOver(who, options = {}){
   syncUiState();
 }
 
+function applyRadialPush(target, origin, force=900, options = {}){
+  if(!target || !origin) return;
+  const dx = (target.x || 0) - (origin.x || 0);
+  const dy = (target.y || 0) - (origin.y || 0);
+  const dist = Math.max(Math.hypot(dx, dy), 1);
+  const nx = dx / dist;
+  const ny = dy / dist;
+  const extraX = options.extraX ?? (force * 0.25);
+  const extraY = options.extraY ?? (force * 0.35);
+  target.vx += nx * force + Math.sign(nx || 1) * extraX;
+  target.vy += (ny * force * 0.35) + extraY;
+  target.onGround = false;
+  target.hasDoubleJumped = false;
+  target.jumpCount = 0;
+  if(options.allowHighSpeed){
+    target.status = target.status || {};
+    target.status.knockbackBoost = Math.max(target.status.knockbackBoost || 1, options.highMult || 6);
+    target.status.knockbackTimer = Math.max(target.status.knockbackTimer || 0, options.highDuration || 0.6);
+  }
+}
+
+function pushTowardsNearestWall(target, force=1800, upForce=600, options = {}){
+  if(!target) return;
+  const leftDist = target.x || 0;
+  const rightDist = (W - (target.x || 0));
+  const dir = leftDist < rightDist ? -1 : 1;
+  target.vx = dir * force;
+  target.vy = -Math.abs(upForce);
+  target.onGround = false;
+  target.hasDoubleJumped = false;
+  target.jumpCount = 0;
+  if(options.allowHighSpeed){
+    target.status = target.status || {};
+    target.status.knockbackBoost = Math.max(target.status.knockbackBoost || 1, options.highMult || 6);
+    target.status.knockbackTimer = Math.max(target.status.knockbackTimer || 0, options.highDuration || 0.6);
+  }
+}
+
+// Fuerza continua opcional (usada como respaldo para meteoritos)
+function applyKnockForce(player, fx, fy, duration=0.5){
+  if(!player) return;
+  player.status = player.status || {};
+  player.status.knockForce = {
+    fx: fx || 0,
+    fy: fy || 0,
+    timer: duration
+  };
+}
+
+function spawnHazardProjectile(config = {}){
+  const proj = {
+    id: config.id || `hz-${Date.now().toString(16)}-${Math.random().toString(16).slice(2,6)}`,
+    type: config.type || 'meteor',
+    owner: config.owner || 'boss',
+    bossId: config.bossId || null,
+    ownerSide: config.ownerSide || null,
+    x: config.x ?? W/2,
+    y: config.y ?? 0,
+    vx: config.vx ?? 0,
+    vy: config.vy ?? 0,
+    r: config.r ?? 40,
+    gravity: config.gravity ?? 0,
+    knockback: config.knockback ?? 800,
+    spriteKey: config.spriteKey || null,
+    persistOnHit: !!config.persistOnHit,
+    rotation: config.rotation ?? Math.random()*Math.PI,
+    spawnedAt: performance.now()
+  };
+  hazardProjectiles.push(proj);
+  return proj;
+}
+
+function clearHazardProjectiles(){
+  hazardProjectiles.length = 0;
+}
+
+function updateHazardProjectiles(dt){
+  if(!hazardProjectiles.length) return;
+  const groundY = CONFIG.GROUND_Y;
+  for(const proj of hazardProjectiles){
+    if(proj.gravity){
+      proj.vy += proj.gravity * dt;
+    }
+    proj.x += proj.vx * dt;
+    proj.y += proj.vy * dt;
+    proj.rotation = (proj.rotation || 0) + (proj.vx * dt * 0.02);
+    if(proj.type === 'boulder'){
+      proj.y = Math.min(proj.y, groundY - proj.r);
+    }
+    const targets = [p1, p2].filter(Boolean);
+    for(const t of targets){
+      if(proj.ownerSide && t?.side === proj.ownerSide) continue;
+      const axes = getHitboxAxes(t);
+      const dist = Math.hypot(proj.x - t.x, proj.y - t.y);
+      const hitRadius = proj.r + Math.max(axes.rx, axes.ry);
+      if(dist <= hitRadius){
+        const kb = proj.knockback || 800;
+        const isBoulder = proj.type === 'boulder';
+        const horizBoost = (isBoulder ? kb * 1.2 : kb * 1.35) * 5; // empuje horizontal alto
+        const vertBoost = isBoulder ? kb * 0.55 : kb * 0.40;
+        applyRadialPush(t, { x: proj.x, y: proj.y }, kb, {
+          extraX: horizBoost,
+          extraY: vertBoost,
+          allowHighSpeed: true,
+          highMult: 8,
+          highDuration: 1.0
+        });
+        pushTowardsNearestWall(
+          t,
+          isBoulder ? kb * 1.05 : kb * 1.3,
+          isBoulder ? kb * 0.6 : kb * 0.45,
+          { allowHighSpeed:true, highMult:8, highDuration:1.0 }
+        );
+        // Failsafe: fuerza m�nima alej�ndose del centro
+        const dirFromCenter = ((proj.x ?? t.x) < W/2) ? -1 : 1;
+        const minHoriz = kb * 2.4;
+        if(Math.abs(t.vx) < minHoriz){
+          t.vx = dirFromCenter * minHoriz;
+        }
+        if(!t.vx || Math.abs(t.vx) < kb){
+          const fallbackDir = (Math.random() < 0.5 ? -1 : 1);
+          t.vx = fallbackDir * kb * 2.8;
+        }
+        t.vy = Math.min(t.vy, -Math.abs(kb * 0.4));
+        // Refuerza boost temporal de velocidad
+        t.status = t.status || {};
+        t.status.knockbackBoost = Math.max(t.status.knockbackBoost || 1, 10);
+        t.status.knockbackTimer = Math.max(t.status.knockbackTimer || 0, 1.1);
+        // Empuje continuo extra para meteoritos (collider invisible) - 0.5s
+        if(proj.type === 'meteor'){
+          const forceX = dirFromCenter * kb * 120; // x10 m�s fuerte
+          const forceY = Math.abs(kb * 6.0); // hacia abajo      // x10 m�s fuerte
+          applyKnockForce(t, forceX, forceY, 0.5);
+          try{ SFX.mineexplode.currentTime = 0; SFX.mineexplode.play(); }catch(e){}
+        }
+        if(!proj.persistOnHit){
+          proj.expired = true;
+          break;
+        }
+      }
+    }
+    if(proj.x < -proj.r*2 || proj.x > W + proj.r*2 || proj.y > groundY + proj.r*4){
+      proj.expired = true;
+    }
+  }
+  for(let i=hazardProjectiles.length-1; i>=0; i--){
+    if(hazardProjectiles[i].expired){
+      hazardProjectiles.splice(i, 1);
+    }
+  }
+}
+
+function isBossFightMode(){
+  return isArcadeMode() && arcadeContext.mode === ARCADE_MODES.BOSS && arcadeContext.bossFight;
+}
+
+function getBossState(){
+  return isBossFightMode() ? arcadeContext.bossFight : null;
+}
+
+function maybeSwitchBossPhase(state){
+  if(!state) return;
+  if(state.phase === 1 && state.hp <= state.thresholds.phase2){
+    enterBossPhase(2);
+  }
+  if(state.phase === 2 && state.hp <= state.thresholds.phase3){
+    enterBossPhase(3);
+  }
+}
+
+function applyBossDamage(amount){
+  const state = getBossState();
+  if(!state || arcadeContext.ended || amount <= 0) return;
+  state.hp = Math.max(0, state.hp - amount);
+  arcadeContext.score = (state.maxHp - state.hp);
+  maybeSwitchBossPhase(state);
+  if(state.hp <= 0){
+    endBossFight({ winner:'p1', reason:'bossDown' });
+  }
+}
+
+function enterBossPhase(next){
+  const state = getBossState();
+  if(!state) return;
+  state.phase = next;
+  state.dropResets = 0;
+  state.phase3Hits = 0;
+  arcadeContext.drops = 0;
+  arcadeContext.maxDrops = state.dropLimit || 5;
+  if(next === 2){
+    arcadeContext.hideNet = true;
+    arcadeContext.freeCourt = true;
+    state.targetHits = 0;
+    state.lastPushAt = performance.now();
+    arcadeContext.target = null;
+    if(p1) p1.vx = 0;
+    if(p2) p2.vx = 0;
+    if(p1) p1.x = W*0.35;
+    if(p2) p2.x = W*0.65;
+    resetArcadeBall({ x: p1?.x || W/2, vy: -720, spread: 200 });
+    spawnArcadeTarget();
+  } else if(next === 3){
+    arcadeContext.hideNet = true;
+    arcadeContext.freeCourt = true;
+    arcadeContext.target = null;
+    state.lastPushAt = performance.now();
+    state.nextMeteorAt = performance.now() + 900;
+    state.nextBoulderAt = performance.now() + 1500;
+    resetArcadeBall({ x: p1?.x || W/2, vy: -760, spread: 220 });
+  }
+}
+
+function handleBossGroundTouch(){
+  const state = getBossState();
+  if(!state) return;
+  const onPlayerSide = ball.x < CONFIG.NET_X;
+  const cfg = state.config || {};
+  if(state.phase === 1){
+    if(onPlayerSide){
+      state.playerLives = Math.max(0, state.playerLives - 1);
+    } else {
+      applyBossDamage(cfg.phase1DamagePerGround || 3);
+    }
+    resetArcadeBall({ x: p1?.x ?? W/2, vy: -680, spread: 140 });
+  } else {
+    state.dropResets = (state.dropResets || 0) + 1;
+    arcadeContext.drops = state.dropResets;
+    const limit = state.dropLimit || 5;
+    if(state.dropResets >= limit){
+      state.playerLives = Math.max(0, state.playerLives - 1);
+      state.dropResets = 0;
+      arcadeContext.drops = 0;
+    }
+    if(state.phase === 3){
+      state.phase3Hits = 0;
+    }
+    resetArcadeBall({ x: p1?.x ?? W/2, vy: -640, spread: 200 });
+  }
+  if(state.playerLives <= 0){
+    endBossFight({ winner:'boss', reason:'playerLife' });
+  }
+}
+
+function updateBossFight(dt){
+  const state = getBossState();
+  if(!state || arcadeContext.ended || !arcadeContext.active) return;
+  arcadeContext.maxDrops = state.dropLimit || 5;
+  arcadeContext.drops = state.dropResets || 0;
+  const nowMs = performance.now();
+  if(state.phase <= 2){
+    const pushCfg = state.config?.push || {};
+    const cooldown = pushCfg.cooldownMs ?? 5200;
+    const bossAbilityReady = p2?.ability && p2.ability.def?.id === 'rockBossPush' && p2.ability.cooldownMs <= 0;
+    const hasStamina = (p2?.stamina?.value || 0) >= (pushCfg.staminaCost || 35);
+    if((nowMs - state.lastPushAt >= cooldown) && bossAbilityReady && hasStamina){
+      const radius = pushCfg.radius || 360;
+      const dist = p1 && p2 ? Math.hypot(p1.x - p2.x, p1.y - p2.y) : Infinity;
+      if(!radius || dist <= radius){
+        const activated = activatePlayerAbility(p2);
+        if(activated){
+          state.lastPushAt = nowMs;
+        }
+      }
+    }
+  }
+  if(state.phase >= 3){
+    const meteorCfg = state.config?.projectiles?.meteor || {};
+    const boulderCfg = state.config?.projectiles?.boulder || {};
+    if(nowMs >= (state.nextMeteorAt || 0)){
+      const assets = state.assets || {};
+      const r = assets.meteorRadius || 42;
+      const vxRange = meteorCfg.vxRange || [-120, 120];
+      const vx = meteorCfg.vxRange
+        ? (Math.random() * (vxRange[1] - vxRange[0]) + vxRange[0])
+        : 0;
+      const spawnX = Math.random() * (W - r*2) + r;
+      spawnHazardProjectile({
+        type:'meteor',
+        owner:'boss',
+        bossId: state.id,
+        ownerSide: 'R',
+        x: spawnX,
+        y: -r*2,
+        vx,
+        vy: meteorCfg.fallVy || 460,
+        r,
+        gravity: meteorCfg.gravity ?? CONFIG.GRAVITY * 0.65,
+        knockback: meteorCfg.knockback || 720,
+        spriteKey: `boss_${state.id}_meteor`
+      });
+      state.nextMeteorAt = nowMs + (meteorCfg.intervalMs || 1600);
+    }
+    if(nowMs >= (state.nextBoulderAt || 0)){
+      const assets = state.assets || {};
+      const r = assets.boulderRadius || 52;
+      const fromLeft = Math.random() < 0.5;
+      const speed = boulderCfg.speed || 420;
+      spawnHazardProjectile({
+        type:'boulder',
+        owner:'boss',
+        bossId: state.id,
+        ownerSide: 'R',
+        x: fromLeft ? -r*1.5 : W + r*1.5,
+        y: CONFIG.GROUND_Y - r - 2,
+        vx: fromLeft ? speed : -speed,
+        vy: 0,
+        r,
+        gravity: 0,
+        knockback: boulderCfg.knockback || 880,
+        spriteKey: `boss_${state.id}_boulder`,
+        persistOnHit: true
+      });
+      state.nextBoulderAt = nowMs + (boulderCfg.intervalMs || 2400);
+    }
+  }
+}
+
+function triggerRockMeteorRain(owner){
+  const assets = getBossAssets('rock') || {};
+  const r = (assets.meteorRadius || 44) * 0.85;
+  const center = owner?.side === 'L' ? (W * 0.72) : (W * 0.28);
+  for(let i=0;i<5;i++){
+    setTimeout(()=>{
+      if(gameState === STATE.GAMEOVER) return;
+      spawnHazardProjectile({
+        type:'meteor',
+        owner:'ability',
+        bossId:'rock',
+        ownerSide: owner?.side || null,
+        x: center + (Math.random()*240 - 120),
+        y: -r*2,
+        vx: (Math.random()*120 - 60),
+        vy: 460,
+        r,
+        gravity: CONFIG.GRAVITY * 0.55,
+        knockback: 2000,
+        spriteKey: 'boss_rock_meteor'
+      });
+    }, i * 160);
+  }
+}
+
 /* Arcade helpers */
 function resetArcadeBall(options = {}){
   if(serveTimeout){ clearTimeout(serveTimeout); serveTimeout = null; }
@@ -8529,6 +9261,21 @@ function spawnArcadeTarget(){
 
 function handleArcadeHit(player){
   if(!arcadeContext.active) return;
+  if(arcadeContext.mode === ARCADE_MODES.BOSS){
+    const bossState = getBossState();
+    if(bossState && bossState.phase === 3 && player?.side === 'L'){
+      bossState.phase3Hits = (bossState.phase3Hits || 0) + 1;
+      const hitsNeeded = bossState.hitsPerHpPhase3 || 5;
+      const damagePerCycle = (bossState.id === 'rock') ? 2 : 1;
+      const requiredHits = (bossState.id === 'rock') ? 3 : hitsNeeded;
+      if(bossState.phase3Hits >= requiredHits){
+        bossState.phase3Hits = 0;
+        applyBossDamage(damagePerCycle);
+      }
+    }
+    arcadeContext.lastHitAt = performance.now();
+    return;
+  }
   if(arcadeContext.mode === ARCADE_MODES.DOMINADAS){
     arcadeContext.score = (arcadeContext.score || 0) + 1;
     arcadeContext.streak = (arcadeContext.streak || 0) + 1;
@@ -8538,7 +9285,9 @@ function handleArcadeHit(player){
 }
 
 function checkArcadeTargetHit(){
-  if(!arcadeContext.active || arcadeContext.mode !== ARCADE_MODES.TARGET) return;
+  const bossState = getBossState();
+  const bossTargets = arcadeContext.active && arcadeContext.mode === ARCADE_MODES.BOSS && bossState && bossState.phase === 2;
+  if(!arcadeContext.active || (!bossTargets && arcadeContext.mode !== ARCADE_MODES.TARGET)) return;
   if(!arcadeContext.target){
     spawnArcadeTarget();
     return;
@@ -8548,16 +9297,29 @@ function checkArcadeTargetHit(){
   const dy = ball.y - t.y;
   const dist = Math.hypot(dx, dy);
   if(dist <= ball.r + t.r){
-    arcadeContext.score = (arcadeContext.score || 0) + 1;
-    arcadeContext.streak = (arcadeContext.streak || 0) + 1;
-    arcadeContext.bestStreak = Math.max(arcadeContext.bestStreak || 0, arcadeContext.streak);
+    if(bossTargets){
+      bossState.targetHits = (bossState.targetHits || 0) + 1;
+      applyBossDamage(bossState.config?.phase2DamagePerTarget || 1);
+    } else {
+      arcadeContext.score = (arcadeContext.score || 0) + 1;
+      arcadeContext.streak = (arcadeContext.streak || 0) + 1;
+      arcadeContext.bestStreak = Math.max(arcadeContext.bestStreak || 0, arcadeContext.streak);
+    }
     spawnArcadeTarget();
   }
 }
 
 function handleArcadeGroundTouch(){
   if(!arcadeContext.active) return;
+  if(arcadeContext.mode === ARCADE_MODES.BOSS){
+    handleBossGroundTouch();
+    return;
+  }
   if(arcadeContext.mode === ARCADE_MODES.FATALITY){
+    // Si ya se disparó o está en cola un fatality, no reiniciar la ventana
+    if(finishState.active && (finishState.stage === 'fatality_pending' || finishState.stage === 'fatality')){
+      return;
+    }
     // Reinicia la ventana de fatality si la pelota toca suelo en practice
     ball.groundScheduled = false;
     resetArcadeBall({ x: p1?.x ?? W/2, vy: -720, spread: 120 });
@@ -8622,6 +9384,43 @@ function endArcadeRun(reason='end'){
   });
   badge.innerText = '';
   arcadeContext.active = false;
+  gameState = STATE.GAMEOVER;
+  stopAllMusic();
+  currentMusicTrack = null;
+  syncUiState();
+}
+
+function endBossFight(result = {}){
+  if(!arcadeContext.active || arcadeContext.ended || arcadeContext.mode !== ARCADE_MODES.BOSS) return;
+  arcadeContext.ended = true;
+  const state = arcadeContext.bossFight || {};
+  const elapsedMs = getMatchElapsedMs();
+  const bossLabel = state.label || 'Boss';
+  const playerWin = result.winner === 'p1' || result.winner === 'player' || !!result.playerWin;
+  if(playerWin && state.id === 'rock'){
+    progress.unlocks = progress.unlocks || {};
+    progress.unlocks.rockPlayable = true;
+    refreshRosterFromProgress();
+  }
+  const bossHpText = `${Math.max(0, state.hp || 0)}/${state.maxHp || 0}`;
+  const lifeText = `${Math.max(0, state.playerLives || 0)}`;
+  window._winnerInfo = {
+    winner: playerWin ? (playerNames.p1 || 'Jugador') : bossLabel,
+    finalScore: `Boss HP: ${bossHpText} · Vidas jugador: ${lifeText}`,
+    banner: playerWin ? 'Boss derrotado' : 'Derrota'
+  };
+  applyArcadeProgress({
+    mode: ARCADE_MODES.BOSS,
+    bossId: state.id,
+    bossWin: playerWin,
+    score: (state.maxHp || 0) - (state.hp || 0),
+    bestStreak: state.targetHits || 0,
+    elapsedMs,
+    skin: p1?.skin || null
+  });
+  badge.innerText = '';
+  arcadeContext.active = false;
+  clearHazardProjectiles();
   gameState = STATE.GAMEOVER;
   stopAllMusic();
   currentMusicTrack = null;
@@ -9456,7 +10255,8 @@ function handleCanvasTouch(ev){
 /* Selección */
 /* === CONFIGURACIÓN DEL GRID DE SELECCIÓN === */
 
-const GRID_COLS = 5;                // Número de columnas del roster
+const GRID_COLS_BASE = 5;           // Número de columnas base del roster
+let GRID_COLS = GRID_COLS_BASE;     // Se actualiza si Rock se desbloquea
 
 const CARD_W = 150;                 // Tamaño de cada tarjeta
 const CARD_H = 135;
@@ -9464,8 +10264,15 @@ const CARD_H = 135;
 const SPACING_X = 175;              // Distancia horizontal entre tarjetas
 const SPACING_Y = 160;              // Distancia vertical entre tarjetas
 
-const GRID_PAD_X = (W - (GRID_COLS-1)*SPACING_X - CARD_W) / 2;
+let GRID_PAD_X = (W - (GRID_COLS-1)*SPACING_X - CARD_W) / 2;
 const GRID_PAD_Y = 120;             // distancia desde arriba
+
+function isRosterExtended(){
+  return ROSTER.length > BASE_ROSTER.length;
+}
+
+// Ajustar roster/grid seg�n progreso (se llama tras definir constantes)
+refreshRosterFromProgress();
 
 function playSelectionMoveFx(isP1){
   if(isP1){
@@ -9575,9 +10382,14 @@ function handleSelectionTouch(ev){
 
 /* === SELECCIÓN === */
 function createDefaultSelectionState(){
+  const extended = isRosterExtended();
+  const baseP1 = 6 + (extended ? 1 : 0);
+  const baseP2 = 8 + (extended ? 2 : 0);
+  const maxIdx = ROSTER.length - 1;
+
   return {
-    p1Index: 6,
-    p2Index: 8,
+    p1Index: Math.min(maxIdx, baseP1),
+    p2Index: Math.min(maxIdx, baseP2),
     p1ConfirmTimer: 0,
     p2ConfirmTimer: 0,
     p1Locked: false,
@@ -9617,19 +10429,53 @@ function startArcadeMatchFromSelection(){
     return chosen === 'mystery' ? pickMysteryRandomSkin() : chosen;
   };
   const p1Skin = resolveSkin(sel.p1Index);
-  const p2Skin = (arcadeContext.mode === ARCADE_MODES.FATALITY) ? 'dummy' : 'theremin';
-  currentBackground = pickWeighted(BACKGROUNDS, 'weight');
+  const isBossMode = arcadeContext.mode === ARCADE_MODES.BOSS;
+  const bossId = isBossMode ? (arcadeContext.bossId || bossSelectedId || 'rock') : null;
+  const p2Skin = isBossMode ? bossId : (arcadeContext.mode === ARCADE_MODES.FATALITY ? 'dummy' : 'theremin');
+  if(isBossMode){
+    currentBackground = BACKGROUNDS.find(b=>b.name === 'Rock Stage') || pickWeighted(BACKGROUNDS, 'weight');
+  } else {
+    currentBackground = pickWeighted(BACKGROUNDS, 'weight');
+  }
   currentBallType = pickWeighted(BALL_TYPES, 'weight');
-  p1 = makePlayer(W*0.5,'L', p1Skin);
-  const hideDummy = arcadeContext.mode !== ARCADE_MODES.FATALITY;
-  p2 = makePlayer(hideDummy ? W*1.5 : W*0.65,'R', p2Skin);
-  p2.isDummy = true;
-  if(hideDummy){
-    p2.finishHidden = true;
-    p2.hitboxScale = 0.01;
-    p2.hitboxScaleX = 0.01;
-    p2.hitboxScaleY = 0.01;
-    p2.r = 1;
+  p1 = makePlayer(W*0.38,'L', p1Skin);
+  if(isBossMode){
+    arcadeContext.bossFight = createBossFightState(bossId);
+    const bossAssets = arcadeContext.bossFight.assets || {};
+    arcadeContext.maxDrops = arcadeContext.bossFight.dropLimit || arcadeContext.maxDrops;
+    const spawnX = W*0.75;
+    p2 = makePlayer(spawnX,'R', p2Skin);
+    p2.isDummy = false;
+    p2.isBoss = true;
+    const visualScale = bossAssets.spriteScale || 1;
+    const hitScale = bossAssets.hitboxScale || CONFIG.PLAYER_HITBOX_SCALE;
+    applyScaleModifier(p2, {
+      radius: visualScale,
+      hitbox: hitScale,
+      hitboxX: hitScale,
+      hitboxY: hitScale,
+      visualX: visualScale,
+      visualY: visualScale
+    });
+    p2.ability = createAbilityState('rockBossPush', { boss:true });
+    p2.stamina = { max: 100, value: 100, regen: 40 };
+    p2.ability.cooldownMs = 0;
+    botActive = true;
+    useBot = false;
+    arcadeContext.hideNet = false;
+    arcadeContext.freeCourt = false;
+  } else {
+    const hideDummy = arcadeContext.mode !== ARCADE_MODES.FATALITY;
+    p2 = makePlayer(hideDummy ? W*1.5 : W*0.65,'R', p2Skin);
+    p2.isDummy = true;
+    if(hideDummy){
+      p2.finishHidden = true;
+      p2.hitboxScale = 0.01;
+      p2.hitboxScaleX = 0.01;
+      p2.hitboxScaleY = 0.01;
+      p2.r = 1;
+    }
+    botActive = false;
   }
   hydraClones.length = 0;
   directorClones.length = 0;
@@ -9803,7 +10649,7 @@ function handleSelection(){
   ctx.fillStyle="#fff";
   ctx.font="700 40px system-ui";
   ctx.textAlign="center";
-  ctx.fillText("Violin Beach Kombat (v1.6)", W/2, 90);
+  ctx.fillText("Violin Beach Kombat (v1.7)", W/2, 90);
 
   drawSelectionGrid();
 
@@ -10218,7 +11064,7 @@ function handleInput(){
     handleAbilityInput(p);
   }
 
-  const skipP2 = isArcadeMode() && arcadeContext.singlePlayer;
+  const skipP2 = isArcadeMode() && arcadeContext.singlePlayer && arcadeContext.mode !== ARCADE_MODES.BOSS;
   if(skipP2){
     return;
   }
@@ -10437,6 +11283,7 @@ function botAI(){
   const g = CONFIG.GRAVITY;
   const botSpeed = p.stats?.speed ?? CONFIG.PLAYER_SPEED;
   const botJump = p.stats?.jump ?? CONFIG.PLAYER_JUMP_V;
+  const bossFreeCourt = isBossFightMode() && arcadeContext.freeCourt;
 
   // Parámetros ajustables
   const anticipation = 0.35;   // anticipa mejor la caída
@@ -10452,7 +11299,7 @@ function botAI(){
     const timeToGround = Math.sqrt(Math.max(0, (2 * (CONFIG.GROUND_Y - ball.y - ball.r)) / g));
     predictedLanding = ball.x + ball.vx * timeToGround * anticipation;
   }
-  predictedLanding = clamp(predictedLanding, CONFIG.NET_X + 50, W - 50);
+  predictedLanding = clamp(predictedLanding, bossFreeCourt ? 50 : (CONFIG.NET_X + 50), W - 50);
   p.predictedLanding = predictedLanding;
 
   // --- 2. Posicionamiento: se mueve para interceptar la caída
@@ -10469,7 +11316,7 @@ function botAI(){
   const distX = Math.abs(ball.x - p.x);
   const distY = ball.y - p.y;
   const ballGoingDown = ball.vy > 50;
-  const inDefZone = ball.x > CONFIG.NET_X + 40;
+  const inDefZone = bossFreeCourt ? (ball.x > W * 0.45) : (ball.x > CONFIG.NET_X + 40);
 
   if(inDefZone && ballGoingDown && distX < reactionDistance){
     // Predice cuándo pasará la pelota por su altura
@@ -10490,7 +11337,7 @@ function botAI(){
   }
 
   // --- 5. Vuelta al centro defensivo cuando la pelota va al otro lado ---
-  if(ball.x < CONFIG.NET_X - 60){
+  if(!bossFreeCourt && ball.x < CONFIG.NET_X - 60){
     const homeX = (CONFIG.NET_X + W) / 2.05;
     const diff = homeX - p.x;
     if(Math.abs(diff) > 20){
@@ -10504,6 +11351,7 @@ function botAI(){
 }
 
 function maybeBotUseAbility(){
+  if(isBossFightMode()) return;
   if(!botActive) return;
   const player = p2;
   if(!player || !player.ability) return;
@@ -10539,7 +11387,8 @@ function stepPhysics(dt){
     const dashState = p.status?.violinDash;
     const dashCap = dashState ? dashState.mult : 1;
     const baseMaxVx = p.stats?.maxVx ?? CONFIG.PLAYER_MAX_VX;
-    const maxVx = baseMaxVx * dashCap;
+    const kbBoost = (p.status?.knockbackTimer > 0) ? (p.status.knockbackBoost || 1) : 1;
+    const maxVx = baseMaxVx * dashCap * kbBoost;
     p.x += clamp(p.vx, -maxVx, maxVx)*dt;
     p.y += p.vy*dt;
     const freeCourt = isArcadeMode() && arcadeContext.freeCourt;
@@ -10690,6 +11539,8 @@ function stepPhysics(dt){
     handlePlayerHit(clone);
   }
   checkArcadeTargetHit();
+  updateBossFight(dt);
+  updateHazardProjectiles(dt);
 }
 
 function getHitboxAxes(entity){
@@ -10983,7 +11834,7 @@ function drawGame(){
   drawNet();
   drawGhostBarriers();
   drawDjFieldOverlays();
-  if(isArcadeMode() && arcadeContext.mode === ARCADE_MODES.TARGET){
+  if(isArcadeMode() && (arcadeContext.mode === ARCADE_MODES.TARGET || (arcadeContext.mode === ARCADE_MODES.BOSS && arcadeContext?.bossFight?.phase === 2))){
     drawArcadeTarget();
   }
 
@@ -11004,6 +11855,7 @@ function drawGame(){
   // Pelota
   drawBall();
   drawFlorBursts();
+  drawHazardProjectiles();
 
   // Flecha si la pelota está por arriba de la pantalla
   if(ball.y + ball.r < 0){
@@ -11239,7 +12091,8 @@ function drawMysteryBombSprite(ctx, radius = 14){
 }
 
 function drawArcadeTarget(){
-  if(!arcadeContext.active || arcadeContext.mode !== ARCADE_MODES.TARGET) return;
+  const bossTargets = arcadeContext.mode === ARCADE_MODES.BOSS && arcadeContext?.bossFight?.phase === 2;
+  if(!arcadeContext.active || (!bossTargets && arcadeContext.mode !== ARCADE_MODES.TARGET)) return;
   const t = arcadeContext.target;
   if(!t) return;
   ctx.save();
@@ -11262,6 +12115,30 @@ function drawArcadeTarget(){
   ctx.restore();
 }
 
+function drawHazardProjectiles(){
+  if(!hazardProjectiles.length) return;
+  ctx.save();
+  for(const proj of hazardProjectiles){
+    ctx.save();
+    ctx.translate(proj.x, proj.y);
+    ctx.rotate(proj.rotation || 0);
+    const img = proj.spriteKey ? IMAGES[proj.spriteKey] : null;
+    if(img && img.complete){
+      ctx.drawImage(img, -proj.r, -proj.r, proj.r*2, proj.r*2);
+    } else {
+      ctx.fillStyle = proj.type === 'boulder' ? '#7a5740' : '#d96b2c';
+      ctx.beginPath();
+      ctx.arc(0, 0, proj.r, 0, TAU);
+      ctx.fill();
+      ctx.strokeStyle = '#5c3b2c';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+  ctx.restore();
+}
+
 function drawArcadeHud(){
   ctx.save();
   ctx.fillStyle = '#e9f4ff';
@@ -11271,6 +12148,28 @@ function drawArcadeHud(){
   const elapsed = (typeof matchTimerMs === 'number' ? matchTimerMs : getMatchElapsedMs()) || 0;
   ctx.textAlign = 'center';
   ctx.fillText(formatMsClock(elapsed), W/2, 34);
+
+  if(arcadeContext.mode === ARCADE_MODES.BOSS){
+    const bossState = getBossState();
+    const bossName = bossState?.label || 'Boss';
+    const hpRatio = bossState ? clamp((bossState.hp || 0) / (bossState.maxHp || 1), 0, 1) : 0;
+    const lifeRatio = bossState ? clamp((bossState.playerLives || 0) / (CONFIG.BASE_POINTS_TO_WIN || 1), 0, 1) : 0;
+    ctx.textAlign = 'left';
+    ctx.font = '700 18px system-ui';
+    ctx.fillText(`${bossName} · Fase ${bossState?.phase || '-'}`, 24, 58);
+    ctx.textAlign = 'right';
+    ctx.fillText(`Drops: ${(bossState?.dropResets || 0)}/${bossState?.dropLimit || 5}`, W - 24, 58);
+    drawBossBar(W*0.10, 70, W*0.80, 14, hpRatio, '#ff9c5c', '#3b1b0f', `HP ${bossState?.hp || 0}/${bossState?.maxHp || 0}`);
+    // Vida jugador en rojo delgado
+    drawBossBar(24, 96, 240, 10, lifeRatio, '#b80606', '#2a0404', `Vida ${bossState?.playerLives || 0}`);
+    // Stamina P1 bajo vida
+    const stamY = 112;
+    drawArcadeStamina(24, stamY, 240, 10, p1, true);
+    // Stamina Boss a la derecha bajo su barra
+    drawArcadeStamina(W - 260, 88, 220, 10, p2, false);
+    ctx.restore();
+    return;
+  }
 
   if(arcadeContext.mode === ARCADE_MODES.FATALITY){
     ctx.font = '900 52px system-ui';
@@ -11313,6 +12212,27 @@ function drawArcadeHud(){
     ctx.strokeStyle = '#0c5c83';
     ctx.lineWidth = 1;
     ctx.strokeRect(x, y, w, h);
+    ctx.restore();
+  }
+
+  function drawBossBar(x, y, w, h, ratio, fill, bg, label){
+    const value = clamp(ratio, 0, 1);
+    ctx.save();
+    ctx.fillStyle = '#0b1d33';
+    ctx.globalAlpha = 0.9;
+    ctx.fillRect(x, y, w, h);
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = fill;
+    ctx.fillRect(x, y, w * value, h);
+    ctx.strokeStyle = bg;
+    ctx.lineWidth = 1;
+    ctx.strokeRect(x, y, w, h);
+    if(label){
+      ctx.font = '700 14px system-ui';
+      ctx.fillStyle = '#e9f4ff';
+      ctx.textAlign = 'left';
+      ctx.fillText(label, x, y - 6);
+    }
     ctx.restore();
   }
 }
