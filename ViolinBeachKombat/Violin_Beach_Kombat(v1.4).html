@@ -42,8 +42,8 @@
     display:flex;
     align-items:flex-start;
     justify-content:flex-end;
-    padding-top:10%;
-    padding-right:10%;
+    padding-top:6%;
+    padding-right:4%;
     box-sizing:border-box;
   }
   #hudControls .hud-controls-bar{
@@ -1048,6 +1048,10 @@ const SFX = {
     fireburn: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/audiomass-output%20(1).wav'),
     flowerpulse: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/pulso.wav'),
     baloonpop: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/mixkit-click-balloon-small-burst-3070.wav'),
+    uiMove: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/sfx/UImoove.wav'),
+    uiSelect: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/sfx/selectUI.wav'),
+    uiBack: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/sfx/UIbackout.mp3'),
+    fatalStart: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/sfx/jagged-edge-189972.mp3'),
 
 };
 
@@ -1069,43 +1073,84 @@ SFX.sandhit.volume = 1;
 SFX.pito.volume = 0.5;
 SFX.chelohit.volume = 0.6;
 SFX.harpjump.volume = 0.8;
-SFX.pianonote.volume = 0.4;
+SFX.pianonote.volume = 0.2;
 SFX.mineexplode.volume = 0.8;
 SFX.fireburn.volume = 0.7;
 SFX.flowerpulse.volume = 1;
 SFX.baloonpop.volume = 1;
+SFX.uiMove.volume = 0.25;   // ajuste de volumen
+SFX.uiSelect.volume = 0.5;  // ajuste de volumen
+SFX.uiBack.volume = 0.6;    // ajuste de volumen
+SFX.fatalStart.volume = 0.7; // ajuste de volumen
 
 const MUSIC ={
     beach: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/Relax%20%EF%BD%9C%205%20minutes%20of%20Sand%20and%20Sea%20%EF%BD%9C%20Sounds%20of%20Nature%20%EF%BD%9C%20Sleep%20Sounds%20(1).wav'),
     mkmusic: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/Tarkatan%20War%20Kamp%20%EF%BD%9C%20Mortal%20Kombat%2011%20(2).wav'),
     suddendeathmusic: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/War%20&%20Epic%20(Royalty%20Free%20Music%20For%20YouTube)%20-%20WAR%20by%20@Makai-symphony.mp3'),
+    menu1: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/music/Caprice%20No.%205.mp3'),
+    menu2: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/music/Paganini%EF%BC%9A%20Caprice%20No.1%20for%20Violin%20(Augustin%20Hadelich).wav'),
     survival: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/music/Shadow-Fight-2-Act-1-Survival-Th.mp3'),
-    arcade: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/music/Old-Sensei.mp3'),
+    survival2: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/music/Shadow-Fight-2-Act-2-Survival-Th.mp3'),
+    survival3: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/music/Shadow-Fight-2-Act-3-Challenge-A.mp3'),
+    arcade: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/music/Ready-Set-Slice-Fruit-Ninja-Musi.mp3'),
+    arcade2: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/music/Tribes-Tribulations.mp3'),
+    arcade3: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/music/Age-of-War-Theme-Soundtrack.mp3'),
     fatalityPractice: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/music/The-Training-Room.mp3'),
+    versus2: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/music/Lin-Kuei-Temple-Mortal-Kombat-X.mp3'),
+    versus3: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/music/Outworld-Marketplace-Mortal-Komb.mp3'),
+    matchEnd: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/music/MatchEnd.wav'),
 }
 
 MUSIC.beach.volume = 0.3;
 MUSIC.mkmusic.volume = 0.85;
 MUSIC.suddendeathmusic.volume = 0.3;
-MUSIC.survival.volume = 0.5; // ajuste de volumen
-MUSIC.arcade.volume = 0.55; // ajuste de volumen
+MUSIC.menu1.volume = 0.25; // ajuste de volumen
+MUSIC.menu2.volume = 0.4; // ajuste de volumen
+MUSIC.survival.volume = 0.30; // ajuste de volumen
+MUSIC.survival2.volume = 0.20; // ajuste de volumen
+MUSIC.survival3.volume = 0.30; // ajuste de volumen
+MUSIC.arcade.volume = 0.3; // ajuste de volumen
+MUSIC.arcade2.volume = 0.3; // ajuste de volumen
+MUSIC.arcade3.volume = 0.3; // ajuste de volumen
 MUSIC.fatalityPractice.volume = 0.5; // ajuste de volumen
+MUSIC.versus2.volume = 0.85; // ajuste de volumen
+MUSIC.versus3.volume = 0.85; // ajuste de volumen
+MUSIC.matchEnd.volume = 0.95; // ajuste de volumen
 MUSIC.beach.loop = true;
 MUSIC.mkmusic.loop = true;
-MUSIC.survival.loop = true;
+MUSIC.menu1.loop = false;
+MUSIC.menu2.loop = false;
+MUSIC.survival.loop = false; // se reproducen en secuencia, no en loop
+MUSIC.survival2.loop = false; // se reproducen en secuencia, no en loop
+MUSIC.survival3.loop = false; // se reproducen en secuencia, no en loop
 MUSIC.arcade.loop = true;
+MUSIC.arcade2.loop = true;
+MUSIC.arcade3.loop = true;
 MUSIC.fatalityPractice.loop = true;
+MUSIC.versus2.loop = true;
+MUSIC.versus3.loop = true;
+MUSIC.matchEnd.loop = false;
 let musicMuted = false;
 
 // Controla qué sonidos están en reproducción
 const ACTIVE_AUDIO = new WeakMap();
 
-function playSong(audioNode, { restart = true } = {}) {
+function playSong(audioNode, { restart = true, onEnded = null } = {}) {
   if (!audioNode || ACTIVE_AUDIO.has(audioNode)) return; // ya sonando o nunca pasó un audio válido
+
+  const shouldChainSurvival = !onEnded && matchMode === MATCH_MODE.BOT && SURVIVAL_NODES.has(audioNode) && !suddenDeathActive;
+  const endHook = shouldChainSurvival ? (()=>handleSurvivalTrackEnd(audioNode)) : onEnded;
 
   const handleEnded = () => {
     audioNode.removeEventListener('ended', handleEnded);
     ACTIVE_AUDIO.delete(audioNode);
+    if(typeof endHook === 'function'){
+      try{
+        endHook();
+      }catch(e){
+        console.warn('music end hook failed', e);
+      }
+    }
   };
 
   audioNode.addEventListener('ended', handleEnded);
@@ -1139,19 +1184,91 @@ function stopAllMusic(except = null){
   });
 }
 
+function pickWeightedTrack(pool, exclude = null){
+  const filtered = exclude ? pool.filter(item=>!exclude.has(item.node)) : pool;
+  const usePool = filtered.length ? filtered : pool;
+  const total = usePool.reduce((acc, item)=>acc + (item.weight || 1), 0);
+  if(total <= 0) return null;
+  let r = Math.random() * total;
+  for(const item of usePool){
+    r -= (item.weight || 1);
+    if(r <= 0) return item.node;
+  }
+  return usePool[usePool.length - 1]?.node || null;
+}
+
+let currentMusicTrack = null;
+function resetMusicSelection(){
+  currentMusicTrack = null;
+}
+const MENU_MUSIC = [MUSIC.menu1, MUSIC.menu2];
+const MENU_TRACKS = [
+  { node: MUSIC.menu1, weight: 2 },
+  { node: MUSIC.menu2, weight: 1 },
+];
+const SURVIVAL_TRACKS = [
+  { node: MUSIC.survival, weight: 2 },
+  { node: MUSIC.survival2, weight: 2 },
+  { node: MUSIC.survival3, weight: 2 },
+];
+const SURVIVAL_NODES = new Set(SURVIVAL_TRACKS.map(t=>t.node));
+let menuMusicPrimed = false;
+
+function playUiMoveSound(){
+  const a = SFX.uiMove;
+  if(!a) return;
+  try{ a.currentTime = 0; a.play(); }catch(e){}
+}
+
+function playUiSelectSound(){
+  const a = SFX.uiSelect;
+  if(!a) return;
+  try{ a.currentTime = 0; a.play(); }catch(e){}
+}
+
+function playUiBackSound(){
+  const a = SFX.uiBack;
+  if(!a) return;
+  try{ a.currentTime = 0; a.play(); }catch(e){}
+}
+
 function getCurrentBgm(){
   if(matchMode === MATCH_MODE.ARCADE){
-    return arcadeContext.mode === ARCADE_MODES.FATALITY ? MUSIC.fatalityPractice : MUSIC.arcade;
+    if(arcadeContext.mode === ARCADE_MODES.FATALITY) return MUSIC.fatalityPractice;
+    const pool = [
+      { node: MUSIC.arcade, weight: 8 },
+      { node: MUSIC.arcade2, weight: 9 },
+      { node: MUSIC.arcade3, weight: 1 },
+    ];
+    currentMusicTrack = currentMusicTrack || pickWeightedTrack(pool);
+    return currentMusicTrack || MUSIC.arcade;
   }
   if(matchMode === MATCH_MODE.BOT){
-    return MUSIC.survival;
+    currentMusicTrack = currentMusicTrack || getSurvivalTrack();
+    return currentMusicTrack || MUSIC.survival;
   }
-  return MUSIC.mkmusic;
+  const pool = [
+    { node: MUSIC.mkmusic, weight: 1 },
+    { node: MUSIC.versus2, weight: 1.2 },
+    { node: MUSIC.versus3, weight: 1.3 },
+  ];
+  currentMusicTrack = currentMusicTrack || pickWeightedTrack(pool);
+  return currentMusicTrack || MUSIC.mkmusic;
 }
 
 function playCurrentMusic(options = {}){
   if(musicMuted) return;
-  const track = suddenDeathActive ? MUSIC.suddendeathmusic : getCurrentBgm();
+  if(suddenDeathActive){
+    const track = MUSIC.suddendeathmusic;
+    stopAllMusic(track);
+    playSong(track, options);
+    return;
+  }
+  if(matchMode === MATCH_MODE.BOT){
+    playSurvivalMusic(options);
+    return;
+  }
+  const track = getCurrentBgm();
   stopAllMusic(track);
   playSong(track, options);
 }
@@ -1161,9 +1278,72 @@ function toggleMusicMute(){
   if(musicMuted){
     stopAllMusic();
   } else {
-    playCurrentMusic({ restart:false });
+    if(isUiScene()){
+      ensureMenuMusic();
+    } else {
+      playCurrentMusic({ restart:false });
+    }
   }
   syncMusicUi();
+}
+
+function isUiScene(){
+  // solo UIs de menú/lobby, no en selección ni juego
+  return appScene === APP_SCENE.MENU || appScene === APP_SCENE.NET;
+}
+
+function primeMenuMusic(){
+  if(menuMusicPrimed) return;
+  menuMusicPrimed = true;
+  ensureMenuMusic();
+}
+
+function isAudioPlaying(node){
+  return !!node && ACTIVE_AUDIO.has(node);
+}
+
+function playMenuMusicSequence(startIndex = null){
+  if(!MENU_TRACKS.length || musicMuted || !isUiScene()) return;
+  const track = pickWeightedTrack(MENU_TRACKS);
+  if(!track) return;
+  playSong(track);
+}
+
+function ensureMenuMusic(){
+  if(!isUiScene() || musicMuted) return;
+  const anyPlaying = MENU_TRACKS.some(t=>isAudioPlaying(t.node));
+  if(!anyPlaying){
+    playMenuMusicSequence();
+  }
+}
+
+function getSurvivalTrack(excludeNode = null){
+  const exclude = excludeNode ? new Set([excludeNode]) : null;
+  return pickWeightedTrack(SURVIVAL_TRACKS, exclude) || MUSIC.survival;
+}
+
+function handleSurvivalTrackEnd(prevNode = null){
+  if(musicMuted || suddenDeathActive || matchMode !== MATCH_MODE.BOT) return;
+  const next = getSurvivalTrack(prevNode || currentMusicTrack);
+  currentMusicTrack = next;
+  if(!next) return;
+  stopAllMusic(next);
+  playSong(next, { onEnded: ()=>handleSurvivalTrackEnd(next) });
+}
+
+function playSurvivalMusic(options = {}){
+  if(musicMuted || suddenDeathActive || matchMode !== MATCH_MODE.BOT) return;
+  const restart = options.restart !== undefined ? options.restart : true;
+  const keepCurrent = currentMusicTrack && SURVIVAL_NODES.has(currentMusicTrack);
+  const next = keepCurrent ? currentMusicTrack : getSurvivalTrack();
+  currentMusicTrack = next;
+  if(!next) return;
+  stopAllMusic(next);
+  playSong(next, { restart, onEnded: ()=>handleSurvivalTrackEnd(next) });
+}
+
+function stopMenuMusic(){
+  MENU_TRACKS.forEach(t=>stopSong(t.node));
 }
 
 
@@ -1869,6 +2049,7 @@ const uiRefs = {
 const APP_SCENE = { MENU:'menu', NET:'net', SELECT:'select', GAME:'game' };
 const MATCH_MODE = { LOCAL:'local', BOT:'bot', LAN:'lan', ARCADE:'arcade' };
 let appScene = APP_SCENE.MENU;
+let lastMenuLike = true; // track last ui/game state to avoid restarting menu music when switching UI panels
 let matchMode = MATCH_MODE.LOCAL;
 let netRole = null; // 'host' o 'client'
 let tutorialOpen = false;
@@ -2019,6 +2200,11 @@ function setScene(scene){
     if(uiRefs.arcadePanel) uiRefs.arcadePanel.classList.add('hidden');
   }
   syncUiState();
+  if(isUiScene()){
+    ensureMenuMusic();
+  } else {
+    stopMenuMusic();
+  }
 }
 
 function getActiveMenuButtons(){
@@ -2083,6 +2269,7 @@ function moveMenuFocus(delta){
   if(!buttons.length) return;
   menuFocusIndex = (menuFocusIndex + buttons.length + delta) % buttons.length;
   syncMenuFocus();
+  playUiMoveSound();
 }
 
 function activateMenuFocus(){
@@ -2090,6 +2277,7 @@ function activateMenuFocus(){
   if(!buttons.length) return;
   const target = buttons[menuFocusIndex];
   if(target && typeof target.click === 'function'){
+    playUiSelectSound();
     target.click();
   }
 }
@@ -2977,6 +3165,15 @@ function syncUiState(){
     if(showTouch) positionTouchOverlay();
   }
   if(menuLike){
+    if(!lastMenuLike){
+      stopAllMusic();
+    }
+    ensureMenuMusic();
+  } else {
+    stopMenuMusic();
+  }
+  lastMenuLike = menuLike;
+  if(menuLike){
     clearTouchKeys();
   }
   if(menuLike){
@@ -3661,6 +3858,8 @@ function startArcadeMode(mode){
   gameState = STATE.SELECT;
   arcadeOpen = false;
   badge.innerText = getArcadeModeLabel();
+  resetMusicSelection();
+  ensureMenuMusic();
 }
 
 function openLanMenu(){
@@ -3688,12 +3887,12 @@ if(uiRefs.btnLocalPvp) uiRefs.btnLocalPvp.addEventListener('click', ()=>startLoc
 if(uiRefs.btnLocalBot) uiRefs.btnLocalBot.addEventListener('click', ()=>startLocalMode('bot'));
 if(uiRefs.btnLan) uiRefs.btnLan.addEventListener('click', ()=>openLanMenu());
 if(uiRefs.btnArcade) uiRefs.btnArcade.addEventListener('click', ()=>openArcadeMenu());
-if(uiRefs.btnArcadeBack) uiRefs.btnArcadeBack.addEventListener('click', ()=>closeArcadeMenu());
+if(uiRefs.btnArcadeBack) uiRefs.btnArcadeBack.addEventListener('click', ()=>{ playUiBackSound(); closeArcadeMenu(); });
 if(uiRefs.btnArcadeDominadas) uiRefs.btnArcadeDominadas.addEventListener('click', ()=>startArcadeMode(ARCADE_MODES.DOMINADAS));
 if(uiRefs.btnArcadeTarget) uiRefs.btnArcadeTarget.addEventListener('click', ()=>startArcadeMode(ARCADE_MODES.TARGET));
 if(uiRefs.btnArcadeFatality) uiRefs.btnArcadeFatality.addEventListener('click', ()=>startArcadeMode(ARCADE_MODES.FATALITY));
 if(uiRefs.btnOpenStats) uiRefs.btnOpenStats.addEventListener('click', ()=>openStats());
-if(uiRefs.btnStatsBack) uiRefs.btnStatsBack.addEventListener('click', ()=>closeStats());
+if(uiRefs.btnStatsBack) uiRefs.btnStatsBack.addEventListener('click', ()=>{ playUiBackSound(); closeStats(); });
 if(uiRefs.btnStatsEncy) uiRefs.btnStatsEncy.addEventListener('click', ()=>{ closeStats(); openEncy('menu'); });
 if(uiRefs.btnEditName) uiRefs.btnEditName.addEventListener('click', ()=>handleNameChange());
 if(uiRefs.btnExportProgress) uiRefs.btnExportProgress.addEventListener('click', ()=>handleExportProgress());
@@ -3703,14 +3902,31 @@ if(uiRefs.btnCancelImport) uiRefs.btnCancelImport.addEventListener('click', ()=>
 if(uiRefs.btnResetProgress) uiRefs.btnResetProgress.addEventListener('click', ()=>handleResetProgress());
 if(uiRefs.btnToggleFullscreen) uiRefs.btnToggleFullscreen.addEventListener('click', ()=>toggleFullscreen());
 if(uiRefs.btnOpenTutorial) uiRefs.btnOpenTutorial.addEventListener('click', ()=>openTutorial());
-if(uiRefs.btnTutorialBack) uiRefs.btnTutorialBack.addEventListener('click', ()=>closeTutorial());
+if(uiRefs.btnTutorialBack) uiRefs.btnTutorialBack.addEventListener('click', ()=>{ playUiBackSound(); closeTutorial(); });
 if(uiRefs.btnOpenEncy) uiRefs.btnOpenEncy.addEventListener('click', ()=>openEncy(tutorialOpen ? 'tutorial' : 'menu'));
-if(uiRefs.btnEncyBack) uiRefs.btnEncyBack.addEventListener('click', ()=>closeEncy());
+if(uiRefs.btnEncyBack) uiRefs.btnEncyBack.addEventListener('click', ()=>{ playUiBackSound(); closeEncy(); });
 if(uiRefs.btnTutorialDownload) uiRefs.btnTutorialDownload.addEventListener('click', ()=>triggerTutorialDownload());
 if(uiRefs.btnTutorialCopy) uiRefs.btnTutorialCopy.addEventListener('click', ()=>copyTutorialLink());
 if(uiRefs.btnHudFullscreen) uiRefs.btnHudFullscreen.addEventListener('click', ()=>toggleFullscreen());
 if(uiRefs.btnHudMute) uiRefs.btnHudMute.addEventListener('click', ()=>toggleMusicMute());
-if(uiRefs.btnBackMenu) uiRefs.btnBackMenu.addEventListener('click', ()=>{ showLobbyPanel(true); });
+document.addEventListener('click', (e)=>{
+  const target = e.target;
+  if(!target) return;
+  primeMenuMusic();
+  const backIds = new Set([
+    'btnArcadeBack','btnStatsBack','btnTutorialBack','btnEncyBack',
+    'btnBackMenu','btnLobbyBack','btnLobbyMenu','btnExitPause'
+  ]);
+  if(target.closest('.ui-btn') || target.closest('.mode-card') || target.closest('.lobby-tag')){
+    const btn = target.closest('button');
+    if(btn && backIds.has(btn.id)){
+      playUiBackSound();
+    } else {
+      playUiSelectSound();
+    }
+  }
+});
+if(uiRefs.btnBackMenu) uiRefs.btnBackMenu.addEventListener('click', ()=>{ playUiBackSound(); showLobbyPanel(true); });
 if(uiRefs.btnResetLink) uiRefs.btnResetLink.addEventListener('click', ()=>resetNetState());
 if(uiRefs.btnCreateOffer) uiRefs.btnCreateOffer.addEventListener('click', ()=>createHostOffer());
 if(uiRefs.btnCreateAnswer) uiRefs.btnCreateAnswer.addEventListener('click', ()=>createClientAnswer());
@@ -3720,8 +3936,8 @@ if(uiRefs.btnApplyAnswer) uiRefs.btnApplyAnswer.addEventListener('click', ()=>{
   applyHostAnswer();
 });
 if(uiRefs.btnOpenLobby) uiRefs.btnOpenLobby.addEventListener('click', ()=>showLobbyPanel(true));
-if(uiRefs.btnLobbyBack) uiRefs.btnLobbyBack.addEventListener('click', ()=>showLobbyPanel(false));
-if(uiRefs.btnLobbyMenu) uiRefs.btnLobbyMenu.addEventListener('click', ()=>{ resetNetState(); setScene(APP_SCENE.MENU); badge.innerText = 'Selecciona modo'; });
+if(uiRefs.btnLobbyBack) uiRefs.btnLobbyBack.addEventListener('click', ()=>{ playUiBackSound(); showLobbyPanel(false); });
+if(uiRefs.btnLobbyMenu) uiRefs.btnLobbyMenu.addEventListener('click', ()=>{ playUiBackSound(); resetNetState(); setScene(APP_SCENE.MENU); badge.innerText = 'Selecciona modo'; });
 if(uiRefs.btnLobbyConnect) uiRefs.btnLobbyConnect.addEventListener('click', ()=>connectLobby());
 if(uiRefs.btnLobbyHelp) uiRefs.btnLobbyHelp.addEventListener('click', ()=>showLobbyHelp());
 if(uiRefs.lobbyName) uiRefs.lobbyName.addEventListener('change', ()=>{
@@ -3743,7 +3959,7 @@ if(pauseHudBtn) pauseHudBtn.addEventListener('click', ()=>{
     requestPauseToggle();
   }
 });
-if(exitPauseBtn) exitPauseBtn.addEventListener('click', ()=>requestEscapeToMenu());
+if(exitPauseBtn) exitPauseBtn.addEventListener('click', ()=>{ playUiBackSound(); requestEscapeToMenu(); });
 
 ['fullscreenchange','webkitfullscreenchange','msfullscreenchange'].forEach(evt=>{
   document.addEventListener(evt, syncFullscreenUi);
@@ -4001,7 +4217,11 @@ function requestPauseToggle(){
 
 function requestEscapeToMenu(){
   if(matchMode === MATCH_MODE.ARCADE){
-    returnToArcadeSelection();
+    arcadeOpen = true;
+    resetSelectionState();
+    setScene(APP_SCENE.MENU);
+    badge.innerText = 'Arcade';
+    ensureMenuMusic();
     return;
   }
   if(matchMode === MATCH_MODE.LAN && netRole === 'client'){
@@ -4039,9 +4259,11 @@ function returnToSelectLocal(){
     exitArcadeToMenu();
     return;
   }
+  resetMusicSelection();
   gameState = STATE.SELECT;
   setScene(APP_SCENE.SELECT);
   stopAllMusic();
+  ensureMenuMusic();
   clearMatchTimer();
   resetSelectionState();
   badge.innerText = getModeLabel();
@@ -4385,6 +4607,7 @@ function startMatchLocalFromConfig(cfg = {}){
   matchMode = MATCH_MODE.LAN;
   useBot = false;
   botActive = false;
+  resetMusicSelection();
   setScene(APP_SCENE.GAME);
   badge.innerText = getModeLabel();
 
@@ -8267,6 +8490,10 @@ function gameOver(who, options = {}){
   if(matchMode === MATCH_MODE.LAN && netRole === 'host'){
     sendNet({ type:'gameOver', info: window._winnerInfo });
   }
+  stopAllMusic();
+  if(!musicMuted){
+    playSong(MUSIC.matchEnd);
+  }
   matchTimerMs = null;
   resetScoreStreaks();
   syncUiState();
@@ -8397,6 +8624,7 @@ function endArcadeRun(reason='end'){
   arcadeContext.active = false;
   gameState = STATE.GAMEOVER;
   stopAllMusic();
+  currentMusicTrack = null;
   syncUiState();
 }
 
@@ -8596,27 +8824,34 @@ function translateFatalityInput(player, code){
 function startFatalityAnimation(winner){
   if(!finishState.active) return;
   if(finishState.stage === 'fatality') return; // evita rebotes
-  finishState.stage = 'fatality';
+  finishState.stage = 'fatality_pending';
+  if(SFX.fatalStart){
+    try{ const fx = SFX.fatalStart.cloneNode(); fx.volume = SFX.fatalStart.volume; fx.play(); }catch(e){}
+  }
   finishState.fatalityLocked = true;
   clearFinishTimers(finishState);
   const loser = getPlayerByKey(finishState.loser);
   freezeFinishPlayer(winner);
   freezeFinishPlayer(loser, { lockGravity:false });
-  const fatalityDef = getFatalityDefinitionForSkin(winner.skin);
-  const data = fatalityDef.onStart ? (fatalityDef.onStart({ winner, loser, state: finishState }) || {}) : {};
-  finishState.fatality = {
-    def: fatalityDef,
-    winner,
-    loser,
-    data,
-    startedAt: performance.now(),
-    completed: false,
-    resolveScheduled: false
-  };
-  //banner que diga fatality durante el fatality fatalitybanner
-  //setFinishOverlay('Fatality', fatalityDef.duration || 2000);
-  sendFinishSync('fatality', { winner: finishState.winner });
-  gameState = STATE.FATALITY;
+  scheduleFinishTimer(()=>{
+    if(!finishState.active || finishState.stage !== 'fatality_pending') return;
+    const fatalityDef = getFatalityDefinitionForSkin(winner.skin);
+    const data = fatalityDef.onStart ? (fatalityDef.onStart({ winner, loser, state: finishState }) || {}) : {};
+    finishState.fatality = {
+      def: fatalityDef,
+      winner,
+      loser,
+      data,
+      startedAt: performance.now(),
+      completed: false,
+      resolveScheduled: false
+    };
+    finishState.stage = 'fatality';
+    //banner que diga fatality durante el fatality fatalitybanner
+    //setFinishOverlay('Fatality', fatalityDef.duration || 2000);
+    sendFinishSync('fatality', { winner: finishState.winner });
+    gameState = STATE.FATALITY;
+  }, 1000);
 }
 
 function finalizeFatalityVictory(){
@@ -8673,7 +8908,8 @@ function handleFinishMercy(){
   refreshScoreTarget();
   resetScoreStreaks();
   suddenDeathActive = false;
-  stopSong(MUSIC.suddendeathmusic);
+  stopAllMusic();
+  resetMusicSelection();
   setFinishOverlay('Mercy', 2000);
   sendFinishSync('mercy', { winner: winnerKey });
   const loser = getPlayerByKey(finishState.loser);
@@ -8807,27 +9043,31 @@ const keys = {};
 const keyTaps = new Set();
 addEventListener('keydown', e=>{
   if(!keys[e.code]) keyTaps.add(e.code);
+  primeMenuMusic();
   queueMysteryInputFromCode(e.code);
   keys[e.code]=true;
   if(!e.repeat && finishState.active){
     registerFinishInput(e.code);
   }
-  if(appScene === APP_SCENE.MENU || appScene === APP_SCENE.NET){
+if(appScene === APP_SCENE.MENU || appScene === APP_SCENE.NET){
     if(appScene === APP_SCENE.MENU && encyOpen && e.code === 'Escape'){
+      playUiBackSound();
       closeEncy();
       e.preventDefault();
       return;
     }
     if(appScene === APP_SCENE.MENU && tutorialOpen && !encyOpen && e.code === 'Escape'){
+      playUiBackSound();
       closeTutorial();
       e.preventDefault();
       return;
     }
-    if(appScene === APP_SCENE.MENU && arcadeOpen && e.code === 'Escape'){
-      closeArcadeMenu();
-      e.preventDefault();
-      return;
-    }
+if(appScene === APP_SCENE.MENU && arcadeOpen && e.code === 'Escape'){
+    playUiBackSound();
+    closeArcadeMenu();
+    e.preventDefault();
+    return;
+  }
     const isPrev = (e.code === 'ArrowLeft' || e.code === 'ArrowUp' || e.code === 'KeyA' || e.code === 'KeyW');
     const isNext = (e.code === 'ArrowRight' || e.code === 'ArrowDown' || e.code === 'KeyD' || e.code === 'KeyS');
     if(isPrev){
@@ -8840,7 +9080,8 @@ addEventListener('keydown', e=>{
       e.preventDefault();
       return;
     }
-    if(e.code === 'Enter' || e.code === 'Space' || e.code === 'NumpadEnter'){
+  if(e.code === 'Enter' || e.code === 'Space' || e.code === 'NumpadEnter'){
+      playUiSelectSound();
       activateMenuFocus();
       e.preventDefault();
       return;
@@ -8849,12 +9090,14 @@ addEventListener('keydown', e=>{
   if(appScene === APP_SCENE.NET && e.code === 'Escape'){
     const lobbyVisible = lobbyLayer && !lobbyLayer.classList.contains('hidden');
     if(lobbyVisible){
+      playUiBackSound();
       resetNetState();
       setScene(APP_SCENE.MENU);
       badge.innerText = 'Selecciona modo';
       e.preventDefault();
       return;
     }
+    playUiBackSound();
     showLobbyPanel(true);
     e.preventDefault();
     return;
@@ -9368,6 +9611,7 @@ function setArcadeSelectionDefaults(){
 function startArcadeMatchFromSelection(){
   if(!isArcadeMode()) return;
   suddenDeathActive = false;
+  resetMusicSelection();
   const resolveSkin = (index)=>{
     const chosen = ROSTER[index];
     return chosen === 'mystery' ? pickMysteryRandomSkin() : chosen;
