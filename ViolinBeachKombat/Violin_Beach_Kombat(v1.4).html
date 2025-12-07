@@ -1537,12 +1537,12 @@ const BALL_TYPES = [ //tipos de pelotas disponibles
 const BOSS_ASSETS = {
   rock: {
     // URL de la imagen del boss (cuerpo principal). Pon aqu� la foto de Rock.
-    spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/images/Rock%20Skin.png?raw=true',
-    spriteScale: 1.25,
-    hitboxScale: 1.32,
+    spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/images/RockSkinAlt.png?raw=true',
+    spriteScale: 1.3,
+    hitboxScale: 1.11,
     // Tama�o/hitbox cuando Rock sea jugable como easter egg (m�s peque�o/nerfeado)
-    playableScale: 0.92,
-    playableHitboxScale: 1.02,
+    playableScale: 1.12,
+    playableHitboxScale: 1.05,
     // URL de meteorito que cae desde el cielo.
     meteorUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/images/Rock%20Meteorite.png?raw=true',
     meteorRadius: 44,
@@ -1560,8 +1560,8 @@ const BOSS_CONFIG = {
     phaseThresholds: { phase2: 2/3, phase3: 1/3 }, // vida restante para pasar de fase
     phase1DamagePerGround: 5,      // da�o al boss por rally ganado en fase 1
     phase2DamagePerTarget: 2,      // da�o al boss por target en fase 2
-    hitsPerHpPhase3: 5,            // golpes en fase 3 por cada punto de vida del boss
-    dropLimit: 5,                  // ca�das antes de perder 1 vida del jugador en fases 2-3
+    hitsPerHpPhase3: 4,            // golpes en fase 3 por cada punto de vida del boss
+    dropLimit: 3,                  // ca�das antes de perder 1 vida del jugador en fases 2-3
     push: { force: 2200, cooldownMs: 5200, radius: 420 },
     projectiles: {
       meteor: { intervalMs: 1500, fallVy: 520, vxRange: [-160, 160], knockback: 2200 },
@@ -2782,7 +2782,9 @@ function syncProfileUi(noteText){
 // Override renderFavoriteSkin para asegurar glow y texto de nivel coloreado
 function renderFavoriteSkin(){
   if(!uiRefs.favSkinName || !uiRefs.favSkinMeta) return;
-  const fav = getFavoriteChar() || { skin: ROSTER[0], stats: CHAR_DEFAULT_STATS };
+  const rosterReady = (typeof ROSTER !== 'undefined') && Array.isArray(ROSTER) && ROSTER.length > 0;
+  const fallbackSkin = rosterReady ? ROSTER[0] : 'violin';
+  const fav = getFavoriteChar() || { skin: fallbackSkin, stats: CHAR_DEFAULT_STATS };
   const name = fav ? getSkinLabel(fav.skin) : '-';
   const stats = fav?.stats || null;
   const ach = getCharAchievementData(stats || {});
@@ -2984,6 +2986,8 @@ function closeArcadeMenu(){
   arcadeOpen = false;
   closeBossfightBox();
   if(uiRefs.arcadePanel) uiRefs.arcadePanel.classList.add('hidden');
+  matchMode = MATCH_MODE.LOCAL;
+  refreshRosterFromProgress();
   setScene(APP_SCENE.MENU);
   badge.innerText = 'Selecciona modo';
 }
@@ -4033,6 +4037,7 @@ function startLocalMode(mode){
   useBot = matchMode === MATCH_MODE.BOT;
   botActive = useBot;
   netRole = null;
+  refreshRosterFromProgress();
   resetPlayerNames();
   resetSelectionState();
   setScene(APP_SCENE.SELECT);
@@ -4051,8 +4056,9 @@ function exitArcadeToMenu(){
   resetArcadeState();
   arcadeOpen = false;
   closeBossfightBox();
-  if(uiRefs.arcadePanel) uiRefs.arcadePanel.classList.add('hidden');
   matchMode = MATCH_MODE.LOCAL;
+  refreshRosterFromProgress();
+  if(uiRefs.arcadePanel) uiRefs.arcadePanel.classList.add('hidden');
   useBot = false;
   botActive = false;
   netRole = null;
@@ -4089,6 +4095,7 @@ function returnToArcadeModeMenu(){
   serveTimeout = null;
   ballGroundTimeout = null;
   matchMode = MATCH_MODE.ARCADE;
+  refreshRosterFromProgress();
   useBot = false;
   botActive = false;
   netRole = null;
@@ -4119,6 +4126,7 @@ function startArcadeMode(mode, options = {}){
   useBot = false;
   botActive = false;
   netRole = null;
+  refreshRosterFromProgress();
   resetPlayerNames();
   setArcadeSelectionDefaults();
   if(arcadeContext.mode === ARCADE_MODES.FATALITY){
@@ -4142,6 +4150,7 @@ function openLanMenu(){
   matchMode = MATCH_MODE.LAN;
   useBot = false;
   botActive = false;
+  refreshRosterFromProgress();
   resetNetState();
   setScene(APP_SCENE.NET);
   badge.innerText = 'Modo: LAN';
@@ -4906,7 +4915,7 @@ function startMatchLocalFromConfig(cfg = {}){
   ghostBarriers.length = 0;
   florBursts.length = 0;
   clearHazardProjectiles();
-  arcadeContext.bossFight = isBossMode ? (arcadeContext.bossFight || createBossFightState(bossId)) : null;
+  arcadeContext.bossFight = null;
 
   score.p1 = cfg.score?.p1 ?? 0;
   score.p2 = cfg.score?.p2 ?? 0;
@@ -5291,6 +5300,8 @@ function buildRosterForProgress(prog){
 }
 
 function refreshRosterFromProgress(){
+  if(typeof SPACING_X === 'undefined' || typeof CARD_W === 'undefined') return;
+  if(typeof GRID_COLS === 'undefined') return;
   const unlocked = !!(progress?.unlocks?.rockPlayable);
   ROSTER = buildRosterForProgress(progress);
   GRID_COLS = unlocked ? 6 : GRID_COLS_BASE;
@@ -5678,7 +5689,7 @@ const ABILITIES = {
     duration: 500,
     cooldown: 1000,
     staminaCost: 40,
-    description: 'Invoca 3 meteoritos breves hacia el lado rival (versi�n nerfeada).',
+    description: 'Invoca 3 meteoritos breves hacia el lado rival.',
     staminaProfile: { max: 100, regen: 30, start: 100 },
     onActivate(player){
       triggerRockMeteorRain(player);
@@ -9210,7 +9221,7 @@ function triggerRockMeteorRain(owner){
   const assets = getBossAssets('rock') || {};
   const r = (assets.meteorRadius || 44) * 0.85;
   const center = owner?.side === 'L' ? (W * 0.72) : (W * 0.28);
-  for(let i=0;i<5;i++){
+  for(let i=0;i<3;i++){
     setTimeout(()=>{
       if(gameState === STATE.GAMEOVER) return;
       spawnHazardProjectile({
