@@ -570,6 +570,7 @@
 <body>
 <div class="wrap">
   <canvas id="game" width="1200" height="675" aria-label="Violin Beach Volley"></canvas>
+  <button class="hud-btn secondary hidden" id="btnToggleSkins" title="Toggle skins modernas/dibujos">🎨</button>
 </div>
 <div class="touch-overlay hidden" id="touchOverlay">
   <div class="line vert"></div>
@@ -856,7 +857,8 @@
         <h2>Descarga directa (offline)</h2>
         <p>Descarga el HTML (v1.7) desde el juego para jugar sin navegador o montar el lobby local.</p>
         <div class="tutorial-download">
-          <input id="tutorialDownloadUrl" type="url" value="https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/refs/heads/main/ViolinBeachKombat/Violin_Beach_Kombat%28v1.7%29.html" />
+          <input id="tutorialDownloadUrl" type="url" value="https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/refs/heads/main/ViolinBeachKombat/Violin_Beach_Kombat%28v1.4%29.html" />
+
           <button class="mini-btn" id="btnTutorialDownload">Descargar</button>
           <button class="mini-btn secondary" id="btnTutorialCopy">Copiar link</button>
           <small id="tutorialDownloadStatus"></small>
@@ -1416,6 +1418,8 @@ const CONFIG = {
 // Precargar imágenes
 const bgImages = {};
 const IMAGES = {};
+const SKIN_PHOTOS = {}; // Almacena URLs de fotos de skins y su estado de carga
+
 function loadBackgroundImage(name, url) {
   const img = new Image();
   img.src = url;
@@ -1430,7 +1434,245 @@ function loadImageAsset(name, url){
   IMAGES[name] = img;
 }
 
-// Cargar las imágenes que usarás
+// Cargar foto de skin (con manejo de errores)
+function loadSkinPhoto(skin, url){
+  if(!skin || !url) return;
+  const key = `skin_${skin}`;
+  const img = new Image();
+  let loaded = false;
+  
+  img.onload = () => {
+    SKIN_PHOTOS[skin] = { img, loaded: true, error: false };
+    loaded = true;
+  };
+  
+  img.onerror = () => {
+    SKIN_PHOTOS[skin] = { img: null, loaded: true, error: true };
+  };
+  
+  img.src = url;
+  // Si después de 5 segundos no cargó, marcar como error
+  setTimeout(() => {
+    if(!loaded && SKIN_PHOTOS[skin]?.img){
+      SKIN_PHOTOS[skin].error = true;
+    }
+  }, 5000);
+}
+
+// === URLS DE FOTOS PARA LOS SKINS ===
+// Reemplaza las URLs vacías con las fotos que quieras usar
+// Usa formato: https://raw.githubusercontent.com/usuario/repo/main/archivo.png
+// O cualquier URL directa a una imagen
+const SKIN_ASSETS = {
+  violin: {
+    spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Violin/ViolinSkin2.png?raw=true', // Pon aquí la foto del violín
+    spriteScale: 1.5,
+    spriteOffsetX: 0,      // Ajusta para mover horizontalmente (negativo = izquierda, positivo = derecha)
+    spriteOffsetY: -10     // Ajusta para mover verticalmente (negativo = arriba, positivo = abajo)
+  },
+  cello: {
+    spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Cello/CelloSkin.png?raw=true', // Pon aquí la foto del violonchelo
+    spriteScale: 1.5,
+    spriteOffsetX: 5,
+    spriteOffsetY: 0
+  },
+  piano: {
+    spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Piano/PianoSkin.png?raw=true', // Pon aquí la foto del piano (versión normal)
+    spriteScale: 1.25,
+    spriteOffsetX: 0,
+    spriteOffsetY: 0,
+    // Versión estirada (habilidad / fatality)
+    stretchedSpriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Piano/PianoLongSkin.png?raw=true', // Pon aquí la foto de la versión estirada
+    stretchedSpriteScale: 1.6,
+    stretchedSpriteOffsetX: 0,
+    stretchedSpriteOffsetY: 0
+  },
+  metal: {
+    spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Metal/MetalSkin.png?raw=true', // Pon aquí la foto del metal
+    spriteScale: 1.3,
+    spriteOffsetX: 0,
+    spriteOffsetY: 0
+  },
+  dj: {
+    spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Dj/DjSkin.png?raw=true', // Pon aquí la foto del DJ
+    spriteScale: 1.0,
+    spriteOffsetX: 0,
+    spriteOffsetY: 0  
+  },
+  queen: {
+    spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Queen/QueenSkin.png?raw=true', // Pon aquí la foto de la reina
+    spriteScale: 1.1,
+    spriteOffsetX: 0,
+    spriteOffsetY: 0
+  },
+  fire: {
+    spriteUrl: '', // Pon aquí la foto del fuego
+    spriteScale: 1.0,
+    spriteOffsetX: 0,
+    spriteOffsetY: 0
+  },
+  drum: {
+    spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Drumm/DrummSkin.png?raw=true', // Pon aquí la foto del tambor
+    spriteScale: 1.3,
+    spriteOffsetX: 0,
+    spriteOffsetY: 0
+    },
+    drumMine: {
+      spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Drumm/DrummMine.png?raw=true', // Pon aquí el link de la bomba de Drumm
+      spriteScale: 1.8,
+      spriteOffsetX: 0,
+      spriteOffsetY: 0
+  },
+  hydra: {
+    spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Hydra/HydraSkin.png?raw=true', // Pon aquí la foto de la hidra
+    spriteScale: 1.1,
+    spriteOffsetX: 0,
+    spriteOffsetY: 0
+  },
+  ghost: {
+    spriteUrl: '', // Pon aquí la foto del fantasma (fallback si no uses tubos/teclas)
+    spriteScale: 1.0,
+    spriteOffsetX: 0,
+    spriteOffsetY: 0
+  },
+  ghostTubeRed: {
+    spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Ghost/GhostTubeRed.png?raw=true', // Pon aquí la imagen del tubo rojo (vertical, transparente)
+    spriteScale: 1.0,
+    spriteWidth: 2.5, // multiplicador para hacer el tubo más ancho directamente desde SKIN_ASSETS
+    spriteOffsetX: 0,
+    spriteOffsetY: 0
+  },
+  ghostKeyGray: {
+    spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Ghost/GhostKey.png?raw=true', // Pon aquí la imagen de la tecla gris (vertical, transparente)
+    spriteScale: 1.0,
+    spriteWidth: 5.0, // multiplicador para ajustar ancho de la tecla
+    spriteOffsetX: 0,
+    spriteOffsetY: -2.5
+  },
+  theremin: {
+    spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Theremin/ThereminSkin.png?raw=true', // Pon aquí la foto del theremin
+    spriteScale: 1.1,
+    spriteSpinSpeed: 1.2, // velocidad de giro similar al metal
+    spriteOffsetX: 0,
+    spriteOffsetY: 0
+  },
+  harp: {
+    spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Harp/HarpSkin.png?raw=true', // Pon aquí la foto del arpa
+    spriteScale: 1.3,
+    spriteOffsetX: 0,
+    spriteOffsetY: 0
+  },
+  director: {
+    spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Director/DirectorSkinTilt.png?raw=true', // Pon aquí la foto del director
+    spriteScale: 1,
+    spriteOffsetX: 1.8,
+    spriteOffsetY: -1
+  },
+  flor: {
+    spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Flor/FlorSkin.png?raw=true', // Pon aquí la foto de la flor
+    spriteScale: 1.2, // 1.2 * 1.1 = 1.32 (ensanchado por 1.1)
+    spriteOffsetX: 0,
+    spriteOffsetY: 0
+  },
+  mystery: {
+    spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Mistery/MisterySkin.png?raw=true', // Pon aquí la foto del misterio
+    spriteScale: 1.1,
+    spriteOffsetX: 0,
+    spriteOffsetY: 0
+  },
+  rock: {
+    spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Rock/RockSkin.png?raw=true', // Skin de Rock jugable
+    spriteScale: 1.12,
+    spriteOffsetX: 0,
+    spriteOffsetY: 0
+  }
+};
+
+// === URLS DE FOTOS PARA SKINS DARK ===
+// Pon aquí las versiones DARK por personaje (se usan solo si el jugador tiene nivel DARK)
+// IMPORTANTE: Las escalas se copian del skin base, pero puedes sobreescribirlas si la imagen dark tiene proporciones diferentes.
+const SKIN_DARK_ASSETS = {
+  violin: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Violin/ViolinSkinDark.png?raw=true', spriteScale: 1.5, spriteOffsetX: 0, spriteOffsetY: -10 },
+  cello: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Cello/CelloSkinDark.png?raw=true', spriteScale: 1.5, spriteOffsetX: 5, spriteOffsetY: 0 },
+  piano: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Piano/PianoSkinDark.png?raw=true', spriteScale: 1.25, spriteOffsetX: 0, spriteOffsetY: 0, stretchedSpriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Piano/PianoLongSkinDark.png?raw=true', stretchedSpriteScale: 1.6, stretchedSpriteOffsetX: 0, stretchedSpriteOffsetY: 0 },
+  metal: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Metal/MetalSkinDark.png?raw=true', spriteScale: 1.3, spriteOffsetX: 0, spriteOffsetY: 0 },
+  dj: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Dj/DjSkinDark.png?raw=true', spriteScale: 1.0, spriteOffsetX: 0, spriteOffsetY: 0 },
+  queen: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Queen/QueenSkinDark.png?raw=true', spriteScale: 1.1, spriteOffsetX: 0, spriteOffsetY: 0 },
+  fire: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Fire/FireSkinDark.png?raw=true', spriteScale: 1.0, spriteOffsetX: 0, spriteOffsetY: 0 },
+  drum: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Drumm/DrummSkinDark.png?raw=true', spriteScale: 1.3, spriteOffsetX: 0, spriteOffsetY: 0 },
+  hydra: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Hydra/HydraSkinDark.png?raw=true', spriteScale: 1.1, spriteOffsetX: 0, spriteOffsetY: 0 },
+  ghost: { spriteUrl: '', spriteScale: 1.0, spriteOffsetX: 0, spriteOffsetY: 0 },
+  theremin: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Theremin/ThereminSkinDark.png?raw=true', spriteScale: 1.1, spriteSpinSpeed: 1.2, spriteOffsetX: 0, spriteOffsetY: 0 },
+  harp: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Harp/HarpSkinDark.png?raw=true', spriteScale: 1.5, spriteWidth: 0.73, spriteOffsetX: 0, spriteOffsetY: 8 },
+  director: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Director/DirectorSkinDark.png?raw=true', spriteScale: 1.0, spriteOffsetX: 1.8, spriteOffsetY: -1 },
+  flor: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Flor/FlorSkinDark.png?raw=true', spriteScale: 1.2, spriteOffsetX: 0, spriteOffsetY: 0 },
+  mystery: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Mistery/MisterySkinDark.png?raw=true', spriteScale: 1.1, spriteOffsetX: 0, spriteOffsetY: 0 },
+  rock: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Rock/RockSkinDark.png?raw=true', spriteScale: 1.12, spriteOffsetX: 0, spriteOffsetY: 0 },
+  ghostTubeDark: {
+    spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Ghost/GhostTubeDark.png?raw=true',
+    spriteScale: 1.0,
+    spriteWidth: 2.5,
+    spriteOffsetX: 0,
+    spriteOffsetY: 0
+  }
+};
+
+// === ESCALA DE HITBOX POR PERSONAJE ===
+// Ajusta aquí la escala de hitbox de cada personaje (independiente de la skin)
+// Ejemplo: hitboxScales.violin = 1.0; (default)
+// Valores mayores hacen la hitbox más grande, menores la hacen más pequeña
+// === ESCALA VISUAL DE SKIN POR DEFECTO ===
+// Ajusta aquí la escala visual de la skin por defecto de cada personaje
+// Ejemplo: defaultSkinScales.violin = 1.0; (default)
+// Esto NO afecta la hitbox, solo el tamaño visual del personaje dibujado sin imagen
+const defaultSkinScales = {
+  violin: 1.0,
+  cello: 1.3,
+  piano: 1.0,
+  drum: 1.0,
+  harp: 1.0,
+  mystery: 1.0,
+  // Agrega aquí otros personajes si lo necesitas
+};
+
+const hitboxScales = {
+  violin: 1.0,
+  cello: 1.1,
+  piano: 1.05,
+  drum: 1.1,
+  harp: 1.00,
+  mystery: 1.0,
+  ghost: 1.1,
+  // Agrega aquí otros personajes si lo necesitas
+};
+
+// Para usarlo en el código: hitboxScales[skinId]
+if(SKIN_ASSETS.drumMine?.spriteUrl){
+  loadSkinPhoto('drumMine', SKIN_ASSETS.drumMine.spriteUrl);
+}
+// Cargar sprites de ghost (tubos y teclas)
+if(SKIN_ASSETS.ghostTubeRed?.spriteUrl){
+  loadSkinPhoto('ghostTubeRed', SKIN_ASSETS.ghostTubeRed.spriteUrl);
+}
+if(SKIN_ASSETS.ghostKeyGray?.spriteUrl){
+  loadSkinPhoto('ghostKeyGray', SKIN_ASSETS.ghostKeyGray.spriteUrl);
+}
+// Cargar fotos DARK (se activan solo al desbloquear nivel DARK)
+for(const [skinName, asset] of Object.entries(SKIN_DARK_ASSETS)){
+  if(skinName === 'ghostTubeDark'){
+    // Caso especial: cargar directamente sin sufijo _dark
+    if(asset?.spriteUrl){
+      loadSkinPhoto('ghostTubeDark', asset.spriteUrl);
+    }
+    continue;
+  }
+  if(asset?.spriteUrl){
+    loadSkinPhoto(`${skinName}_dark`, asset.spriteUrl);
+  }
+  if(asset?.stretchedSpriteUrl){
+    loadSkinPhoto(`${skinName}_dark_stretched`, asset.stretchedSpriteUrl);
+  }
+}
 loadBackgroundImage('beachPhoto', 'https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/beach.avif');
 loadBackgroundImage('beachPhoto_night', 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/beach_nighted.png?raw=true');
 loadBackgroundImage('beachPhoto_weather', 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/beach_weather.jpg?raw=true');
@@ -1438,6 +1680,8 @@ loadBackgroundImage('beachPhoto_weather', 'https://github.com/FranciscoAraya04/V
 loadBackgroundImage('skullflower', 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Captura%20de%20pantalla%202025-11-16%20154153-Photoroom.png?raw=true')
 // Fondo especial Rock
 loadBackgroundImage('rockStage', 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/images/RockBackgroundStage.png?raw=true');
+
+
 
 // Presets de fondos y pelotas (selección aleatoria al empezar partida)
 const BACKGROUNDS = [
@@ -1868,6 +2112,17 @@ function getAchLevelName(level){
   }
 }
 
+function getMaxAchievementLevel(){
+  return Math.max(0, ACH_COLORS.length - 1);
+}
+
+function isDarkTierUnlocked(statsOrAch){
+  const level = (statsOrAch && typeof statsOrAch.level === 'number')
+    ? statsOrAch.level
+    : getCharAchievementData(statsOrAch || {}).level;
+  return level >= getMaxAchievementLevel();
+}
+
 function getPlayerLevelColor(player){
   if(!player || !player.skin) return '#e9f4ff';
   const stats = getCharStatsSnapshot(player.skin);
@@ -2110,6 +2365,7 @@ const lobbyLayer = document.getElementById('lobbyLayer');
 const lobbyPanel = document.getElementById('lobbyPanel');
 const pauseHudBtn = document.getElementById('btnPauseHud');
 const exitPauseBtn = document.getElementById('btnExitPause');
+const toggleSkinsBtn = document.getElementById('btnToggleSkins');
 let menuFocusIndex = 0;
 if(document.getElementById('lobbyCode') && location.hostname){
   const h = location.hostname;
@@ -2223,6 +2479,7 @@ let bossUiOpen = false;
 let bossSelectedId = 'rock';
 let encyReturnTarget = 'menu';
 let selectionUsedTouch = false;
+let modernSkinsEnabled = true; // Toggle para skins modernas con imágenes vs dibujos
 let lobbySocket = null;
 let lobbyId = null;
 let lobbyPeers = [];
@@ -3387,6 +3644,25 @@ function syncUiState(){
     pauseHudBtn.textContent = inSelection ? '🏠︎' : (paused ? '►' : '⏸');
     pauseHudBtn.classList.toggle('hidden', !!menuLike || gameState === STATE.GAMEOVER);
   }
+  if(toggleSkinsBtn){
+    const inSelection = (gameState === STATE.SELECT && appScene === APP_SCENE.SELECT);
+    toggleSkinsBtn.classList.toggle('hidden', !inSelection);
+    toggleSkinsBtn.style.opacity = modernSkinsEnabled ? '1' : '0.5';
+    
+    // Posicionar el botón en la esquina superior izquierda del canvas
+    if(!inSelection){
+      toggleSkinsBtn.style.position = '';
+      toggleSkinsBtn.style.top = '';
+      toggleSkinsBtn.style.left = '';
+    } else {
+      const canvas = document.getElementById('game');
+      const canvasRect = canvas.getBoundingClientRect();
+      toggleSkinsBtn.style.position = 'fixed';
+      toggleSkinsBtn.style.left = (canvasRect.left + 35) + 'px';
+      toggleSkinsBtn.style.top = (canvasRect.top + 30) + 'px';
+      toggleSkinsBtn.style.zIndex = '100';
+    }
+  }
   if(exitPauseBtn){
     const showExit = !menuLike && (gameState === STATE.PAUSE || gameState === STATE.GAMEOVER);
     exitPauseBtn.classList.toggle('hidden', !showExit);
@@ -4249,6 +4525,11 @@ if(pauseHudBtn) pauseHudBtn.addEventListener('click', ()=>{
     requestPauseToggle();
   }
 });
+if(toggleSkinsBtn) toggleSkinsBtn.addEventListener('click', ()=>{
+  modernSkinsEnabled = !modernSkinsEnabled;
+  toggleSkinsBtn.style.opacity = modernSkinsEnabled ? '1' : '0.5';
+  toggleSkinsBtn.title = modernSkinsEnabled ? 'Skins modernas activadas (click para desactivar)' : 'Skins clásicas activadas (click para activar modernas)';
+});
 if(exitPauseBtn) exitPauseBtn.addEventListener('click', ()=>{ playUiBackSound(); requestEscapeToMenu(); });
 
 ['fullscreenchange','webkitfullscreenchange','msfullscreenchange'].forEach(evt=>{
@@ -4258,6 +4539,7 @@ if(exitPauseBtn) exitPauseBtn.addEventListener('click', ()=>{ playUiBackSound();
 addEventListener('resize', ()=>{
   resizeCanvas();
   positionTouchOverlay();
+  syncUiState(); // Reposicionar el botón de toggle de skins cuando la ventana cambia tamaño
 });
 
 saveProgress(progress);
@@ -5767,76 +6049,97 @@ function buildSkinLibrary(){
   const library = {};
   const pool = Array.from(new Set([...BASE_ROSTER, 'rock', 'mystery']));
   for(const id of pool){
-    library[id] = createSkinProfile(id);
+    const profile = createSkinProfile(id);
+    // Aplicar hitboxScales si existe
+    if(hitboxScales[id]){
+      profile.hitboxScale = (profile.hitboxScale || CONFIG.PLAYER_HITBOX_SCALE) * hitboxScales[id];
+    }
+    library[id] = profile;
   }
 
   library.violin = createSkinProfile('violin', {
     abilityId: 'violinDash'
   });
+  if(hitboxScales.violin) library.violin.hitboxScale = (library.violin.hitboxScale || CONFIG.PLAYER_HITBOX_SCALE) * hitboxScales.violin;
 
   library.dj = createSkinProfile('dj', {
     abilityId: 'djTempo'
   });
+  if(hitboxScales.dj) library.dj.hitboxScale = (library.dj.hitboxScale || CONFIG.PLAYER_HITBOX_SCALE) * hitboxScales.dj;
 
   library.piano = createSkinProfile('piano', {
     abilityId: 'pianoStretch'
   });
+  if(hitboxScales.piano) library.piano.hitboxScale = (library.piano.hitboxScale || CONFIG.PLAYER_HITBOX_SCALE) * hitboxScales.piano;
 
   library.queen = createSkinProfile('queen', {
     abilityId: 'queenMajesty'
   });
+  if(hitboxScales.queen) library.queen.hitboxScale = (library.queen.hitboxScale || CONFIG.PLAYER_HITBOX_SCALE) * hitboxScales.queen;
 
   library.flor = createSkinProfile('flor', {
     abilityId: 'florPulse'
   });
+  if(hitboxScales.flor) library.flor.hitboxScale = (library.flor.hitboxScale || CONFIG.PLAYER_HITBOX_SCALE) * hitboxScales.flor;
 
   library.fire = createSkinProfile('fire', {
     abilityId: 'fireIgnition'
   });
+  if(hitboxScales.fire) library.fire.hitboxScale = (library.fire.hitboxScale || CONFIG.PLAYER_HITBOX_SCALE) * hitboxScales.fire;
 
   library.metal = createSkinProfile('metal', {
     abilityId: 'metalSpike'
   });
+  if(hitboxScales.metal) library.metal.hitboxScale = (library.metal.hitboxScale || CONFIG.PLAYER_HITBOX_SCALE) * hitboxScales.metal;
 
   library.ghost = createSkinProfile('ghost', {
     abilityId: 'ghostWall'
   });
+  if(hitboxScales.ghost) library.ghost.hitboxScale = (library.ghost.hitboxScale || CONFIG.PLAYER_HITBOX_SCALE) * hitboxScales.ghost;
 
   library.theremin = createSkinProfile('theremin', {
     abilityId: 'thereminPulse'
   });
+  if(hitboxScales.theremin) library.theremin.hitboxScale = (library.theremin.hitboxScale || CONFIG.PLAYER_HITBOX_SCALE) * hitboxScales.theremin;
 
   library.hydra = createSkinProfile('hydra', {
     abilityId: 'hydraEcho'
   });
+  if(hitboxScales.hydra) library.hydra.hitboxScale = (library.hydra.hitboxScale || CONFIG.PLAYER_HITBOX_SCALE) * hitboxScales.hydra;
 
   library.director = createSkinProfile('director', {
     abilityId: 'directorDouble'
   });
+  if(hitboxScales.director) library.director.hitboxScale = (library.director.hitboxScale || CONFIG.PLAYER_HITBOX_SCALE) * hitboxScales.director;
 
   library.drum = createSkinProfile('drum', {
     abilityId: 'drumDetonate'
   });
+  if(hitboxScales.drum) library.drum.hitboxScale = (library.drum.hitboxScale || CONFIG.PLAYER_HITBOX_SCALE) * hitboxScales.drum;
 
   library.cello = createSkinProfile('cello', {
     abilityId: 'celloFortissimo'
   });
+  if(hitboxScales.cello) library.cello.hitboxScale = (library.cello.hitboxScale || CONFIG.PLAYER_HITBOX_SCALE) * hitboxScales.cello;
 
   library.harp = createSkinProfile('harp', {
     abilityId: 'harpAria'
   });
+  if(hitboxScales.harp) library.harp.hitboxScale = (library.harp.hitboxScale || CONFIG.PLAYER_HITBOX_SCALE) * hitboxScales.harp;
 
   library.mystery = createSkinProfile('mystery', {
     abilityId: 'mysteryCipher'
   });
+  if(hitboxScales.mystery) library.mystery.hitboxScale = (library.mystery.hitboxScale || CONFIG.PLAYER_HITBOX_SCALE) * hitboxScales.mystery;
 
-  const rockAsset = getBossAssets('rock') || {};
+  const rockAsset = SKIN_ASSETS.rock || {};
   library.rock = createSkinProfile('rock', {
     label: 'Rock',
-    radius: CONFIG.PLAYER_RADIUS * (rockAsset.playableScale || 1),
-    hitboxScale: rockAsset.playableHitboxScale || CONFIG.PLAYER_HITBOX_SCALE,
+    radius: CONFIG.PLAYER_RADIUS * (rockAsset.spriteScale || 1.12),
+    hitboxScale: 1.05,
     abilityId: 'rockMeteorRain'
   });
+  if(hitboxScales.rock) library.rock.hitboxScale = (library.rock.hitboxScale || CONFIG.PLAYER_HITBOX_SCALE) * hitboxScales.rock;
 
   return library;
 }
@@ -6024,7 +6327,16 @@ function buildFatalityLibrary(){
         ctx.save();
         ctx.translate(mine.x, mine.y);
         const pulse = 1 + 0.08*Math.sin((performance.now()/180) + mine.x*0.02);
-        drawDrumMineSprite(ctx, (mine.radius || 14) * pulse, { spikeLength: (mine.radius || 14) * 0.6 });
+        // Usar la skin personalizada si existe
+        drawDrumMineSprite(ctx, (mine.radius || 14) * pulse, {
+          spikeLength: (mine.radius || 14) * 0.6,
+          // Si hay imagen, pasar los offsets y escala
+          bodyColor: SKIN_ASSETS.drumMine?.spriteUrl ? undefined : undefined,
+          coreColor: SKIN_ASSETS.drumMine?.spriteUrl ? undefined : undefined,
+          spriteScale: SKIN_ASSETS.drumMine?.spriteScale,
+          spriteOffsetX: SKIN_ASSETS.drumMine?.spriteOffsetX,
+          spriteOffsetY: SKIN_ASSETS.drumMine?.spriteOffsetY
+        });
         ctx.restore();
       }
       ctx.restore();
@@ -6951,6 +7263,10 @@ function applySkinProfile(player, skinId){
   const abilityState = createAbilityState(profile.abilityId, profile.abilitySettings);
   const abilityDef = abilityState.def;
 
+  player.charProgressStats = getCharStatsSnapshot(skinId);
+  player.charAchievementData = getCharAchievementData(player.charProgressStats);
+  player.darkTierUnlocked = isDarkTierUnlocked(player.charAchievementData);
+
   player.skin = skinId;
   player.profile = profile;
   player.baseRadius = profile.radius;
@@ -6974,7 +7290,9 @@ function applySkinProfile(player, skinId){
     ...(profile.stats || {})
   };
   player.scale = { radius: 1, hitbox: 1, hitboxX: 1, hitboxY: 1, visualX: 1, visualY: 1 };
-  player.visualScale = { x: 1, y: 1 };
+  // Aplicar escala visual por defecto del personaje
+  const defaultVisualScale = defaultSkinScales[skinId] ?? 1.0;
+  player.visualScale = { x: defaultVisualScale, y: defaultVisualScale };
   const baseStamina = { max: 100, regen: 24, start: 100 };
   const abilityStamina = abilityDef.staminaProfile || {};
   const profileStamina = profile.stamina || {};
@@ -7156,6 +7474,10 @@ function activateCelloPower(player, ability){
   const scale = ability?.def?.scaleMultiplier || 1.5;
   const powerMult = ability?.def?.powerMultiplier || 2;
   player.status = player.status || {};
+  // Guardar la escala visual original antes de aplicar la del poder
+  if(!player.status.originalVisualScale){
+    player.status.originalVisualScale = { ...player.visualScale };
+  }
   player.status.celloPower = { mult: powerMult, scale };
   player.skinState = 'fortissimo';
   applyScaleModifier(player, {
@@ -7170,8 +7492,10 @@ function activateCelloPower(player, ability){
 
 function deactivateCelloPower(player){
   if(!player) return;
+  const originalVisualScale = player.status?.originalVisualScale || { x: defaultSkinScales[player.skin] || 1.0, y: defaultSkinScales[player.skin] || 1.0 };
   if(player.status){
     delete player.status.celloPower;
+    delete player.status.originalVisualScale;
   }
   player.skinState = 'normal';
   applyScaleModifier(player, {
@@ -7179,8 +7503,8 @@ function deactivateCelloPower(player){
     hitbox: 1,
     hitboxX: 1,
     hitboxY: 1,
-    visualX: 1,
-    visualY: 1
+    visualX: originalVisualScale.x,
+    visualY: originalVisualScale.y
   });
 }
 
@@ -7505,6 +7829,7 @@ function spawnDirectorClone(player){
     ownerSide: player.side,
     side: player.side,
     isClone: true,
+    forceClassicSkin: true, // Fuerza el uso de la versión vectorial, no la foto
     vx: 0,
     vy: 0,
     expires: performance.now() + 4000,
@@ -7597,7 +7922,7 @@ function drawDirectorClones(){
     ctx.arc(0, 0, clone.r * 1.1, 0, TAU);
     ctx.fill();
     ctx.shadowBlur = 0;
-    drawSkin(ctx, clone.skin || 'director', { r: clone.r });
+    drawSkin(ctx, clone.skin || 'director', { r: clone.r, forceClassicSkin: clone.forceClassicSkin });
     ctx.restore();
   }
   ctx.restore();
@@ -7763,6 +8088,9 @@ function stopMysteryMimic(player, ability){
   runtime.mimicState = null;
   runtime.activeMimicId = null;
   runtime.activeCategory = null;
+  // Restaurar la escala visual original de Mystery
+  const originalVisualScale = defaultSkinScales[player.skin] || 1.0;
+  player.visualScale = { x: originalVisualScale, y: originalVisualScale };
 }
 
 function updateFlorBursts(){
@@ -7936,11 +8264,153 @@ function concludeAbility(player){
   ability.cooldownMs = (cooldownOverride !== null) ? cooldownOverride : ability.def.cooldown;
 }
 
+function resolveSkinPhotoCandidates(baseSkin, b){
+  const player = b?.player;
+  const stats = player?.charProgressStats || (baseSkin ? getCharStatsSnapshot(baseSkin) : null);
+  const achData = player?.charAchievementData || (stats ? getCharAchievementData(stats) : null);
+  const darkUnlocked = isDarkTierUnlocked(achData || stats);
+  const normalAsset = (typeof SKIN_ASSETS !== 'undefined' && SKIN_ASSETS[baseSkin]) ? SKIN_ASSETS[baseSkin] : {};
+  const darkAssetRaw = darkUnlocked ? (SKIN_DARK_ASSETS?.[baseSkin] || null) : null;
+  const darkAsset = (darkAssetRaw && darkAssetRaw.spriteUrl) ? darkAssetRaw : null;
+
+  const baseCandidates = [];
+  if(darkAsset){
+    baseCandidates.push({ key:`${baseSkin}_dark`, asset: darkAsset });
+  }
+  baseCandidates.push({ key: baseSkin, asset: normalAsset });
+
+  const wantsStretch = player?.skinState === 'stretched';
+  const stretchedCandidates = [];
+  if(wantsStretch){
+    if(darkAsset?.stretchedSpriteUrl){
+      stretchedCandidates.push({ key:`${baseSkin}_dark_stretched`, asset: darkAsset, stretched:true });
+    }
+    if(normalAsset.stretchedSpriteUrl){
+      stretchedCandidates.push({ key:`${baseSkin}_stretched`, asset: normalAsset, stretched:true });
+    }
+  }
+
+  return { baseCandidates, stretchedCandidates, wantsStretch };
+}
+
 function drawSkin(ctx, skin, b){
   ctx.save();
   const TAU = Math.PI * 2;
   const R = b.r;
   const t = now();
+
+  // Si forceClassicSkin está activo (ej: clones), saltar directamente al fallback vectorial
+  const skipModernSkins = b.forceClassicSkin === true;
+
+  const skinPhotos = resolveSkinPhotoCandidates(skin, b);
+
+  // Intentar dibujar foto si está cargada exitosamente (soporta variante "stretched" con offsets X e Y)
+  // Solo si modernSkinsEnabled es true Y no hay forceClassicSkin
+  if (modernSkinsEnabled && !skipModernSkins) {
+    try{
+      const candidates = [];
+      if(skinPhotos.wantsStretch && skinPhotos.stretchedCandidates.length){
+        candidates.push(...skinPhotos.stretchedCandidates);
+      }
+      candidates.push(...skinPhotos.baseCandidates);
+
+      let chosen = null;
+      for(const cand of candidates){
+        const photo = SKIN_PHOTOS[cand.key];
+        if(photo && photo.loaded && !photo.error && photo.img){
+          chosen = { ...cand, photo };
+          break;
+        }
+      }
+
+      if (chosen){
+        const baseAsset = chosen.asset || {};
+        const isStretchedVariant = !!chosen.stretched;
+        const scale = isStretchedVariant ? (typeof baseAsset.stretchedSpriteScale === 'number' ? baseAsset.stretchedSpriteScale : (typeof baseAsset.spriteScale === 'number' ? baseAsset.spriteScale : 1.0)) : (typeof baseAsset.spriteScale === 'number' ? baseAsset.spriteScale : 1.0);
+        const widthMul = isStretchedVariant
+          ? (typeof baseAsset.stretchedSpriteWidth === 'number' ? baseAsset.stretchedSpriteWidth : (typeof baseAsset.spriteWidth === 'number' ? baseAsset.spriteWidth : 1.0))
+          : (typeof baseAsset.spriteWidth === 'number' ? baseAsset.spriteWidth : 1.0);
+        const offsetX = isStretchedVariant ? (typeof baseAsset.stretchedSpriteOffsetX === 'number' ? baseAsset.stretchedSpriteOffsetX : (typeof baseAsset.spriteOffsetX === 'number' ? baseAsset.spriteOffsetX : 0)) : (typeof baseAsset.spriteOffsetX === 'number' ? baseAsset.spriteOffsetX : 0);
+        const offsetY = isStretchedVariant ? (typeof baseAsset.stretchedSpriteOffsetY === 'number' ? baseAsset.stretchedSpriteOffsetY : (typeof baseAsset.spriteOffsetY === 'number' ? baseAsset.spriteOffsetY : 0)) : (typeof baseAsset.spriteOffsetY === 'number' ? baseAsset.spriteOffsetY : 0);
+        const w = R * 2 * scale * widthMul;
+        const h = R * 2 * scale;
+        // Si es la skin de metal, girar igual que la versión vectorial
+        if (skin === 'metal') {
+          ctx.rotate((t/1000) * 1.6);
+        }
+        // Si es theremin con spriteSpinSpeed, agregar rotación y glow pulsante
+        if (skin === 'theremin' && typeof baseAsset.spriteSpinSpeed === 'number') {
+          // Glow radial pulsante celeste con tamaño dinámico
+          const pulse = 0.65 + 0.25 * Math.sin(t / 600);
+          const glowSize = 0.75 + 0.3 * Math.sin(t / 600); // Glow varía entre 0.45 y 1.05 (3/4 del máximo original)
+          const outerRadius = R * 1.1 * glowSize;
+          const gGlow = ctx.createRadialGradient(0, 0, R*0.8, 0, 0, outerRadius);
+          gGlow.addColorStop(0, `rgba(140, 220, 255, ${0.55 * pulse})`);
+          gGlow.addColorStop(1, `rgba(140, 220, 255, 0.18)`);
+          ctx.fillStyle = gGlow;
+          ctx.beginPath();
+          ctx.arc(0, 0, outerRadius, 0, Math.PI * 2);
+          ctx.fill();
+          // Rotación hacia el otro lado (negativa) con velocidad que oscila
+          const speedOscillation = 0.8 + 0.4 * Math.sin(t / 1200); // Velocidad varía entre 0.4 y 1.2
+          ctx.rotate(-(t/1000) * baseAsset.spriteSpinSpeed * speedOscillation);
+        }
+        // Centrar la imagen en el origen y aplicar offsets horizontal y vertical opcionales
+        ctx.drawImage(chosen.photo.img, -w/2 + offsetX, -h/2 + offsetY, w, h);
+        
+        // Si es DJ, agregar ondas de audio encima de la imagen
+        if (skin === 'dj') {
+          // Ondas de audio cyan pequeñas sobre la pantalla
+          ctx.fillStyle = '#12d1ff';
+          const waveScale = 0.25; // Escala de las ondas (35% del tamaño original)
+          const waveSpacing = 2.8; // Espaciado entre barras
+          const centerX = R*0 ; // Posición X de las ondas (ajustable)
+          const centerY = 0; // Posición Y de las ondas (ajustable)
+          const maxWaveHeight = 5; // Altura máxima de las ondas (ajustable)
+          
+          for(let i = -4; i <= 4; i++){
+            const barHeight = (Math.sin((t/200) + i) * 0.5 + 0.5) * maxWaveHeight + 4.5;
+            const x = centerX + i * waveSpacing;
+            const barWidth = 2.25; // Ancho de cada barra (ajustable)
+            ctx.fillRect(x - barWidth/2, centerY - barHeight/2, barWidth, barHeight);
+          }
+        }
+        
+        // Si es director, agregar glow morado pulsante y borde blanco brillante en forma de estrella
+        if (skin === 'director') {
+          // Glow morado pulsante por detrás
+          const auraGrad = ctx.createRadialGradient(0, 0, R*0.8, 0, 0, R*1.3);
+          auraGrad.addColorStop(0, 'rgba(199,182,255,0.25)');
+          auraGrad.addColorStop(1, 'rgba(199,182,255,0)');
+          ctx.fillStyle = auraGrad;
+          ctx.beginPath();
+          ctx.arc(0, 0, R*1.6, 0, TAU);
+          ctx.fill();
+          
+          // Efecto de luz que rota alrededor de la imagen - solo si no hay clones activos
+          const hasActiveClones = directorClones && directorClones.length > 0;
+          if (!hasActiveClones) {
+            const rotationAngle = (t / 3000) * TAU; // Rota una vuelta cada 3 segundos
+            const lightX = Math.cos(rotationAngle) * R * 1.1;
+            const lightY = Math.sin(rotationAngle) * R * 1.1;
+            const lightGrad = ctx.createRadialGradient(lightX, lightY, 0, lightX, lightY, R * 0.8);
+            lightGrad.addColorStop(0, 'rgba(255,255,255,0.6)');
+            lightGrad.addColorStop(0.5, 'rgba(199,182,255,0.3)');
+            lightGrad.addColorStop(1, 'rgba(199,182,255,0)');
+            ctx.fillStyle = lightGrad;
+            ctx.beginPath();
+            ctx.arc(lightX, lightY, R * 0.8, 0, TAU);
+            ctx.fill();
+          }
+        }
+        
+        ctx.restore();
+        return;
+      }
+    }catch(e){
+      // Error al dibujar, continuar con fallback
+    }
+  }
 
   switch(skin){
 
@@ -8395,36 +8865,19 @@ case 'ghost': {
 
   // Transparencia global pulsante (fantasmal)
   const pulse = 0.05 + 0.85 * (0.5 + 0.5 * Math.sin(now() / 4000)); 
-  ctx.globalAlpha = pulse;
 
   // --- Tubos del fondo (rojos, altos, entre medio) ---
   for(let i=0;i<4;i++){
     const hFactor = 1.6 + 0.3*Math.sin((i*1.1)+now()/1500); 
-    const w = b.r*0.25;
-    const h = b.r*1.8*hFactor;
-
-    const grad = ctx.createLinearGradient(0,-h,0,h);
-    grad.addColorStop(0,'rgba(255,100,100,0.6)');
-    grad.addColorStop(1,'rgba(120,40,40,0.2)');
-
-    ctx.fillStyle = grad;
-    // un poco más centrados que los tubos frontales
-    ctx.fillRect(-b.r*0.5 + i*(b.r*0.33), -h, w, h);
+    const xPos = -b.r*0.5 + i*(b.r*0.33);
+    drawGhostTubeRed(ctx, xPos, 0, b.r, hFactor, pulse, b);
   }
 
-  // --- Tubos del frente (azules fantasmas) ---
+  // --- Tubos del frente (azules fantasmas/teclas grises) ---
   for(let i=0;i<5;i++){
     const hFactor = 1.3 + 0.4*Math.sin((i*1.2)+now()/1200); 
-    const w = b.r*0.28;
-    const h = b.r*1.4*hFactor;
-
-    const grad = ctx.createLinearGradient(0,-h,0,h);
-    grad.addColorStop(0,'rgba(200,220,255,0.9)');
-    grad.addColorStop(0.4,'rgba(150,170,255,0.5)');
-    grad.addColorStop(1,'rgba(120,140,200,0.2)');
-
-    ctx.fillStyle = grad;
-    ctx.fillRect(-b.r + i*(b.r*0.5), -h, w, h);
+    const xPos = -b.r + i*(b.r*0.5);
+    drawGhostKeyGray(ctx, xPos, 0, b.r, hFactor, pulse);
   }
 
   ctx.restore();
@@ -8707,20 +9160,43 @@ case 'flor': {
 
 case 'rock': {
   const R = b.r;
-  const key = `boss_${b.player?.skin || 'rock'}`;
-  const img = IMAGES[key];
   ctx.save();
-  if(img && img.complete){
-    ctx.drawImage(img, -R, -R, R*2, R*2);
-  } else {
-    ctx.fillStyle = '#8a7768';
-    ctx.beginPath();
-    ctx.arc(0,0,R,0,TAU);
-    ctx.fill();
-    ctx.strokeStyle = '#5b4638';
-    ctx.lineWidth = 3;
-    ctx.stroke();
+  
+  // Intentar usar foto modern skin (con variante dark si está desbloqueada)
+  if(modernSkinsEnabled && !skipModernSkins){
+    const rockPhotos = resolveSkinPhotoCandidates('rock', b);
+    const candidates = [...rockPhotos.baseCandidates];
+    
+    let chosen = null;
+    for(const cand of candidates){
+      const photo = SKIN_PHOTOS[cand.key];
+      if(photo && photo.loaded && !photo.error && photo.img){
+        chosen = { ...cand, photo };
+        break;
+      }
+    }
+    
+    if(chosen){
+      const asset = chosen.asset || {};
+      const scale = asset.spriteScale || 1.12;
+      const offsetX = asset.spriteOffsetX || 0;
+      const offsetY = asset.spriteOffsetY || 0;
+      const w = R * 2 * scale;
+      const h = R * 2 * scale;
+      ctx.drawImage(chosen.photo.img, -w/2 + offsetX, -h/2 + offsetY, w, h);
+      ctx.restore();
+      break;
+    }
   }
+  
+  // Fallback vectorial
+  ctx.fillStyle = '#8a7768';
+  ctx.beginPath();
+  ctx.arc(0,0,R,0,TAU);
+  ctx.fill();
+  ctx.strokeStyle = '#5b4638';
+  ctx.lineWidth = 3;
+  ctx.stroke();
   ctx.restore();
   break;
 }
@@ -9219,9 +9695,9 @@ function updateBossFight(dt){
 
 function triggerRockMeteorRain(owner){
   const assets = getBossAssets('rock') || {};
-  const r = (assets.meteorRadius || 44) * 0.85;
+  const r = (assets.meteorRadius || 44) * 0.8;
   const center = owner?.side === 'L' ? (W * 0.72) : (W * 0.28);
-  for(let i=0;i<3;i++){
+  for(let i=0;i<2;i++){
     setTimeout(()=>{
       if(gameState === STATE.GAMEOVER) return;
       spawnHazardProjectile({
@@ -12008,7 +12484,11 @@ function drawBall(){
   if(drumMine.attached){
     ctx.save();
     ctx.translate(r * 0.45, -r * 0.3);
-    drawDrumMineSprite(ctx, r * 0.23);
+    drawDrumMineSprite(ctx, r * 0.23, {
+      spriteScale: SKIN_ASSETS.drumMine?.spriteScale,
+      spriteOffsetX: SKIN_ASSETS.drumMine?.spriteOffsetX,
+      spriteOffsetY: SKIN_ASSETS.drumMine?.spriteOffsetY
+    });
     ctx.restore();
   }
   if(drumMine.pulse > 0){
@@ -12064,21 +12544,113 @@ function drawBall(){
 
 function drawDrumMineSprite(ctx, radius = 14, options = {}){
   ctx.save();
-  ctx.fillStyle = options.bodyColor || '#ff9b9b';
-  ctx.beginPath();
-  ctx.arc(0, 0, radius, 0, TAU);
-  ctx.fill();
-  ctx.fillStyle = options.coreColor || '#5a1010';
-  const spikeR = radius + (options.spikeLength ?? radius * 0.45);
-  const spikes = options.spikes ?? 6;
-  ctx.translate(0, 0);
-  for(let i=0;i<spikes;i++){
-    const a = i * TAU / spikes;
-    const size = options.spikeSize || 3;
-    ctx.fillRect(Math.cos(a)*spikeR - size/2, Math.sin(a)*spikeR - size/2, size, size);
+  const asset = SKIN_ASSETS.drumMine || {};
+  const photo = asset.spriteUrl ? SKIN_PHOTOS.drumMine : null;
+  const img = photo && photo.img ? photo.img : null;
+  if(img && photo.loaded && !photo.error && img.complete && img.naturalWidth > 0){
+    const scale = asset.spriteScale || 1.0;
+    const offsetX = asset.spriteOffsetX || 0;
+    const offsetY = asset.spriteOffsetY || 0;
+    ctx.drawImage(img, -radius * scale + offsetX, -radius * scale + offsetY, radius * 2 * scale, radius * 2 * scale);
+  }else{
+    ctx.fillStyle = options.bodyColor || '#ff9b9b';
+    ctx.beginPath();
+    ctx.arc(0, 0, radius, 0, TAU);
+    ctx.fill();
+    ctx.fillStyle = options.coreColor || '#5a1010';
+    const spikeR = radius + (options.spikeLength ?? radius * 0.45);
+    const spikes = options.spikes ?? 6;
+    ctx.translate(0, 0);
+    for(let i=0;i<spikes;i++){
+      const a = i * TAU / spikes;
+      const size = options.spikeSize || 3;
+      ctx.fillRect(Math.cos(a)*spikeR - size/2, Math.sin(a)*spikeR - size/2, size, size);
+    }
   }
   ctx.restore();
 }
+
+function drawGhostTubeRed(ctx, x, y, baseHeight, hFactor, opacity, b){
+  ctx.save();
+  
+  // Resolver variante dark si está desbloqueada
+  const player = b?.player;
+  const stats = player?.charProgressStats || (player?.skin ? getCharStatsSnapshot(player.skin) : null);
+  const darkUnlocked = stats ? isDarkTierUnlocked(stats) : false;
+  
+  let asset = SKIN_ASSETS.ghostTubeRed || {};
+  let photoKey = 'ghostTubeRed';
+  
+  if(darkUnlocked){
+    const darkAsset = SKIN_DARK_ASSETS.ghostTubeDark;
+    if(darkAsset && darkAsset.spriteUrl){
+      asset = darkAsset;
+      photoKey = 'ghostTubeDark';
+    }
+  }
+  
+  const photo = asset.spriteUrl ? SKIN_PHOTOS[photoKey] : null;
+  const img = photo && photo.img ? photo.img : null;
+  
+  const baseW = baseHeight * 0.25;
+  const h = baseHeight * 1.8 * hFactor;
+  
+  if(modernSkinsEnabled && img && photo.loaded && !photo.error && img.complete && img.naturalWidth > 0){
+    // Usar imagen: aplicar spriteWidth para ancho de imagen
+    const w = baseW * (asset.spriteWidth || 1.0);
+    const scale = asset.spriteScale || 1.0;
+    const offsetX = asset.spriteOffsetX || 0;
+    const offsetY = asset.spriteOffsetY || 0;
+    ctx.globalAlpha = opacity;
+    const finalW = w * scale;
+    const finalH = h * scale;
+    ctx.drawImage(img, x - finalW/2 + offsetX, y - finalH + offsetY, finalW, finalH);
+  }else{
+    // Fallback: dibujar tubo rojo original con ancho original (sin spriteWidth)
+    const w = baseW;
+    const grad = ctx.createLinearGradient(x, y-h, x, y);
+    grad.addColorStop(0, 'rgba(255,100,100,0.6)');
+    grad.addColorStop(1, 'rgba(120,40,40,0.2)');
+    ctx.fillStyle = grad;
+    ctx.globalAlpha = opacity;
+    ctx.fillRect(x - w/2, y - h, w, h);
+  }
+  ctx.restore();
+}
+
+function drawGhostKeyGray(ctx, x, y, baseHeight, hFactor, opacity){
+  ctx.save();
+  const asset = SKIN_ASSETS.ghostKeyGray || {};
+  const photo = asset.spriteUrl ? SKIN_PHOTOS.ghostKeyGray : null;
+  const img = photo && photo.img ? photo.img : null;
+  
+  const baseW = baseHeight * 0.28;
+  const h = baseHeight * 1.4 * hFactor;
+  
+  if(modernSkinsEnabled && img && photo.loaded && !photo.error && img.complete && img.naturalWidth > 0){
+    // Usar imagen: aplicar spriteWidth para ancho de imagen
+    const w = baseW * (asset.spriteWidth || 1.0);
+    const scale = asset.spriteScale || 1.0;
+    const offsetX = asset.spriteOffsetX || 0;
+    const offsetY = asset.spriteOffsetY || 0;
+    ctx.globalAlpha = opacity;
+    const finalW = w * scale;
+    const finalH = h * scale;
+    ctx.drawImage(img, x - finalW/2 + offsetX, y - finalH + offsetY, finalW, finalH);
+  }else{
+    // Fallback: dibujar tecla azul fantasmal original con ancho original (sin spriteWidth)
+    const w = baseW;
+    const grad = ctx.createLinearGradient(x, y-h, x, y);
+    grad.addColorStop(0, 'rgba(200,220,255,0.9)');
+    grad.addColorStop(0.4, 'rgba(150,170,255,0.5)');
+    grad.addColorStop(1, 'rgba(120,140,200,0.2)');
+    ctx.fillStyle = grad;
+    ctx.globalAlpha = opacity;
+    ctx.fillRect(x - w/2, y - h, w, h);
+  }
+  ctx.restore();
+}
+
 
 function drawMysteryBombSprite(ctx, radius = 14){
   ctx.save();
@@ -12619,6 +13191,20 @@ setScene(APP_SCENE.MENU);
 syncProfileUi();
 gameState = STATE.SELECT;
 resetRally(Math.random()<0.5?'L':'R');
+
+// === CARGAR FOTOS DE SKINS DESDE SKIN_ASSETS ===
+// Automáticamente carga las URLs definidas en SKIN_ASSETS
+// Si una URL está vacía, se salta. Si una foto falla, usa el dibujo original
+for (const [skinName, asset] of Object.entries(SKIN_ASSETS)) {
+  if (asset.spriteUrl) {
+    loadSkinPhoto(skinName, asset.spriteUrl);
+  }
+  // Cargar variante estirada si está definida
+  if (asset.stretchedSpriteUrl) {
+    loadSkinPhoto(`${skinName}_stretched`, asset.stretchedSpriteUrl);
+  }
+}
+
 loop();
 
 </script>
