@@ -559,6 +559,100 @@
   .ency-card.expanded .ency-details{display:block}
   .ency-body{grid-column:2/3;}
   .ency-details{grid-column:2/3;}
+  .ency-overlay{
+    position:fixed;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:radial-gradient(circle at 50% 20%,rgba(15,25,45,0.9),rgba(3,8,20,0.96));
+    pointer-events:auto;
+    z-index:20;
+  }
+  .ency-overlay.hidden{display:none;}
+  .ency-overlay-card{
+    background:#050915f0;
+    border:1px solid #21375c;
+    border-radius:16px;
+    box-shadow:0 24px 60px #000d,0 0 0 1px #0f2038;
+    padding:14px 16px 16px;
+    width:min(520px,96vw);
+    max-height:82vh;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .ency-overlay-header{
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  .ency-overlay-frame{
+    width:112px;
+    height:112px;
+    padding:8px;
+    box-sizing:border-box;
+    border-radius:14px;
+    background:#0c1422;
+    border:1px solid #1f365a;
+    box-shadow:0 0 0 1px #1f365a;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .ency-overlay-frame canvas{
+    width:96px;
+    height:96px;
+  }
+  .ency-overlay-title{
+    font:800 20px/1.2 'Barlow',system-ui;
+    color:#e9f4ff;
+  }
+  .ency-overlay-sub{
+    font:600 12px/1.3 'Barlow',system-ui;
+    color:#9dc6ff;
+    margin-top:2px;
+  }
+  .ency-overlay-actions{
+    margin-left:auto;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+  .ency-overlay-close{
+    background:#151f33;
+    border:1px solid #2a3f63;
+    color:#cfdcff;
+    border-radius:999px;
+    padding:4px 10px;
+    font:700 11px system-ui;
+    cursor:pointer;
+  }
+  .ency-overlay-fav{
+    background:linear-gradient(135deg,#1f7aec,#10b2ff);
+    border:none;
+    color:#fff;
+    border-radius:999px;
+    padding:6px 12px;
+    font:800 12px system-ui;
+    cursor:pointer;
+    box-shadow:0 8px 20px #0009;
+  }
+  .ency-overlay-fav.active{
+    background:linear-gradient(135deg,#12b886,#0fd6b1);
+  }
+  .ency-overlay-body{
+    font:500 13px/1.45 'Barlow',system-ui;
+    color:#cfd9ff;
+    margin-top:4px;
+  }
+  .ency-overlay-body p{margin:2px 0 4px;}
+  .ency-overlay-progress{
+    margin-top:8px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+  }
   .menu-footer{
     text-align:center;
     color:#8aa2c8;
@@ -898,6 +992,9 @@
       <button class="ui-btn low-profile" id="btnEncyBack">Volver</button>
     </div>
     <div class="ency-list" id="encyList"></div>
+    <div class="ency-overlay hidden" id="encyDetailOverlay">
+      <div class="ency-overlay-card" id="encyDetailCard"></div>
+    </div>
   </div>
 
 </div>
@@ -1101,7 +1198,7 @@ SFX.woosh.volume = 0.8;
 SFX.woosh2.volume = 0.8;
 SFX.ballhit.volume = 0.4;
 SFX.sandhit.volume = 1;
-SFX.pito.volume = 0.5;
+SFX.pito.volume = 0.3;
 SFX.chelohit.volume = 0.6;
 SFX.harpjump.volume = 0.8;
 SFX.pianonote.volume = 0.2;
@@ -1507,9 +1604,21 @@ const SKIN_ASSETS = {
   },
   fire: {
     spriteUrl: '', // Pon aquí la foto del fuego
-    spriteScale: 1.0,
+    spriteScale: 1.2,
     spriteOffsetX: 0,
-    spriteOffsetY: 0
+    spriteOffsetY: 0,
+    lightsUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Fire/FireLights.png?raw=true',
+    bodyUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Fire/FireBody.png?raw=true',
+    lightsDarkUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Fire/FireLightDark.png?raw=true',
+    bodyDarkUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Fire/FireBodyDark.png?raw=true',
+    // Configuración para versión DARK
+    darkLightsScale: 1.6,      // Escala de las luces dark (1.0 = tamaño normal)
+    darkBodyScale: 1.2,        // Escala del body dark (1.0 = tamaño normal)
+    darkLightsOffsetX: 0,      // Offset X de luces dark
+    darkLightsOffsetY: 0,      // Offset Y de luces dark
+    darkBodyOffsetX: 0,        // Offset X de body dark
+    darkBodyOffsetY: 0,        // Offset Y de body dark
+    darkHitboxScale: 1.25       // Hitbox más grande para dark (1.0 = normal)
   },
   drum: {
     spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Drumm/DrummSkin.png?raw=true', // Pon aquí la foto del tambor
@@ -1540,14 +1649,14 @@ const SKIN_ASSETS = {
     spriteScale: 1.0,
     spriteWidth: 2.5, // multiplicador para hacer el tubo más ancho directamente desde SKIN_ASSETS
     spriteOffsetX: 0,
-    spriteOffsetY: 0
+    spriteOffsetY: 23
   },
   ghostKeyGray: {
     spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Ghost/GhostKey.png?raw=true', // Pon aquí la imagen de la tecla gris (vertical, transparente)
     spriteScale: 1.0,
     spriteWidth: 5.0, // multiplicador para ajustar ancho de la tecla
     spriteOffsetX: 0,
-    spriteOffsetY: -2.5
+    spriteOffsetY: 22.5
   },
   theremin: {
     spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Theremin/ThereminSkin.png?raw=true', // Pon aquí la foto del theremin
@@ -1570,7 +1679,7 @@ const SKIN_ASSETS = {
   },
   flor: {
     spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Flor/FlorSkin.png?raw=true', // Pon aquí la foto de la flor
-    spriteScale: 1.2, // 1.2 * 1.1 = 1.32 (ensanchado por 1.1)
+    spriteScale: 1.15, // 1.2 * 1.1 = 1.32 (ensanchado por 1.1)
     spriteOffsetX: 0,
     spriteOffsetY: 0
   },
@@ -1591,11 +1700,12 @@ const SKIN_ASSETS = {
 // === URLS DE FOTOS PARA SKINS DARK ===
 // Pon aquí las versiones DARK por personaje (se usan solo si el jugador tiene nivel DARK)
 // IMPORTANTE: Las escalas se copian del skin base, pero puedes sobreescribirlas si la imagen dark tiene proporciones diferentes.
+// hitboxScale: escala de hitbox específica para la versión dark (opcional, si no se define usa la del skin base)
 const SKIN_DARK_ASSETS = {
-  violin: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Violin/ViolinSkinDark.png?raw=true', spriteScale: 1.5, spriteOffsetX: 0, spriteOffsetY: -10 },
+  violin: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Violin/ViolinSkinDark.png?raw=true', spriteScale: 1.8, spriteOffsetX: 0, spriteOffsetY: -20, hitboxScale: 1.35 },
   cello: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Cello/CelloSkinDark.png?raw=true', spriteScale: 1.5, spriteOffsetX: 5, spriteOffsetY: 0 },
-  piano: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Piano/PianoSkinDark.png?raw=true', spriteScale: 1.25, spriteOffsetX: 0, spriteOffsetY: 0, stretchedSpriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Piano/PianoLongSkinDark.png?raw=true', stretchedSpriteScale: 1.6, stretchedSpriteOffsetX: 0, stretchedSpriteOffsetY: 0 },
-  metal: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Metal/MetalSkinDark.png?raw=true', spriteScale: 1.3, spriteOffsetX: 0, spriteOffsetY: 0 },
+  piano: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Piano/PianoSkinDark.png?raw=true', spriteScale: 1.25, spriteOffsetX: 0, spriteOffsetY: 0, stretchedSpriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Piano/PianoLongSkinDark.png?raw=true', stretchedSpriteScale: 2.5, stretchedSpriteOffsetX: 0, stretchedSpriteOffsetY: 0 },
+  metal: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Metal/MetalSkinDark.png?raw=true', spriteScale: 1.5, spriteOffsetX: 0, spriteOffsetY: 0, hitboxScale: 1.2 },
   dj: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Dj/DjSkinDark.png?raw=true', spriteScale: 1.0, spriteOffsetX: 0, spriteOffsetY: 0 },
   queen: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Queen/QueenSkinDark.png?raw=true', spriteScale: 1.1, spriteOffsetX: 0, spriteOffsetY: 0 },
   fire: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Fire/FireSkinDark.png?raw=true', spriteScale: 1.0, spriteOffsetX: 0, spriteOffsetY: 0 },
@@ -1604,7 +1714,7 @@ const SKIN_DARK_ASSETS = {
   ghost: { spriteUrl: '', spriteScale: 1.0, spriteOffsetX: 0, spriteOffsetY: 0 },
   theremin: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Theremin/ThereminSkinDark.png?raw=true', spriteScale: 1.1, spriteSpinSpeed: 1.2, spriteOffsetX: 0, spriteOffsetY: 0 },
   harp: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Harp/HarpSkinDark.png?raw=true', spriteScale: 1.5, spriteWidth: 0.73, spriteOffsetX: 0, spriteOffsetY: 8 },
-  director: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Director/DirectorSkinDark.png?raw=true', spriteScale: 1.0, spriteOffsetX: 1.8, spriteOffsetY: -1 },
+  director: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Director/DirectorSkinDark.png?raw=true', spriteScale: 1.4, spriteOffsetX: 1.8, spriteOffsetY: -1, hitboxScale: 1.2 },
   flor: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Flor/FlorSkinDark.png?raw=true', spriteScale: 1.2, spriteOffsetX: 0, spriteOffsetY: 0 },
   mystery: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Mistery/MisterySkinDark.png?raw=true', spriteScale: 1.1, spriteOffsetX: 0, spriteOffsetY: 0 },
   rock: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Rock/RockSkinDark.png?raw=true', spriteScale: 1.12, spriteOffsetX: 0, spriteOffsetY: 0 },
@@ -1612,6 +1722,12 @@ const SKIN_DARK_ASSETS = {
     spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Ghost/GhostTubeDark.png?raw=true',
     spriteScale: 1.0,
     spriteWidth: 2.5,
+    spriteOffsetX: 0,
+    spriteOffsetY: 23
+  },
+  drumMineDark: {
+    spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Drumm/DrummMineDark.png?raw=true',
+    spriteScale: 3.2,
     spriteOffsetX: 0,
     spriteOffsetY: 0
   }
@@ -1659,10 +1775,10 @@ if(SKIN_ASSETS.ghostKeyGray?.spriteUrl){
 }
 // Cargar fotos DARK (se activan solo al desbloquear nivel DARK)
 for(const [skinName, asset] of Object.entries(SKIN_DARK_ASSETS)){
-  if(skinName === 'ghostTubeDark'){
-    // Caso especial: cargar directamente sin sufijo _dark
+  if(skinName === 'ghostTubeDark' || skinName === 'drumMineDark'){
+    // Casos especiales: cargar directamente sin sufijo _dark
     if(asset?.spriteUrl){
-      loadSkinPhoto('ghostTubeDark', asset.spriteUrl);
+      loadSkinPhoto(skinName, asset.spriteUrl);
     }
     continue;
   }
@@ -1680,6 +1796,19 @@ loadBackgroundImage('beachPhoto_weather', 'https://github.com/FranciscoAraya04/V
 loadBackgroundImage('skullflower', 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Captura%20de%20pantalla%202025-11-16%20154153-Photoroom.png?raw=true')
 // Fondo especial Rock
 loadBackgroundImage('rockStage', 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/images/RockBackgroundStage.png?raw=true');
+// Cargar imágenes Fire
+if(SKIN_ASSETS.fire?.lightsUrl){
+  loadSkinPhoto('fire_lights', SKIN_ASSETS.fire.lightsUrl);
+}
+if(SKIN_ASSETS.fire?.bodyUrl){
+  loadSkinPhoto('fire_body', SKIN_ASSETS.fire.bodyUrl);
+}
+if(SKIN_ASSETS.fire?.lightsDarkUrl && SKIN_ASSETS.fire.lightsDarkUrl.startsWith('http')){
+  loadSkinPhoto('fire_lights_dark', SKIN_ASSETS.fire.lightsDarkUrl);
+}
+if(SKIN_ASSETS.fire?.bodyDarkUrl && SKIN_ASSETS.fire.bodyDarkUrl.startsWith('http')){
+  loadSkinPhoto('fire_body_dark', SKIN_ASSETS.fire.bodyDarkUrl);
+}
 
 
 
@@ -1853,7 +1982,16 @@ const CHAR_DEFAULT_STATS = {
   arcadeFatalities: 0,
   arcadeBossRuns: 0,
   arcadeBossWins: 0,
-  arcadeBossRockWins: 0
+  arcadeBossRockWins: 0,
+  timePlayedMs: 0,
+  localMatches: 0,
+  arcadeBossRockNoMercyWins: 0,
+  arcadeBossRockSpeedWins: 0,
+  // Logros especiales por personaje / favorito
+  mysteryRolls: 0,            // veces que este personaje salió al elegir Mystery
+  favMysterySelf: 0,          // veces que Mystery salió como Mystery teniendo a este personaje de favorito
+  favTutorialDownload: 0,     // veces que se descargó el tutorial con este personaje de favorito
+  favManualFavSelect: 0       // veces que se marcó manualmente como favorito este personaje
 };
 
 function genUserId(){
@@ -2060,6 +2198,11 @@ function getSkinLabel(skin){
 
 function getFavoriteChar(){
   const perChar = progress?.stats?.perChar || {};
+  const manualSkin = progress?.user?.favoriteSkin;
+  if(manualSkin){
+    const stats = perChar[manualSkin] || CHAR_DEFAULT_STATS;
+    return { skin: manualSkin, stats };
+  }
   let best = null;
   for(const [skin, data] of Object.entries(perChar)){
     const d = data || {};
@@ -2117,10 +2260,11 @@ function getMaxAchievementLevel(){
 }
 
 function isDarkTierUnlocked(statsOrAch){
-  const level = (statsOrAch && typeof statsOrAch.level === 'number')
-    ? statsOrAch.level
-    : getCharAchievementData(statsOrAch || {}).level;
-  return level >= getMaxAchievementLevel();
+  const ach = (statsOrAch && typeof statsOrAch.level === 'number' && typeof statsOrAch.displayLevel === 'number')
+    ? statsOrAch
+    : getCharAchievementData(statsOrAch || {});
+  const displayLevel = typeof ach.displayLevel === 'number' ? ach.displayLevel : (ach.level || 0);
+  return displayLevel >= 11;
 }
 
 function getPlayerLevelColor(player){
@@ -2131,11 +2275,31 @@ function getPlayerLevelColor(player){
   return style?.glow || '#e9f4ff';
 }
 
+function getTierDisplayName(level){
+  switch(level){
+    case 1: return 'BRONCE';
+    case 2: return 'HIERRO';
+    case 3: return 'PLATA';
+    case 4: return 'ORO';
+    case 5: return 'PLATINO';
+    case 6: return 'DIAMANTE';
+    case 7: return 'ESMERALDA';
+    case 8: return 'RUBI';
+    case 9: return 'LAPIZ';
+    case 10: return 'SAFIRO';
+    case 11: return 'DARK';
+    default: return '';
+  }
+}
+
 function getCharAchievementData(stats){
   const s = stats || {};
   const botKills = s.botKillsTotal || 0;
-  const best20 = (typeof s.best20TimeMs === 'number') ? s.best20TimeMs : null;
+  const abilityUses = s.abilityUses || 0;
+  const points = s.points || 0;
+  const matches = s.matches || 0;
   const lan = s.lanMatches || 0;
+  const localMatches = s.localMatches != null ? s.localMatches : Math.max(0, matches - lan);
   const fatals = s.fatalities || 0;
   const fouls = s.fouls || 0;
   const domMax = s.arcadeDominadasMax || 0;
@@ -2143,58 +2307,129 @@ function getCharAchievementData(stats){
   const targetMax = s.arcadeTargetHitsMax || 0;
   const targetTotal = s.arcadeTargetTotal || 0;
   const targetStreak = s.arcadeTargetStreakMax || 0;
-  const rockWins = s.arcadeBossRockWins || s.arcadeBossWins || 0;
+  const rockWins = s.arcadeBossRockWins || 0;
+  const rockNoMercyWins = s.arcadeBossRockNoMercyWins || 0;
+  const rockSpeedWins = s.arcadeBossRockSpeedWins || 0;
+  const timePlayedMs = s.timePlayedMs || 0;
+  const best20 = (typeof s.best20TimeMs === 'number') ? s.best20TimeMs : null;
+  const mysteryRolls = s.mysteryRolls || 0;
+  const favMysterySelf = s.favMysterySelf || 0;
+  const favTutorialDownload = s.favTutorialDownload || 0;
+  const favManualFavSelect = s.favManualFavSelect || 0;
 
   const lines = [];
   const pushLine = (text, done)=>{ lines.push({ text, done }); };
   let met = 0;
-  const botMilestones = [50,100,500,1000];
-  met += botMilestones.filter(m=>botKills >= m).length;
-  pushLine(`Bots: ${botKills} / 50 / 100 / 500 / 1000`, botKills >= 1000);
 
-  const best20done = best20 !== null && best20 <= 120000;
-  if(best20done) met++;
-  pushLine(`20 bots <2: ${best20 !== null ? formatMsClock(best20) : '--'}`, best20done);
+  const addMilestones = (value, milestones, labelFn)=>{
+    for(const m of milestones){
+      const done = value >= m;
+      if(done) met++;
+      pushLine(labelFn(m, value, done), done);
+    }
+  };
 
-  const landone = lan >= 5;
-  if(landone) met++;
-  pushLine(`LAN: ${lan}/5`, landone);
+  // Bots totales: 50, 100, 200, 500, 1000
+  // Incluimos un hito pequeño de 10 bots
+  addMilestones(botKills, [10,50,100,200,500,1000], (m, val)=>`Bots ${m}: ${val}/${m}`);
 
-  const fataldone = fatals >= 10;
-  if(fataldone) met++;
-  pushLine(`Fatalities: ${fatals}/10`, fataldone);
+  // Habilidad usada: 5, 15, 50
+  addMilestones(abilityUses, [5,15,50], (m, val)=>`Hab ${m}: ${val}/${m}`);
 
-  const foulsDone = fouls >= 50;
-  if(foulsDone) met++;
-  pushLine(`Fouls: ${fouls}/50`, foulsDone);
+  // Puntos totales: 100, 250, 600, 1500
+  addMilestones(points, [100,250,600,1500], (m, val)=>`Pts ${m}: ${val}/${m}`);
 
-  const domMaxDone = domMax >= 50;
-  if(domMaxDone) met++;
-  pushLine(`Dominadas seguidas: ${domMax}/50`, domMaxDone);
+  // Fouls: 5, 15, 40
+  addMilestones(fouls, [5,15,40], (m, val)=>`Fouls ${m}: ${val}/${m}`);
 
-  const domTotalDone = domTotal >= 500;
-  if(domTotalDone) met++;
-  pushLine(`Dominadas total: ${domTotal}/500`, domTotalDone);
+  // Dominadas seguidas: 3, 10, 30, 50
+  addMilestones(domMax, [3,10,30,50], (m, val)=>`Dom seg ${m}: ${val}/${m}`);
 
-  const targetTotalDone = targetTotal >= 100;
-  if(targetTotalDone) met++;
-  pushLine(`Targets: ${targetTotal}/100`, targetTotalDone);
+  // Dominadas totales: 100, 250, 500
+  addMilestones(domTotal, [100,250,500], (m, val)=>`Dom total ${m}: ${val}/${m}`);
 
-  const targetStreakDone = targetStreak >= 10;
-  if(targetStreakDone) met++;
-  pushLine(`Targets seguidos: ${targetStreak}/10`, targetStreakDone);
+  // Targets totales: 1, 15, 30, 50
+  addMilestones(targetTotal, [1,15,30,50], (m, val)=>`Targets ${m}: ${val}/${m}`);
 
+  // Targets seguidos: 3, 6, 10
+  addMilestones(targetStreak, [3,6,10], (m, val)=>`Targets seg ${m}: ${val}/${m}`);
+
+  // Boss Rock: win, No Mercy, Speed Kill
   const rockDone = rockWins >= 1;
   if(rockDone) met++;
   pushLine(`Rock Slayer: ${rockWins}/1`, rockDone);
 
-  const level = Math.min(met, ACH_COLORS.length - 1);
+  const rockNoMercyDone = rockNoMercyWins >= 1;
+  if(rockNoMercyDone) met++;
+  pushLine(`No Mercy Rock (>7 vida): ${rockNoMercyWins}/1`, rockNoMercyDone);
+
+  const rockSpeedDone = rockSpeedWins >= 1;
+  if(rockSpeedDone) met++;
+  pushLine(`Speed Kill Rock (<3:00): ${rockSpeedWins}/1`, rockSpeedDone);
+
+  // Fatalities: 1, 5, 10
+  addMilestones(fatals, [1,5,10], (m, val)=>`Fatalities ${m}: ${val}/${m}`);
+
+  // Partidas LAN: 1, 5, 15
+  addMilestones(lan, [1,5,15], (m, val)=>`LAN ${m}: ${val}/${m}`);
+
+  // Partidas locales (PvP o vs bot): 1, 10, 20
+  addMilestones(localMatches, [1,10,20], (m, val)=>`Local ${m}: ${val}/${m}`);
+
+  // Tiempo jugado con el personaje: 10, 30, 60 minutos
+  const minutesPlayed = Math.floor(timePlayedMs / 60000);
+  addMilestones(minutesPlayed, [10,30,60], (m, val)=>`Tiempo ${m}m: ${val}m/${m}m`);
+
+  // Mystery especial por personaje: salir alguna vez al elegir Mystery
+  const mysteryDone = mysteryRolls >= 1;
+  if(mysteryDone) met++;
+  pushLine(`?: ${mysteryRolls}/1`, mysteryDone);
+
+  // Jugar todos los modos principales con este personaje (Local, LAN, Arcade)
+  let modesCount = 0;
+  if(localMatches > 0) modesCount++;
+  if(lan > 0) modesCount++;
+  if(s.arcadeRuns > 0) modesCount++;
+  const allModesDone = modesCount >= 3;
+  if(allModesDone) met++;
+  pushLine(`Modos?: ${modesCount}/3`, allModesDone);
+
+  // Logros generales asignados al favorito
+  const favMysteryDone = favMysterySelf >= 1;
+  if(favMysteryDone) met++;
+  pushLine(`¿?: ${favMysterySelf}/1`, favMysteryDone);
+
+  const favTutDone = favTutorialDownload >= 1;
+  if(favTutDone) met++;
+  pushLine(`Descargar: ${favTutorialDownload}/1`, favTutDone);
+
+  const favManualDone = favManualFavSelect >= 1;
+  if(favManualDone) met++;
+  pushLine(`Fav: ${favManualFavSelect}/1`, favManualDone);
+
+  // Extra informativo: mejor tiempo 20 bots (<2:00), no cuenta para el tier
+  const best20done = best20 !== null && best20 <= 120000;
+  pushLine(`20 bots <2: ${best20 !== null ? formatMsClock(best20) : '--'}`, best20done);
+
+  // Mapear logros cumplidos (met) a nivel visible 1..11 (DARK a partir de 33/44)
+  const thresholds = [3,6,9,12,16,20,24,28,30,32,33];
+  let displayLevel = 0;
+  for(let i=0;i<thresholds.length;i++){
+    if(met >= thresholds[i]) displayLevel = i+1;
+  }
+  const maxColorLevel = ACH_COLORS.length - 1;
+  const colorLevel = Math.min(displayLevel, maxColorLevel);
+
   return {
-    level,
+    level: colorLevel,
+    displayLevel,
     lines,
     botKills,
     best20,
+    abilityUses,
+    points,
     lan,
+    localMatches,
     fatals,
     fouls,
     met
@@ -2259,6 +2494,13 @@ function applyPostGameStats(winnerKey, elapsedMs=0, context = {}){
       addCharStat(skin, 'fatalities', fatalityCount);
     }
   }
+  // Tiempo jugado por personaje (ganador y perdedor)
+  if(elapsedMs > 0){
+    const winnerSkinTime = (winnerKey === 'p1') ? p1?.skin : p2?.skin;
+    const loserSkinTime = (winnerKey === 'p1') ? p2?.skin : p1?.skin;
+    if(winnerSkinTime) addCharStat(winnerSkinTime, 'timePlayedMs', elapsedMs);
+    if(loserSkinTime) addCharStat(loserSkinTime, 'timePlayedMs', elapsedMs);
+  }
   evaluateAchievements({
     botKillsRun: botRun,
     elapsedMs,
@@ -2311,6 +2553,9 @@ function applyArcadeProgress(result = {}){
   if(skin){
     const entry = ensureCharStats(skin);
     if(entry){
+      if(typeof result.elapsedMs === 'number' && result.elapsedMs > 0){
+        entry.timePlayedMs = (entry.timePlayedMs || 0) + result.elapsedMs;
+      }
       entry.arcadeRuns = (entry.arcadeRuns || 0) + 1;
       if(result.mode === ARCADE_MODES.DOMINADAS){
         entry.arcadeDominadasMax = Math.max(entry.arcadeDominadasMax || 0, result.score || 0);
@@ -2327,6 +2572,13 @@ function applyArcadeProgress(result = {}){
           entry.arcadeBossWins = (entry.arcadeBossWins || 0) + 1;
           if(result.bossId === 'rock'){
             entry.arcadeBossRockWins = (entry.arcadeBossRockWins || 0) + 1;
+            const lives = typeof result.playerLives === 'number' ? result.playerLives : null;
+            if(lives !== null && lives > 7){
+              entry.arcadeBossRockNoMercyWins = (entry.arcadeBossRockNoMercyWins || 0) + 1;
+            }
+            if(typeof result.elapsedMs === 'number' && result.elapsedMs > 0 && result.elapsedMs < 180000){
+              entry.arcadeBossRockSpeedWins = (entry.arcadeBossRockSpeedWins || 0) + 1;
+            }
           }
         }
       }
@@ -2435,6 +2687,8 @@ const uiRefs = {
   btnEncyBack: document.getElementById('btnEncyBack'),
   encyPanel: document.getElementById('encyPanel'),
   encyList: document.getElementById('encyList'),
+  encyDetailOverlay: document.getElementById('encyDetailOverlay'),
+  encyDetailCard: document.getElementById('encyDetailCard'),
   tutorialDownloadUrl: document.getElementById('tutorialDownloadUrl'),
   btnTutorialDownload: document.getElementById('btnTutorialDownload'),
   btnTutorialCopy: document.getElementById('btnTutorialCopy'),
@@ -3199,6 +3453,16 @@ function recordCharacterOutcome(winnerKey, options = {}){
     addCharStat(loserSkin, 'matches', 1);
     if(loserPoints) addCharStat(loserSkin, 'points', loserPoints);
   }
+  // Partidas locales (PvP o vs bot) por personaje
+  const isLocalMode = matchMode !== MATCH_MODE.LAN && matchMode !== MATCH_MODE.ARCADE;
+  if(isLocalMode){
+    if(winnerSkin && !(botActive && winner === p2)){
+      addCharStat(winnerSkin, 'localMatches', 1);
+    }
+    if(loserSkin && !(botActive && loser === p2)){
+      addCharStat(loserSkin, 'localMatches', 1);
+    }
+  }
 }
 
 function registerMatchPlayed(){
@@ -3402,6 +3666,16 @@ function updateTutorialDownloadStatus(msg, tone='info'){
 async function triggerTutorialDownload(){
   const url = (uiRefs.tutorialDownloadUrl?.value || '').trim();
   if(!url) return;
+  // Logro general: descargar tutorial con el personaje favorito actual
+  try{
+    const fav = getFavoriteChar();
+    const favSkin = fav?.skin;
+    if(favSkin){
+      addCharStat(favSkin, 'favTutorialDownload', 1);
+    }
+  }catch(err){
+    console.warn('No pude registrar favTutorialDownload', err);
+  }
   updateTutorialDownloadStatus('Descargando...', 'info');
   try{
     const res = await fetch(url);
@@ -3504,9 +3778,6 @@ function renderEncyCards(){
     body.appendChild(ability);
     if(fatal) body.appendChild(fatal);
     const stats = getCharStatsSnapshot(entry.skin);
-    const kd = formatKd(stats);
-    const statsBox = document.createElement('div');
-    statsBox.className = 'ency-stats';
     const makeStat = (label, value)=>{
       const box = document.createElement('div');
       box.className = 'ency-stat';
@@ -3531,29 +3802,249 @@ function renderEncyCards(){
     statsBox.appendChild(makeStat('20 bots', charStats.best20TimeMs ? formatMsClock(charStats.best20TimeMs) : '--'));
     statsBox.appendChild(makeStat('LAN', charStats.lanMatches || 0));
     statsBox.appendChild(makeStat('Fouls', charStats.fouls || 0));
-    body.appendChild(statsBox);
-    const progress = document.createElement('div');
-    progress.className = 'char-stat-grid';
+    // statsBox solo se muestra en el detalle, no en la lista
+    card.appendChild(frame);
+    card.appendChild(body);
+    card.addEventListener('click', ()=>{
+      openEncyDetail(entry.skin);
+    });
+    list.appendChild(card);
+  });
+}
+
+function setFavoriteSkin(skin){
+  if(!progress || !progress.user) return;
+  const current = progress.user.favoriteSkin || null;
+  if(current === skin){
+    delete progress.user.favoriteSkin;
+  } else {
+    progress.user.favoriteSkin = skin;
+    // Marcar selección manual de favorito para este personaje
+    try{
+      addCharStat(skin, 'favManualFavSelect', 1);
+    }catch(err){
+      console.warn('No pude registrar favManualFavSelect', err);
+    }
+  }
+  saveProgress(progress);
+  renderFavoriteSkin();
+}
+
+function openEncyDetail(skin){
+  if(!uiRefs.encyDetailOverlay || !uiRefs.encyDetailCard) return;
+  const card = uiRefs.encyDetailCard;
+  card.innerHTML = '';
+  const stats = getCharStatsSnapshot(skin);
+  const ach = getCharAchievementData(stats || {});
+  const displayLevel = ach.displayLevel || ach.level || 0;
+  const style = getAchFrameStyle(Math.min(displayLevel, ACH_COLORS.length - 1));
+  const levelName = getTierDisplayName(displayLevel);
+  ach.level = displayLevel;
+  const entry = getSkinProfile(skin) || {};
+
+  const header = document.createElement('div');
+  header.className = 'ency-overlay-header';
+
+  const frame = document.createElement('div');
+  frame.className = 'ency-overlay-frame';
+  if(style){
+    const base = style.glow || '#ffffff';
+    frame.style.boxShadow = `0 0 0 2px ${base}CC, 0 0 22px ${base}99`;
+    frame.style.borderColor = base + 'CC';
+  }
+  const cv = document.createElement('canvas');
+  cv.width = 120;
+  cv.height = 120;
+  const ctx = cv.getContext('2d');
+  ctx.fillStyle = '#050915';
+  ctx.fillRect(0,0,cv.width,cv.height);
+  ctx.save();
+  ctx.translate(cv.width/2, cv.height/2 + 4);
+  drawSkin(ctx, skin, { r:40, player:{ skin } });
+  ctx.restore();
+  frame.appendChild(cv);
+  header.appendChild(frame);
+
+  const titleBox = document.createElement('div');
+  const title = document.createElement('div');
+  title.className = 'ency-overlay-title';
+  title.textContent = getSkinLabel(skin);
+  const sub = document.createElement('div');
+  sub.className = 'ency-overlay-sub';
+  const lvlText = levelName ? `Nivel ${ach.level} · ${levelName}` : `Nivel ${ach.level}`;
+  const abilityLabel = entry.abilityLabel || 'Habilidad';
+  sub.textContent = `${abilityLabel} · ${lvlText}`;
+  titleBox.appendChild(title);
+  titleBox.appendChild(sub);
+  header.appendChild(titleBox);
+
+  const actions = document.createElement('div');
+  actions.className = 'ency-overlay-actions';
+  const btnFav = document.createElement('button');
+  btnFav.className = 'ency-overlay-fav';
+  const isFav = progress?.user?.favoriteSkin === skin;
+  if(isFav) btnFav.classList.add('active');
+  btnFav.textContent = isFav ? 'Quitar de favorito' : 'Poner como favorito';
+  btnFav.addEventListener('click', (ev)=>{
+    ev.stopPropagation();
+    setFavoriteSkin(skin);
+    const nowFav = progress?.user?.favoriteSkin === skin;
+    btnFav.classList.toggle('active', !!nowFav);
+    btnFav.textContent = nowFav ? 'Quitar de favorito' : 'Poner como favorito';
+  });
+  const btnClose = document.createElement('button');
+  btnClose.className = 'ency-overlay-close';
+  btnClose.textContent = 'Cerrar';
+  btnClose.addEventListener('click', (ev)=>{
+    ev.stopPropagation();
+    uiRefs.encyDetailOverlay.classList.add('hidden');
+  });
+  actions.appendChild(btnFav);
+  actions.appendChild(btnClose);
+  header.appendChild(actions);
+
+  const body = document.createElement('div');
+  body.className = 'ency-overlay-body';
+  const kd = formatKd(stats);
+  const makeStat = (label, value)=>{
+    const box = document.createElement('div');
+    box.className = 'ency-stat';
+    const l = document.createElement('div');
+    l.className = 'ency-stat-label';
+    l.textContent = label;
+    const v = document.createElement('div');
+    v.className = 'ency-stat-value';
+    v.textContent = value;
+    box.appendChild(l);
+    box.appendChild(v);
+    return box;
+  };
+  statsBox.appendChild(makeStat('Partidas', stats.matches || 0));
+  statsBox.appendChild(makeStat('Victorias', stats.wins || 0));
+  statsBox.appendChild(makeStat('Derrotas', stats.losses || 0));
+  statsBox.appendChild(makeStat('K/D', `${kd.fraction} (${kd.kd}) ú ${kd.pct}%`));
+  statsBox.appendChild(makeStat('Puntos', stats.points || 0));
+  statsBox.appendChild(makeStat('Hab. usadas', stats.abilityUses || 0));
+  statsBox.appendChild(makeStat('Fatalities', stats.fatalities || 0));
+  statsBox.appendChild(makeStat('Bots', stats.botKillsTotal || 0));
+  statsBox.appendChild(makeStat('20 bots', stats.best20TimeMs ? formatMsClock(stats.best20TimeMs) : '--'));
+  statsBox.appendChild(makeStat('LAN', stats.lanMatches || 0));
+  statsBox.appendChild(makeStat('Fouls', stats.fouls || 0));
+  const abilityP = document.createElement('p');
+  if(skin === 'mystery'){
+    abilityP.innerHTML = '<b>Azar:</b> Esta ficha elige un luchador aleatorio. Algunos dicen que, muy de vez en cuando, no es tan aleatorio.';
+  } else {
+    const abilityDesc = entry.abilityDesc || '';
+    abilityP.innerHTML = `<b>${entry.abilityLabel || 'Habilidad'}:</b> ${abilityDesc}`;
+  }
+  body.appendChild(abilityP);
+
+  const progBox = document.createElement('div');
+  progBox.className = 'ency-overlay-progress';
+  ach.lines.forEach(lineObj=>{
+    const line = typeof lineObj === 'string' ? { text: lineObj } : (lineObj || {});
+    const span = document.createElement('span');
+    span.className = 'stat-chip' + (line.done ? ' achieved' : '');
+    span.textContent = line.text || line;
+    progBox.appendChild(span);
+  });
+
+  card.appendChild(header);
+  card.appendChild(body);
+  card.appendChild(progBox);
+  uiRefs.encyDetailOverlay.classList.remove('hidden');
+  uiRefs.encyDetailOverlay.onclick = (ev)=>{
+    if(ev.target === uiRefs.encyDetailOverlay){
+      uiRefs.encyDetailOverlay.classList.add('hidden');
+    }
+  };
+}
+
+// Override final de renderFavoriteSkin para mostrar nivel y cantidad de logros
+function renderFavoriteSkin(){
+  if(!uiRefs.favSkinName || !uiRefs.favSkinMeta) return;
+  const rosterReady = (typeof ROSTER !== 'undefined') && Array.isArray(ROSTER) && ROSTER.length > 0;
+  const fallbackSkin = rosterReady ? ROSTER[0] : 'violin';
+  const fav = getFavoriteChar() || { skin: fallbackSkin, stats: CHAR_DEFAULT_STATS };
+  const name = fav ? getSkinLabel(fav.skin) : '-';
+  const stats = fav?.stats || null;
+  const ach = getCharAchievementData(stats || {});
+  const displayLevel = ach.displayLevel || ach.level || 0;
+  const style = getAchFrameStyle(Math.min(displayLevel, ACH_COLORS.length - 1));
+  const levelName = getTierDisplayName(displayLevel);
+
+  if(uiRefs.favSkinFrame){
+    const frame = uiRefs.favSkinFrame;
+    frame.className = `skin-frame glow-level-${displayLevel || 0}`;
+    if(style){
+      const base = style.glow || '#ffffff';
+      const grad = `radial-gradient(circle at 50% 50%, ${hexToRgba(base,0.8)} 0%, ${hexToRgba(base,0.5)} 55%, ${hexToRgba(base,0)} 90%)`;
+      frame.style.background = `#0c1422, ${grad}`;
+      frame.style.backgroundBlendMode = 'screen';
+      frame.style.boxShadow = `0 0 0 2px ${hexToRgba(base,0.95)}, 0 0 32px ${hexToRgba(base,0.8)}, 0 0 60px ${hexToRgba(base,0.55)}`;
+      frame.style.borderColor = hexToRgba(base,0.85);
+    } else {
+      frame.style.boxShadow = '0 0 0 1px #1f365a';
+      frame.style.borderColor = '#1f365a';
+      frame.style.background = '#0c1422';
+      frame.style.backgroundBlendMode = 'normal';
+    }
+  }
+
+  if(levelName && style?.glow){
+    uiRefs.favSkinName.innerHTML = `${name} - <span style=\"color:${style.glow};\">${levelName}</span>`;
+  } else {
+    uiRefs.favSkinName.textContent = name;
+  }
+
+  uiRefs.favSkinMeta.textContent = stats
+    ? `${stats.matches || 0} partidas - ${stats.wins || 0} victorias - Nivel ${displayLevel} - ${ach.met || 0} logros`
+    : 'Aun sin partidas';
+
+  if(uiRefs.favSkinChips){
+    uiRefs.favSkinChips.innerHTML = '';
+    if(stats){
+      const chips = [
+        { label:`W ${stats.wins || 0}` },
+        { label:`L ${stats.losses || 0}` },
+        { label:`Hab ${stats.abilityUses || 0}` },
+        { label:`Pts ${stats.points || 0}` },
+        { label:`Fatal ${stats.fatalities || 0}` },
+        { label:`Fouls ${stats.fouls || 0}` },
+        { label:`Dom ${stats.arcadeDominadasMax || 0}` },
+        { label:`Target ${stats.arcadeTargetHitsMax || 0}/${stats.arcadeTargetStreakMax || 0}` }
+      ];
+      chips.forEach(ch=>{
+        const span = document.createElement('span');
+        span.className = 'stat-chip';
+        span.textContent = ch.label;
+        uiRefs.favSkinChips.appendChild(span);
+      });
+    }
+  }
+
+  if(uiRefs.favAchProgress){
+    uiRefs.favAchProgress.innerHTML = '';
     ach.lines.forEach(lineObj=>{
       const line = typeof lineObj === 'string' ? { text: lineObj } : (lineObj || {});
       const span = document.createElement('span');
       span.className = 'stat-chip' + (line.done ? ' achieved' : '');
       span.textContent = line.text || line;
-      progress.appendChild(span);
+      uiRefs.favAchProgress.appendChild(span);
     });
-    const details = document.createElement('div');
-    details.className = 'ency-details';
-    details.appendChild(statsBox);
-    details.appendChild(progress);
+  }
 
-    card.appendChild(frame);
-    card.appendChild(body);
-    card.appendChild(details);
-    card.addEventListener('click', ()=>{
-      card.classList.toggle('expanded');
-    });
-    list.appendChild(card);
-  });
+  const cvs = uiRefs.favSkinCanvas;
+  if(cvs){
+    const ctx = cvs.getContext('2d');
+    ctx.clearRect(0,0,cvs.width,cvs.height);
+    if(fav){
+      ctx.save();
+      ctx.translate(cvs.width/2, cvs.height/2 + 6);
+      drawSkin(ctx, fav.skin, { r: Math.min(cvs.width, cvs.height) * 0.32, player:{ skin: fav.skin } });
+      ctx.restore();
+    }
+  }
 }
 
 function getFullscreenElement(){
@@ -3594,6 +4085,286 @@ function toggleFullscreen(){
     exitFullscreen();
   } else {
     enterFullscreen();
+  }
+}
+
+// Override de la enciclopedia para restaurar estadísticas en la lista
+function renderEncyCards(){
+  const list = uiRefs.encyList;
+  if(!list) return;
+  list.innerHTML = '';
+  const data = buildEncyRoster();
+  data.forEach(entry=>{
+    const stats = getCharStatsSnapshot(entry.skin) || {};
+    const ach = getCharAchievementData(stats);
+    const style = getAchFrameStyle(ach.level);
+    const card = document.createElement('div');
+    card.className = 'ency-card';
+
+    const frame = document.createElement('div');
+    frame.className = 'skin-frame';
+    if(style){
+      frame.style.boxShadow = `0 0 0 2px ${style.glow}aa, 0 0 16px ${style.glow}88`;
+      frame.style.borderColor = style.glow + '99';
+    }
+    const cv = document.createElement('canvas');
+    cv.width = 120;
+    cv.height = 120;
+    const ctx = cv.getContext('2d');
+    ctx.save();
+    ctx.translate(cv.width/2, cv.height/2);
+    drawSkin(ctx, entry.skin, { r:34, player:{ skin: entry.skin } });
+    ctx.restore();
+    frame.appendChild(cv);
+
+    const body = document.createElement('div');
+    body.className = 'ency-body';
+    const title = document.createElement('h3');
+    title.textContent = entry.label;
+    const meta = document.createElement('div');
+    meta.className = 'ency-meta';
+    const ability = document.createElement('p');
+    let fatal = null;
+
+    if(entry.skin === 'mystery'){
+      meta.textContent = 'Selección al azar ú ???';
+      ability.innerHTML = '<b>Azar:</b> Esta ficha elige un luchador aleatorio. Algunos dicen que, muy de vez en cuando, no es tan aleatorio.';
+    } else {
+      meta.textContent = entry.abilityLabel;
+      ability.innerHTML = `<b>${entry.abilityLabel}:</b> ${entry.abilityDesc}`;
+    }
+
+    body.appendChild(title);
+    body.appendChild(meta);
+    body.appendChild(ability);
+
+    const kd = formatKd(stats);
+    const statsBox = document.createElement('div');
+    statsBox.className = 'ency-stats';
+    const makeStat = (label, value)=>{
+      const box = document.createElement('div');
+      box.className = 'ency-stat';
+      const l = document.createElement('div');
+      l.className = 'ency-stat-label';
+      l.textContent = label;
+      const v = document.createElement('div');
+      v.className = 'ency-stat-value';
+      v.textContent = value;
+      box.appendChild(l);
+      box.appendChild(v);
+      return box;
+    };
+    statsBox.appendChild(makeStat('Partidas', stats.matches || 0));
+    statsBox.appendChild(makeStat('Victorias', stats.wins || 0));
+    statsBox.appendChild(makeStat('Derrotas', stats.losses || 0));
+    statsBox.appendChild(makeStat('K/D', `${kd.fraction} (${kd.kd}) ú ${kd.pct}%`));
+    statsBox.appendChild(makeStat('Puntos', stats.points || 0));
+    statsBox.appendChild(makeStat('Hab. usadas', stats.abilityUses || 0));
+    statsBox.appendChild(makeStat('Fatalities', stats.fatalities || 0));
+    statsBox.appendChild(makeStat('Bots', stats.botKillsTotal || 0));
+    statsBox.appendChild(makeStat('20 bots', stats.best20TimeMs ? formatMsClock(stats.best20TimeMs) : '--'));
+    statsBox.appendChild(makeStat('LAN', stats.lanMatches || 0));
+    statsBox.appendChild(makeStat('Fouls', stats.fouls || 0));
+
+    card.appendChild(frame);
+    card.appendChild(body);
+    card.addEventListener('click', ()=>{
+      openEncyDetail(entry.skin);
+    });
+    list.appendChild(card);
+  });
+}
+
+// Override de detalle de enciclopedia: sin stats, solo descripción y logros
+function openEncyDetail(skin){
+  if(!uiRefs.encyDetailOverlay || !uiRefs.encyDetailCard) return;
+  const card = uiRefs.encyDetailCard;
+  card.innerHTML = '';
+  const stats = getCharStatsSnapshot(skin);
+  const ach = getCharAchievementData(stats || {});
+  const displayLevel = ach.displayLevel || ach.level || 0;
+  const style = getAchFrameStyle(Math.min(displayLevel, ACH_COLORS.length - 1));
+  const levelName = getTierDisplayName(displayLevel);
+  ach.level = displayLevel;
+  const entry = getSkinProfile(skin) || {};
+
+  const header = document.createElement('div');
+  header.className = 'ency-overlay-header';
+
+  const frame = document.createElement('div');
+  frame.className = 'ency-overlay-frame';
+  if(style){
+    const base = style.glow || '#ffffff';
+    frame.style.boxShadow = `0 0 0 2px ${base}CC, 0 0 22px ${base}99`;
+    frame.style.borderColor = base + 'CC';
+  }
+  const cv = document.createElement('canvas');
+  cv.width = 120;
+  cv.height = 120;
+  const ctx = cv.getContext('2d');
+  ctx.fillStyle = '#050915';
+  ctx.fillRect(0,0,cv.width,cv.height);
+  ctx.save();
+  ctx.translate(cv.width/2, cv.height/2 + 4);
+  drawSkin(ctx, skin, { r:40, player:{ skin } });
+  ctx.restore();
+  frame.appendChild(cv);
+  header.appendChild(frame);
+
+  const titleBox = document.createElement('div');
+  const title = document.createElement('div');
+  title.className = 'ency-overlay-title';
+  title.textContent = getSkinLabel(skin);
+  const sub = document.createElement('div');
+  sub.className = 'ency-overlay-sub';
+  const lvlText = levelName ? `Nivel ${ach.level} - ${levelName}` : `Nivel ${ach.level}`;
+  const abilityLabel = entry.abilityLabel || 'Habilidad';
+  sub.textContent = `${abilityLabel} - ${lvlText}`;
+  titleBox.appendChild(title);
+  titleBox.appendChild(sub);
+  header.appendChild(titleBox);
+
+  const actions = document.createElement('div');
+  actions.className = 'ency-overlay-actions';
+  const btnFav = document.createElement('button');
+  btnFav.className = 'ency-overlay-fav';
+  const isFav = progress?.user?.favoriteSkin === skin;
+  if(isFav) btnFav.classList.add('active');
+  btnFav.textContent = isFav ? 'Quitar de favorito' : 'Poner como favorito';
+  btnFav.addEventListener('click', (ev)=>{
+    ev.stopPropagation();
+    setFavoriteSkin(skin);
+    const nowFav = progress?.user?.favoriteSkin === skin;
+    btnFav.classList.toggle('active', !!nowFav);
+    btnFav.textContent = nowFav ? 'Quitar de favorito' : 'Poner como favorito';
+  });
+  const btnClose = document.createElement('button');
+  btnClose.className = 'ency-overlay-close';
+  btnClose.textContent = 'Cerrar';
+  btnClose.addEventListener('click', (ev)=>{
+    ev.stopPropagation();
+    uiRefs.encyDetailOverlay.classList.add('hidden');
+  });
+  actions.appendChild(btnFav);
+  actions.appendChild(btnClose);
+  header.appendChild(actions);
+
+  const body = document.createElement('div');
+  body.className = 'ency-overlay-body';
+  const abilityP = document.createElement('p');
+  if(skin === 'mystery'){
+    abilityP.innerHTML = '<b>Azar:</b> Esta ficha elige un luchador aleatorio. Algunos dicen que, muy de vez en cuando, no es tan aleatorio.';
+  } else {
+    const abilityDesc = entry.abilityDesc || '';
+    abilityP.innerHTML = `<b>${entry.abilityLabel || 'Habilidad'}:</b> ${abilityDesc}`;
+  }
+  body.appendChild(abilityP);
+
+  const progBox = document.createElement('div');
+  progBox.className = 'ency-overlay-progress';
+  ach.lines.forEach(lineObj=>{
+    const line = typeof lineObj === 'string' ? { text: lineObj } : (lineObj || {});
+    const span = document.createElement('span');
+    span.className = 'stat-chip' + (line.done ? ' achieved' : '');
+    span.textContent = line.text || line;
+    progBox.appendChild(span);
+  });
+
+  card.appendChild(header);
+  card.appendChild(body);
+  card.appendChild(progBox);
+  uiRefs.encyDetailOverlay.classList.remove('hidden');
+  uiRefs.encyDetailOverlay.onclick = (ev)=>{
+    if(ev.target === uiRefs.encyDetailOverlay){
+      uiRefs.encyDetailOverlay.classList.add('hidden');
+    }
+  };
+}
+
+// Override definitivo de renderFavoriteSkin para mostrar tier y nivel correctos
+function renderFavoriteSkin(){
+  if(!uiRefs.favSkinName || !uiRefs.favSkinMeta) return;
+  const rosterReady = (typeof ROSTER !== 'undefined') && Array.isArray(ROSTER) && ROSTER.length > 0;
+  const fallbackSkin = rosterReady ? ROSTER[0] : 'violin';
+  const fav = getFavoriteChar() || { skin: fallbackSkin, stats: CHAR_DEFAULT_STATS };
+  const name = fav ? getSkinLabel(fav.skin) : '-';
+  const stats = fav?.stats || null;
+  const ach = getCharAchievementData(stats || {});
+  const displayLevel = ach.displayLevel || ach.level || 0;
+  const style = getAchFrameStyle(Math.min(displayLevel, ACH_COLORS.length - 1));
+  const levelName = getTierDisplayName(displayLevel);
+
+  if(uiRefs.favSkinFrame){
+    const frame = uiRefs.favSkinFrame;
+    frame.className = `skin-frame glow-level-${displayLevel || 0}`;
+    if(style){
+      const base = style.glow || '#ffffff';
+      const grad = `radial-gradient(circle at 50% 50%, ${hexToRgba(base,0.8)} 0%, ${hexToRgba(base,0.5)} 55%, ${hexToRgba(base,0)} 90%)`;
+      frame.style.background = `#0c1422, ${grad}`;
+      frame.style.backgroundBlendMode = 'screen';
+      frame.style.boxShadow = `0 0 0 2px ${hexToRgba(base,0.95)}, 0 0 32px ${hexToRgba(base,0.8)}, 0 0 60px ${hexToRgba(base,0.55)}`;
+      frame.style.borderColor = hexToRgba(base,0.85);
+    } else {
+      frame.style.boxShadow = '0 0 0 1px #1f365a';
+      frame.style.borderColor = '#1f365a';
+      frame.style.background = '#0c1422';
+      frame.style.backgroundBlendMode = 'normal';
+    }
+  }
+
+  if(levelName && style?.glow){
+    uiRefs.favSkinName.innerHTML = `${name} - <span style="color:${style.glow};">${levelName}</span>`;
+  } else {
+    uiRefs.favSkinName.textContent = name;
+  }
+
+  uiRefs.favSkinMeta.textContent = stats
+    ? `${stats.matches || 0} partidas - ${stats.wins || 0} victorias - Nivel ${displayLevel} - ${ach.met || 0} logros`
+    : 'Aún sin partidas';
+
+  if(uiRefs.favSkinChips){
+    uiRefs.favSkinChips.innerHTML = '';
+    if(stats){
+      const chips = [
+        { label:`W ${stats.wins || 0}` },
+        { label:`L ${stats.losses || 0}` },
+        { label:`Hab ${stats.abilityUses || 0}` },
+        { label:`Pts ${stats.points || 0}` },
+        { label:`Fatal ${stats.fatalities || 0}` },
+        { label:`Fouls ${stats.fouls || 0}` },
+        { label:`Dom ${stats.arcadeDominadasMax || 0}` },
+        { label:`Target ${stats.arcadeTargetHitsMax || 0}/${stats.arcadeTargetStreakMax || 0}` }
+      ];
+      chips.forEach(ch=>{
+        const span = document.createElement('span');
+        span.className = 'stat-chip';
+        span.textContent = ch.label;
+        uiRefs.favSkinChips.appendChild(span);
+      });
+    }
+  }
+
+  if(uiRefs.favAchProgress){
+    uiRefs.favAchProgress.innerHTML = '';
+    ach.lines.forEach(lineObj=>{
+      const line = typeof lineObj === 'string' ? { text: lineObj } : (lineObj || {});
+      const span = document.createElement('span');
+      span.className = 'stat-chip' + (line.done ? ' achieved' : '');
+      span.textContent = line.text || line;
+      uiRefs.favAchProgress.appendChild(span);
+    });
+  }
+
+  const cvs = uiRefs.favSkinCanvas;
+  if(cvs){
+    const ctx = cvs.getContext('2d');
+    ctx.clearRect(0,0,cvs.width,cvs.height);
+    if(fav){
+      ctx.save();
+      ctx.translate(cvs.width/2, cvs.height/2 + 6);
+      drawSkin(ctx, fav.skin, { r: Math.min(cvs.width, cvs.height) * 0.32, player:{ skin: fav.skin } });
+      ctx.restore();
+    }
   }
 }
 
@@ -4456,7 +5227,10 @@ if(uiRefs.btnArcadeBossfight) uiRefs.btnArcadeBossfight.addEventListener('click'
 if(uiRefs.btnBossfightClose) uiRefs.btnBossfightClose.addEventListener('click', ()=>{ playUiBackSound(); closeBossfightBox(); });
 if(uiRefs.bossfightSelect) uiRefs.bossfightSelect.addEventListener('change', (e)=>setBossSelection(e.target.value));
 if(uiRefs.btnBossfightPlay) uiRefs.btnBossfightPlay.addEventListener('click', ()=>startArcadeMode(ARCADE_MODES.BOSS, { bossId: bossSelectedId }));
-if(uiRefs.btnOpenStats) uiRefs.btnOpenStats.addEventListener('click', ()=>openStats());
+if(uiRefs.btnOpenStats){
+  uiRefs.btnOpenStats.textContent = 'Enciclopedia';
+  uiRefs.btnOpenStats.addEventListener('click', ()=>openEncy('menu'));
+}
 if(uiRefs.btnStatsBack) uiRefs.btnStatsBack.addEventListener('click', ()=>{ playUiBackSound(); closeStats(); });
 if(uiRefs.btnStatsEncy) uiRefs.btnStatsEncy.addEventListener('click', ()=>{ closeStats(); openEncy('menu'); });
 if(uiRefs.btnEditName) uiRefs.btnEditName.addEventListener('click', ()=>handleNameChange());
@@ -5194,6 +5968,7 @@ function startMatchLocalFromConfig(cfg = {}){
   p2 = makePlayer(W*0.75,'R', p2Skin);
   hydraClones.length = 0;
   directorClones.length = 0;
+  miniDirectors.length = 0;
   ghostBarriers.length = 0;
   florBursts.length = 0;
   clearHazardProjectiles();
@@ -5268,9 +6043,11 @@ function serializeWorldState(){
     p2: serializePlayerNet(p2),
     hydraClones: hydraClones.map(c=>({ ...c })),
     directorClones: directorClones.map(c=>({ ...c })),
+    miniDirectors: miniDirectors.map(c=>({ ...c })),
     ghostBarriers: ghostBarriers.map(b=>({ ...b })),
     florBursts: florBursts.map(f=>({ ...f })),
-    drumMine: { ...drumMine },
+    drumMineL: { ...drumMineL },
+    drumMineR: { ...drumMineR },
     mysteryBomb: { ...mysteryBomb },
     suddenDeathActive,
     finishState: {
@@ -5377,12 +6154,15 @@ function applyRemoteWorld(data){
   (data.hydraClones || []).forEach(c=>hydraClones.push({ ...c }));
   directorClones.length = 0;
   (data.directorClones || []).forEach(c=>directorClones.push({ ...c }));
+  miniDirectors.length = 0;
+  (data.miniDirectors || []).forEach(c=>miniDirectors.push({ ...c }));
   ghostBarriers.length = 0;
   (data.ghostBarriers || []).forEach(b=>ghostBarriers.push({ ...b }));
   florBursts.length = 0;
   (data.florBursts || []).forEach(f=>florBursts.push({ ...f }));
 
-  Object.assign(drumMine, data.drumMine || { attached:false, pulse:0, owner:null });
+  Object.assign(drumMineL, data.drumMineL || { attached:false, pulse:0 });
+  Object.assign(drumMineR, data.drumMineR || { attached:false, pulse:0 });
   Object.assign(mysteryBomb, data.mysteryBomb || { attached:false, pulse:0, owner:null });
   suddenDeathActive = !!data.suddenDeathActive;
    if(data.matchTimer){
@@ -5445,7 +6225,9 @@ const ACH_COLORS = [ //Colores de los niveles según achivement colors
   { tint:'rgba(120,235,255,0.30)', glow:'#78ebff' }, // diamante
   { tint:'rgba(142,245,182,0.30)', glow:'#7be0a0' }, // esmeralda
   { tint:'rgba(255,90,90,0.30)',   glow:'#ff5a5a' }, // rubí
-  { tint:'rgba(97,40,199,0.32)',   glow:'#6128c7' }  // dark
+  { tint:'rgba(54, 95, 217,0.32)',   glow:'#315feb' }, // lápiz (azul profundo)
+  { tint:'rgba(87, 70, 220,0.34)',  glow:'#5d4deb' }, // safiro (índigo/morado)
+  { tint:'rgba(97,40,199,0.38)',   glow:'#6128c7' }  // dark
 ];
 
 function hexToRgba(hex, alpha=1){
@@ -5602,9 +6384,11 @@ const STAMINA_REGEN_SCALE = 0.1; // 90% más lento
 const ghostBarriers = [];
 const hydraClones = [];
 const directorClones = [];
+const miniDirectors = [];
 const florBursts = [];
 const hazardProjectiles = [];
-const drumMine = { attached:false, owner:null, pulse:0 };
+const drumMineL = { attached:false, pulse:0 };
+const drumMineR = { attached:false, pulse:0 };
 const mysteryBomb = { attached:false, owner:null, pulse:0 };
 const MYSTERY_CATEGORY_POOLS = {
   defense: [
@@ -5655,7 +6439,28 @@ function pickMysteryRandomSkin(exclude = null){
   }
   const pool = [...entries, ...secrets].filter(entry => entry.skin !== exclude && entry.weight > 0);
   const selected = pickWeighted(pool, 'weight');
-  return selected?.skin || (pool[0]?.skin) || 'violin';
+  const skin = selected?.skin || (pool[0]?.skin) || 'violin';
+
+  // Registrar logro especial cuando Mystery elige una skin
+  try{
+    if(skin){
+      if(skin === 'mystery'){
+        // Mystery salió como Mystery: logro general asignado al favorito
+        const fav = getFavoriteChar();
+        const favSkin = fav?.skin;
+        if(favSkin){
+          addCharStat(favSkin, 'favMysterySelf', 1);
+        }
+      } else {
+        // Este personaje salió al elegir Mystery
+        addCharStat(skin, 'mysteryRolls', 1);
+      }
+    }
+  }catch(err){
+    console.warn('No pude registrar mysteryRolls', err);
+  }
+
+  return skin;
 }
 const MYSTERY_COMMAND_PATTERNS = {
   defense: ['back','back','down'],
@@ -5687,10 +6492,15 @@ const ABILITIES = {
       try{ SFX.pianonote.currentTime = 0; SFX.pianonote.play(); }catch(e){}
       }, 10);
       player.skinState = 'stretched';
+      
+      // Si tiene dark tier, la extensión de hitbox es 1.5x mayor
+      const isDark = player.darkTierUnlocked;
+      const hitboxMultiplier = isDark ? 3.2 : 2.8;
+      
       applyScaleModifier(player, {
         radius: 1,
-        hitboxX: 2.8,
-        hitboxY: 1.05,
+        hitboxX: hitboxMultiplier,
+        hitboxY: hitboxMultiplier/2.1,
         visualX: 1.8,
         visualY: 0.85
       });
@@ -5731,7 +6541,7 @@ const ABILITIES = {
     cooldown: 12,
     staminaCost: 100,
     description: 'Carga pasivamente y con golpes. Al activarla, crea un campo índigo en el lado rival que empuja la pelota hacia su muro e impide su regeneración de stamina.',
-    staminaProfile: { max: 100, regen: 30, start: 0 },
+    staminaProfile: { max: 100, regen: 30, start: 50 },
     hitChargePercent: 5,
     fieldForce: 380,
     onActivate(player, ability){
@@ -5823,7 +6633,7 @@ const ABILITIES = {
     cooldown: 3500,
     staminaCost: 50,
     description: 'Al perder un punto recarga media barra y aturde al rival al activarse.',
-    staminaProfile: { max: 100, regen: 8, start: 0 },
+    staminaProfile: { max: 100, regen: 8, start: 60 },
     onConcede(player){
       recoverStamina(player, (player.stamina?.max || 0) * 0.45);
     },
@@ -5870,6 +6680,21 @@ const ABILITIES = {
       spawnDirectorClone(player);
     }
   }),
+  directorDarkDouble: defineAbility({
+    id: 'directorDarkDouble',
+    label: 'Director Sombra',
+    duration: 200,
+    cooldown: 50,
+    staminaCost: 50,
+    hitChargePercent: 0.3,
+    description: 'Invoca un clon espectral + 2 mini directores que lo ayudan desde el mismo lado.',
+    staminaProfile: { max: 100, regen: 45, start: 100 },
+    onActivate(player){
+      spawnDirectorClone(player);
+      //aleatoriamente 2 a 10 mini directores
+      spawnMiniDirectors(player, 2);
+    }
+  }),
   metalSpike: defineAbility({
     id: 'metalSpike',
     label: 'Púa Metálica',
@@ -5883,6 +6708,19 @@ const ABILITIES = {
       // efecto gestionado en cada golpe
     }
   }),
+  metalDarkSpike: defineAbility({
+    id: 'metalDarkSpike',
+    label: 'Dark Púa Metálica',
+    duration: 800,
+    cooldown: 120,
+    staminaCost: 20,
+    description: 'Pincha la pelota garantizado durante 500ms.',
+    staminaProfile: { max: 100, regen: 25, start: 100 },
+    popChance: 1.0,
+    onActivate(){
+      // efecto gestionado en cada golpe
+    }
+  }),
   drumDetonate: defineAbility({
     id: 'drumDetonate',
     label: 'Beat Mine',
@@ -5892,10 +6730,34 @@ const ABILITIES = {
     description: 'Carga una bomba en la pelota y la detona hacia el suelo.',
     staminaProfile: { max: 100, regen: 50, start: 50 },
     canActivate(player){
-      return player.ability.runtime.bombReady && drumMine.attached && drumMine.owner === player.side;
+      const mine = player.side === 'L' ? drumMineL : drumMineR;
+      return player.ability.runtime.bombReady && mine.attached;
     },
     onActivate(player){
-      triggerDrumExplosion(player);
+      triggerDrumExplosion(player, player.ability);
+      clearTimeout(mineexplodeTimeout);
+      mineexplodeTimeout = setTimeout(()=>{
+      try{ SFX.mineexplode.currentTime = 0; SFX.mineexplode.play(); }catch(e){}
+      }, 0);
+    },
+    onDeactivate(player){
+      concludeDrumAbility(player);
+    }
+  }),
+  drumDarkDetonate: defineAbility({
+    id: 'drumDarkDetonate',
+    label: 'Dark Beat Mine',
+    duration: 600,
+    cooldown: 160,
+    staminaCost: 100,
+    description: 'Carga una bomba en la pelota y la detona hacia el suelo, empujando al oponente radialmente.',
+    staminaProfile: { max: 100, regen: 50, start: 100 },
+    canActivate(player){
+      const mine = player.side === 'L' ? drumMineL : drumMineR;
+      return player.ability.runtime.bombReady && mine.attached;
+    },
+    onActivate(player){
+      triggerDrumExplosion(player, player.ability);
       clearTimeout(mineexplodeTimeout);
       mineexplodeTimeout = setTimeout(()=>{
       try{ SFX.mineexplode.currentTime = 0; SFX.mineexplode.play(); }catch(e){}
@@ -6330,6 +7192,7 @@ function buildFatalityLibrary(){
         // Usar la skin personalizada si existe
         drawDrumMineSprite(ctx, (mine.radius || 14) * pulse, {
           spikeLength: (mine.radius || 14) * 0.6,
+          owner: effect.winner,
           // Si hay imagen, pasar los offsets y escala
           bodyColor: SKIN_ASSETS.drumMine?.spriteUrl ? undefined : undefined,
           coreColor: SKIN_ASSETS.drumMine?.spriteUrl ? undefined : undefined,
@@ -7260,21 +8123,63 @@ function createAbilityState(abilityId, settings = {}){
 function applySkinProfile(player, skinId){
   const profile = getSkinProfile(skinId);
   const prevBottom = (typeof player.y === 'number' && typeof player.r === 'number') ? player.y + player.r : null;
-  const abilityState = createAbilityState(profile.abilityId, profile.abilitySettings);
-  const abilityDef = abilityState.def;
-
+  
   player.charProgressStats = getCharStatsSnapshot(skinId);
   player.charAchievementData = getCharAchievementData(player.charProgressStats);
   player.darkTierUnlocked = isDarkTierUnlocked(player.charAchievementData);
 
+  // Determinar la habilidad: si es Director Dark y NO es bot, usar directorDarkDouble
+  // Si es Drum Dark, usar drumDarkDetonate
+  // Si es Metal Dark, usar metalDarkSpike
+  let effectiveAbilityId = profile.abilityId;
+  if(player.darkTierUnlocked && skinId === 'director'){
+    const isBot = botActive && player?.side === 'R'; // bot es siempre p2
+    if(!isBot){
+      effectiveAbilityId = 'directorDarkDouble';
+    }
+  }
+  if(player.darkTierUnlocked && skinId === 'drum'){
+    const isBot = botActive && player?.side === 'R';
+    if(!isBot){
+      effectiveAbilityId = 'drumDarkDetonate';
+    }
+  }
+  if(player.darkTierUnlocked && skinId === 'metal'){
+    const isBot = botActive && player?.side === 'R';
+    if(!isBot){
+      effectiveAbilityId = 'metalDarkSpike';
+    }
+  }
+  
+  const abilityState = createAbilityState(effectiveAbilityId, profile.abilitySettings);
+  const abilityDef = abilityState.def;
+
   player.skin = skinId;
   player.profile = profile;
   player.baseRadius = profile.radius;
-  player.baseHitboxScale = profile.hitboxScale;
-  player.baseHitboxScaleX = profile.hitboxScaleX || profile.hitboxScale;
-  player.baseHitboxScaleY = profile.hitboxScaleY || profile.hitboxScale;
+  
+  // Aplicar hitbox desde dark asset si está desbloqueado y tiene hitboxScale definido
+  let effectiveHitboxScale = profile.hitboxScale;
+  if(player.darkTierUnlocked){
+    // Primero revisar SKIN_DARK_ASSETS (para skins como ghost, etc)
+    const darkAsset = SKIN_DARK_ASSETS?.[skinId];
+    if(darkAsset && typeof darkAsset.hitboxScale === 'number'){
+      effectiveHitboxScale = darkAsset.hitboxScale;
+    }
+    // Para Fire, revisar darkHitboxScale dentro del mismo SKIN_ASSETS
+    else if(skinId === 'fire'){
+      const fireAsset = SKIN_ASSETS.fire;
+      if(fireAsset && typeof fireAsset.darkHitboxScale === 'number'){
+        effectiveHitboxScale = fireAsset.darkHitboxScale;
+      }
+    }
+  }
+  
+  player.baseHitboxScale = effectiveHitboxScale;
+  player.baseHitboxScaleX = profile.hitboxScaleX || effectiveHitboxScale;
+  player.baseHitboxScaleY = profile.hitboxScaleY || effectiveHitboxScale;
   player.r = profile.radius;
-  player.hitboxScale = profile.hitboxScale;
+  player.hitboxScale = effectiveHitboxScale;
   player.hitboxScaleX = player.baseHitboxScaleX;
   player.hitboxScaleY = player.baseHitboxScaleY;
   player.status = player.status || {};
@@ -7308,9 +8213,9 @@ function applySkinProfile(player, skinId){
   player.lifeBonusAmount = 0;
   player.lifeBonusTimer = 0;
   player.skinState = 'normal';
-  if(skinId !== 'drum' && drumMine.owner === player.side){
-    drumMine.attached = false;
-    drumMine.owner = null;
+  if(skinId !== 'drum'){
+    const mine = player.side === 'L' ? drumMineL : drumMineR;
+    mine.attached = false;
   }
   if(skinId !== 'mystery' && mysteryBomb.owner === player.side){
     detachMysteryBomb(player.side);
@@ -7389,7 +8294,7 @@ function applyThereminShock(caster){
   const target = getOpponentPlayer(caster);
   if(!target) return;
   target.status = target.status || {};
-  target.status.theremin = { stun: 0.2, slow: 0.8 };
+  target.status.theremin = { stun: 0.5, slow: 0.8 };
 }
 
 function applyViolinDash(player, ability){
@@ -7589,7 +8494,7 @@ function applyFireBurnPenalty(side){
 function attemptMetalSpike(player){
   if(!player) return false;
   const ability = player.ability;
-  if(!ability || ability.def?.id !== 'metalSpike' || !ability.active) return false;
+  if(!ability || (ability.def?.id !== 'metalSpike' && ability.def?.id !== 'metalDarkSpike') || !ability.active) return false;
   const chance = ability.def.popChance ?? 0.35;
   if(Math.random() < chance){
     clearTimeout(baloonpopTimeout);
@@ -7737,6 +8642,7 @@ function spawnHydraClone(player, options = {}){
       touchesLeft: 3,
       isClone: true,
       skin: options.skin || player.skin,
+      darkTierUnlocked: player.darkTierUnlocked,
       visualScale: { x: 0.85, y: 0.85 },
       wanderPhase: Math.random() * TAU
     };
@@ -7845,6 +8751,7 @@ function spawnDirectorClone(player){
       maxVx: player.stats?.maxVx ?? CONFIG.PLAYER_MAX_VX,
       impulse: player.stats?.impulse ?? CONFIG.PLAYER_IMPULSE
     },
+    darkTierUnlocked: player.darkTierUnlocked,
     skin
   });
 }
@@ -7908,6 +8815,122 @@ function resolveDirectorCloneCollision(clone, enemy){
   }
 }
 
+function spawnMiniDirectors(player, count = 2){
+  if(!player) return;
+  for(let i = 0; i < count; i++){
+    const offsetIndex = (i - (count - 1) / 2);
+    const miniDirector = {
+      ownerSide: player.side,
+      side: player.side,
+      x: player.x + offsetIndex * (player.r * 0.6),
+      y: player.y,
+      vx: 0,
+      vy: 0,
+      r: player.r * 1,
+      stats: {
+        speed: (player.stats.speed || CONFIG.PLAYER_SPEED) * 0.7,
+        jump: (player.stats.jump || CONFIG.PLAYER_JUMP_V) * 0.7,
+        maxVx: (player.stats.maxVx || CONFIG.PLAYER_MAX_VX) * 0.7,
+        impulse: (player.stats.impulse || CONFIG.PLAYER_IMPULSE) * 0.65
+      },
+      hitboxScale: player.hitboxScale,
+      hitboxScaleX: player.hitboxScaleX,
+      hitboxScaleY: player.hitboxScaleY,
+      onGround: true,
+      touchesLeft: 5,
+      isClone: true,
+      skin: 'director',
+      darkTierUnlocked: false,
+      visualScale: { x: 0.8, y: 0.8 },
+      wanderPhase: Math.random() * TAU
+    };
+    miniDirectors.push(miniDirector);
+  }
+}
+
+function updateMiniDirectors(dt){
+  const gy = CONFIG.GROUND_Y;
+  const allowFreeCourt = isArcadeMode() && (arcadeContext.mode === ARCADE_MODES.DOMINADAS || arcadeContext.mode === ARCADE_MODES.TARGET || (arcadeContext.mode === ARCADE_MODES.BOSS && arcadeContext.freeCourt));
+  
+  for(let i = miniDirectors.length - 1; i >= 0; i--){
+    const mini = miniDirectors[i];
+    if(!mini) continue;
+    
+    mini.wanderPhase = (mini.wanderPhase || 0) + dt * 1.2;
+    const wander = Math.sin(mini.wanderPhase + i * 0.5) * 8;
+
+    const clampMin = allowFreeCourt ? 60 : (mini.ownerSide === 'L' ? 60 : CONFIG.NET_X + 40);
+    const clampMax = allowFreeCourt ? W - 60 : (mini.ownerSide === 'L' ? CONFIG.NET_X - 40 : W - 60);
+    const baseTarget = clamp(ball.x + (mini.side === 'L' ? -30 : 30), clampMin, clampMax);
+    const targetX = baseTarget + wander;
+    const dir = targetX - mini.x;
+    mini.vx = clamp(dir * 3, -mini.stats.speed, mini.stats.speed);
+
+    if(mini.onGround && ball.y < mini.y - 20){
+      mini.vy = -mini.stats.jump * 0.7;
+      mini.onGround = false;
+    }
+
+    mini.vy += CONFIG.GRAVITY * dt;
+    mini.vx *= (1 - CONFIG.AIR_DRAG);
+    mini.vy *= (1 - CONFIG.AIR_DRAG*0.6);
+    mini.x += clamp(mini.vx, -mini.stats.maxVx, mini.stats.maxVx) * dt;
+    mini.y += mini.vy * dt;
+
+    mini.x = clamp(mini.x, clampMin, clampMax);
+
+    const gyMini = gy - mini.r;
+    if(mini.y > gyMini){
+      mini.y = gyMini;
+      mini.vy = 0;
+      mini.onGround = true;
+    }
+    if(mini.y < 60){
+      mini.y = 60;
+      mini.vy = 20;
+    }
+  }
+
+  // Pequeña repulsión entre mini directores para evitar solaparse
+  for(let i = 0; i < miniDirectors.length; i++){
+    for(let j = i + 1; j < miniDirectors.length; j++){
+      const a = miniDirectors[i];
+      const b = miniDirectors[j];
+      const dx = b.x - a.x;
+      const dy = b.y - a.y;
+      const dist = Math.hypot(dx, dy) || 1e-6;
+      const minDist = (a.r + b.r) * 0.9; // ligera holgura para que no se peguen
+      if(dist < minDist){
+        const overlap = (minDist - dist);
+        const nx = dx / dist;
+        const ny = dy / dist;
+        const push = overlap * 0.5;
+        a.x -= nx * push;
+        a.y -= ny * push;
+        b.x += nx * push;
+        b.y += ny * push;
+      }
+    }
+  }
+
+  // Re-clamp tras la repulsión
+  for(const mini of miniDirectors){
+    const clampMin = allowFreeCourt ? 60 : (mini.ownerSide === 'L' ? 60 : CONFIG.NET_X + 40);
+    const clampMax = allowFreeCourt ? W - 60 : (mini.ownerSide === 'L' ? CONFIG.NET_X - 40 : W - 60);
+    mini.x = clamp(mini.x, clampMin, clampMax);
+    const gyMini = gy - mini.r;
+    if(mini.y > gyMini){
+      mini.y = gyMini;
+      mini.vy = 0;
+      mini.onGround = true;
+    }
+    if(mini.y < 60){
+      mini.y = 60;
+      mini.vy = 20;
+    }
+  }
+}
+
 function drawDirectorClones(){
   ctx.save();
   for(const clone of directorClones){
@@ -7928,32 +8951,79 @@ function drawDirectorClones(){
   ctx.restore();
 }
 
+function drawMiniDirectors(){
+  ctx.save();
+  ctx.globalAlpha = 0.85;
+  for(const mini of miniDirectors){
+    ctx.save();
+    ctx.translate(mini.x, mini.y);
+    const vs = mini.visualScale || {x:1,y:1};
+    ctx.scale(vs.x, vs.y);
+    drawSkin(ctx, 'director', { r: mini.r, player: mini });
+    ctx.restore();
+  }
+  ctx.restore();
+}
+
 function armDrumMine(player){
-  if(!player || !player.ability || player.ability.def.id !== 'drumDetonate') return;
+  if(!player || !player.ability) return;
+  const abilityId = player.ability.def.id;
+  if(abilityId !== 'drumDetonate' && abilityId !== 'drumDarkDetonate') return;
   const ability = player.ability;
+  const mine = player.side === 'L' ? drumMineL : drumMineR;
   if(player.stamina.value >= player.stamina.max && !ability.runtime.bombReady){
     ability.runtime.bombReady = true;
-    drumMine.attached = true;
-    drumMine.owner = player.side;
+    mine.attached = true;
   }
-  if(player.stamina.value < player.stamina.max * 0.95 && !drumMine.attached){
+  if(player.stamina.value < player.stamina.max * 0.95 && !mine.attached){
     ability.runtime.bombReady = false;
   }
 }
 
-function triggerDrumExplosion(player){
-  if(!drumMine.attached || drumMine.owner !== player.side) return;
-  drumMine.attached = false;
-  drumMine.owner = null;
-  drumMine.pulse = 1;
+function triggerDrumExplosion(player, ability){
+  const mine = player.side === 'L' ? drumMineL : drumMineR;
+  if(!mine.attached) return;
+  mine.attached = false;
+  mine.pulse = 1;
   ball.vy = Math.abs(ball.vy) + 1200;
   const dir = (player.side === 'L') ? 1 : -1;
   ball.vx += dir * 120;
   player.ability.runtime.bombReady = false;
+  
+  // Si es dark drum, empujar al oponente radialmente desde la pelota
+  if(ability && ability.def.id === 'drumDarkDetonate'){
+    const opponent = getOpponentPlayer(player);
+    if(opponent && ball){
+      const dx = opponent.x - ball.x;
+      const dy = opponent.y - ball.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if(dist > 0){
+        const kb = 2000;
+        const nx = dx / dist;
+        const ny = dy / dist;
+        
+        // Empuje instantáneo fuerte
+        opponent.vx += nx * kb;
+        opponent.vy += ny * kb * 0.4;
+        
+        // Refuerza boost temporal de velocidad (como meteoritos)
+        opponent.status = opponent.status || {};
+        opponent.status.knockbackBoost = Math.max(opponent.status.knockbackBoost || 1, 10);
+        opponent.status.knockbackTimer = Math.max(opponent.status.knockbackTimer || 0, 1.1);
+        
+        // Empuje continuo durante 0.5s (como meteoritos)
+        const forceX = nx * kb * 120;
+        const forceY = ny * kb * 6.0;
+        applyKnockForce(opponent, forceX, forceY, 0.1);
+      }
+    }
+  }
 }
 
 function concludeDrumAbility(player){
-  if(!player || !player.ability || player.ability.def.id !== 'drumDetonate') return;
+  if(!player || !player.ability) return;
+  const abilityId = player.ability.def.id;
+  if(abilityId !== 'drumDetonate' && abilityId !== 'drumDarkDetonate') return;
   player.ability.active = false;
 }
 
@@ -7980,7 +9050,6 @@ function handleMysteryCharge(player){
 
 function attachMysteryBomb(player){
   if(!player) return;
-  if(drumMine.attached && drumMine.owner !== player.side) return;
   mysteryBomb.attached = true;
   mysteryBomb.owner = player.side;
 }
@@ -8119,8 +9188,11 @@ function drawFlorBursts(){
 }
 
 function updateDrumMinePulse(dt){
-  if(drumMine.pulse > 0){
-    drumMine.pulse = Math.max(0, drumMine.pulse - dt * 1.5);
+  if(drumMineL.pulse > 0){
+    drumMineL.pulse = Math.max(0, drumMineL.pulse - dt * 1.5);
+  }
+  if(drumMineR.pulse > 0){
+    drumMineR.pulse = Math.max(0, drumMineR.pulse - dt * 1.5);
   }
 }
 
@@ -8194,7 +9266,7 @@ function updatePlayerRuntime(player, dt){
 
   const ability = player.ability;
   if(!ability) return;
-  if(ability.def.id === 'drumDetonate'){
+  if(ability.def.id === 'drumDetonate' || ability.def.id === 'drumDarkDetonate'){
     armDrumMine(player);
   } else if(ability.def.id === 'mysteryCipher'){
     handleMysteryCharge(player);
@@ -8266,9 +9338,17 @@ function concludeAbility(player){
 
 function resolveSkinPhotoCandidates(baseSkin, b){
   const player = b?.player;
+  
+  // Deshabilitar dark skins para bots, bosses y clones del bot
+  const isBot = (botActive && player === p2);
+  const isBoss = (player === p2 && player?.isBoss === true);
+  const isBotClone = (player?.isClone === true && player?.ownerSide === p2?.side && botActive);
+  const isBotOwned = (player?.ownerSide === p2?.side && botActive && !player?.isClone);
+  const allowDark = !isBot && !isBoss && !isBotClone && !isBotOwned;
+  
   const stats = player?.charProgressStats || (baseSkin ? getCharStatsSnapshot(baseSkin) : null);
   const achData = player?.charAchievementData || (stats ? getCharAchievementData(stats) : null);
-  const darkUnlocked = isDarkTierUnlocked(achData || stats);
+  const darkUnlocked = allowDark && (player?.darkTierUnlocked ?? isDarkTierUnlocked(achData || stats));
   const normalAsset = (typeof SKIN_ASSETS !== 'undefined' && SKIN_ASSETS[baseSkin]) ? SKIN_ASSETS[baseSkin] : {};
   const darkAssetRaw = darkUnlocked ? (SKIN_DARK_ASSETS?.[baseSkin] || null) : null;
   const darkAsset = (darkAssetRaw && darkAssetRaw.spriteUrl) ? darkAssetRaw : null;
@@ -8390,17 +9470,47 @@ function drawSkin(ctx, skin, b){
           // Efecto de luz que rota alrededor de la imagen - solo si no hay clones activos
           const hasActiveClones = directorClones && directorClones.length > 0;
           if (!hasActiveClones) {
+            const isDarkDirector = chosen?.key?.includes('_dark');
             const rotationAngle = (t / 3000) * TAU; // Rota una vuelta cada 3 segundos
-            const lightX = Math.cos(rotationAngle) * R * 1.1;
-            const lightY = Math.sin(rotationAngle) * R * 1.1;
-            const lightGrad = ctx.createRadialGradient(lightX, lightY, 0, lightX, lightY, R * 0.8);
-            lightGrad.addColorStop(0, 'rgba(255,255,255,0.6)');
-            lightGrad.addColorStop(0.5, 'rgba(199,182,255,0.3)');
-            lightGrad.addColorStop(1, 'rgba(199,182,255,0)');
-            ctx.fillStyle = lightGrad;
-            ctx.beginPath();
-            ctx.arc(lightX, lightY, R * 0.8, 0, TAU);
-            ctx.fill();
+
+            if (isDarkDirector) {
+              const stamina = b.player?.stamina;
+              const staminaPct = (stamina && stamina.max > 0) ? (stamina.value / stamina.max) : 0;
+              let orbiters = 0;
+              if (staminaPct >= 1) {
+                orbiters = 4;
+              } else if (staminaPct >= 0.5) {
+                orbiters = 2;
+              }
+
+              if (orbiters > 0) {
+                const spacing = TAU / orbiters;
+                for (let i = 0; i < orbiters; i++) {
+                  const a = rotationAngle + i * spacing;
+                  const lightX = Math.cos(a) * R * 1.5;
+                  const lightY = Math.sin(a) * R * 1.5;
+                  const lightGrad = ctx.createRadialGradient(lightX, lightY, 0, lightX, lightY, R * 0.8);
+                  lightGrad.addColorStop(0, 'rgba(255,255,255,0.6)');
+                  lightGrad.addColorStop(0.5, 'rgba(199,182,255,0.3)');
+                  lightGrad.addColorStop(1, 'rgba(199,182,255,0)');
+                  ctx.fillStyle = lightGrad;
+                  ctx.beginPath();
+                  ctx.arc(lightX, lightY, R * 0.8, 0, TAU);
+                  ctx.fill();
+                }
+              }
+            } else {
+              const lightX = Math.cos(rotationAngle) * R * 1.1;
+              const lightY = Math.sin(rotationAngle) * R * 1.1;
+              const lightGrad = ctx.createRadialGradient(lightX, lightY, 0, lightX, lightY, R * 0.8);
+              lightGrad.addColorStop(0, 'rgba(255,255,255,0.6)');
+              lightGrad.addColorStop(0.5, 'rgba(199,182,255,0.3)');
+              lightGrad.addColorStop(1, 'rgba(199,182,255,0)');
+              ctx.fillStyle = lightGrad;
+              ctx.beginPath();
+              ctx.arc(lightX, lightY, R * 0.8, 0, TAU);
+              ctx.fill();
+            }
           }
         }
         
@@ -8776,43 +9886,68 @@ case 'queen': {
 
 // ===== FIRE =====
 case 'fire': {
-  const phase = (t / 120) % 3;
-  const r1 = R * 0.85;
-  const g = ctx.createRadialGradient(0,0, r1*0.1, 0,0, r1);
-  g.addColorStop(0,'#2a2a33');
-  g.addColorStop(0.5,'#1d1d24');
-  g.addColorStop(1,'#0b0b10');
-  ctx.fillStyle = g;
-  ctx.beginPath(); ctx.arc(0,0, r1, 0, TAU); ctx.fill();
-
-  const ringR = r1 * 1.18;
-  const segs = 36;
-  const chase = Math.floor((t/40)) % segs;
-  const palette = ['#ff0044','#0ff096','#36a2ff'];
-    // borde negro
-  ctx.save();
-  ctx.strokeStyle = 'rgba(1,1,1,0.9)';
-  ctx.lineWidth = Math.max(2, R * 0.12);
-  ctx.beginPath();
-  ctx.arc(0, 0, R * 1, 0, TAU);
-  ctx.stroke();
-  ctx.restore();
-
-  for (let i=0;i<segs;i++){
-    const idx = (Math.floor(i/ (segs/3)) + Math.floor(phase)) % 3;
-    let dist = Math.abs(((i - chase + segs) % segs));
-    if (dist > segs/2) dist = segs - dist;
-    const alpha = 0.22 + Math.max(0, (1 - dist/8)) * 0.6;
-    ctx.strokeStyle = palette[idx];
-    ctx.globalAlpha = alpha;
-    ctx.lineWidth = 7;
-    const a0 = i * TAU / segs;
-    const a1 = (i+0.8) * TAU / segs;
-    ctx.beginPath();
-    ctx.arc(0,0, ringR, a0, a1);
-    ctx.stroke();
+  // Detectar si es dark (igual que Ghost)
+  const player = b?.player;
+  const isBot = (botActive && player === p2);
+  const isBoss = (player === p2 && player?.isBoss === true);
+  const isBotClone = (player?.isClone === true && player?.ownerSide === p2?.side && botActive);
+  const isBotOwned = (player?.ownerSide === p2?.side && botActive && !player?.isClone);
+  const allowDark = !isBot && !isBoss && !isBotClone && !isBotOwned;
+  
+  const stats = player?.charProgressStats || (player?.skin ? getCharStatsSnapshot(player.skin) : null);
+  const darkUnlocked = allowDark && stats ? isDarkTierUnlocked(stats) : false;
+  
+  // Assets normales
+  const fireAsset = SKIN_ASSETS.fire || {};
+  let lightsKey = 'fire_lights';
+  let bodyKey = 'fire_body';
+  
+  // Configuración de escala y offset (normal por defecto)
+  let lightsScale = 1.1;
+  let bodyScale = 1.2;
+  let lightsOffsetX = 0;
+  let lightsOffsetY = 0;
+  let bodyOffsetX = 0;
+  let bodyOffsetY = 0;
+  
+  // Si dark desbloqueado, usar versiones dark con sus propias escalas
+  if(darkUnlocked){
+    if(fireAsset.lightsDarkUrl){
+      lightsKey = 'fire_lights_dark';
+      lightsScale = (fireAsset.darkLightsScale || 1.2) * 0.9; // Aplica factor 0.9 sobre la escala dark
+      lightsOffsetX = fireAsset.darkLightsOffsetX || 0;
+      lightsOffsetY = fireAsset.darkLightsOffsetY || 0;
+    }
+    if(fireAsset.bodyDarkUrl){
+      bodyKey = 'fire_body_dark';
+      bodyScale = fireAsset.darkBodyScale || 1.3;
+      bodyOffsetX = fireAsset.darkBodyOffsetX || 0;
+      bodyOffsetY = fireAsset.darkBodyOffsetY || 0;
+    }
   }
-  ctx.globalAlpha=1;
+  
+  // Calcular dimensiones base
+  const wLights = R * 2 * lightsScale;
+  const hLights = R * 2 * lightsScale;
+  const wBody = R * 2 * bodyScale;
+  const hBody = R * 2 * bodyScale;
+  
+  // Dibujar luces rotando por atrás
+  const lightsPhoto = SKIN_PHOTOS[lightsKey];
+  if(lightsPhoto?.img && lightsPhoto.loaded && !lightsPhoto.error){
+    ctx.save();
+    const rotationSpeed = (t / 2000) * TAU;
+    ctx.rotate(rotationSpeed);
+    ctx.drawImage(lightsPhoto.img, -wLights/2 + lightsOffsetX, -hLights/2 + lightsOffsetY, wLights, hLights);
+    ctx.restore();
+  }
+  
+  // Dibujar body encima (fijo, sin rotación)
+  const bodyPhoto = SKIN_PHOTOS[bodyKey];
+  if(bodyPhoto?.img && bodyPhoto.loaded && !bodyPhoto.error){
+    ctx.drawImage(bodyPhoto.img, -wBody/2 + bodyOffsetX, -hBody/2 + bodyOffsetY, wBody, hBody);
+  }
+  
   break;
 }
 
@@ -9236,9 +10371,9 @@ function makePlayer(x, side, skin='violin'){
   return player;
 }
 
+let botActive = false;
 let p1 = makePlayer(W*0.25,'L', 'violin');
 let p2 = makePlayer(W*0.75,'R', 'theremin');
-let botActive = false;
 
 let ball = {
   x: W*0.5, y: 200,
@@ -9903,6 +11038,7 @@ function endBossFight(result = {}){
     score: (state.maxHp || 0) - (state.hp || 0),
     bestStreak: state.targetHits || 0,
     elapsedMs,
+    playerLives: state.playerLives || 0,
     skin: p1?.skin || null
   });
   badge.innerText = '';
@@ -10966,6 +12102,7 @@ function startArcadeMatchFromSelection(){
   }
   hydraClones.length = 0;
   directorClones.length = 0;
+  miniDirectors.length = 0;
   ghostBarriers.length = 0;
   florBursts.length = 0;
 
@@ -11186,6 +12323,7 @@ function handleSelection(){
     p2 = makePlayer(W*0.75,'R', p2.skin);
     hydraClones.length = 0;
     directorClones.length = 0;
+    miniDirectors.length = 0;
     ghostBarriers.length = 0;
     florBursts.length = 0;
 
@@ -11261,7 +12399,12 @@ function drawSelectionGrid(){
     }
     ctx.save();
     ctx.translate(x + CARD_W/2, y + CARD_H*0.58);
-    drawSkin(ctx, skin, {r:36});
+    // Crear objeto mock player para que drawSkin sepa si es dark
+    const mockPlayer = {
+      charProgressStats: stats,
+      skin: skin
+    };
+    drawSkin(ctx, skin, {r:36, player: mockPlayer});
     ctx.restore();
 
     // --- Nombre ---
@@ -11894,6 +13037,7 @@ function stepPhysics(dt){
   }
   updateHydraClones(dt);
   updateDirectorClones(dt);
+  updateMiniDirectors(dt);
 
   // Pelota (si está en espera de saque, dejamos la integración normal pero waitServe evita movimiento)
   const prevBallX = ball.x;
@@ -12025,6 +13169,9 @@ function stepPhysics(dt){
   for(const clone of directorClones){
     handlePlayerHit(clone);
   }
+  for(const mini of miniDirectors){
+    handlePlayerHit(mini);
+  }
   checkArcadeTargetHit();
   updateBossFight(dt);
   updateHazardProjectiles(dt);
@@ -12066,7 +13213,7 @@ function handlePlayerHit(p){
     }, 1);
 
     if(handleFireTouch(p.side)) return;
-    if(p.ability?.def?.id === 'metalSpike' && p.ability.active){
+    if((p.ability?.def?.id === 'metalSpike' || p.ability?.def?.id === 'metalDarkSpike') && p.ability.active){
       if(attemptMetalSpike(p)) return;
     }
 
@@ -12145,9 +13292,13 @@ function handlePlayerHit(p){
     }
     sendBallEvent('hit', { hitter: p.side });
     if(isClone && p.touchesLeft <= 0){
-      const idx = hydraClones.indexOf(p);
-      if(idx !== -1){
-        hydraClones.splice(idx, 1);
+      const hydroIdx = hydraClones.indexOf(p);
+      if(hydroIdx !== -1){
+        hydraClones.splice(hydroIdx, 1);
+      }
+      const miniIdx = miniDirectors.indexOf(p);
+      if(miniIdx !== -1){
+        miniDirectors.splice(miniIdx, 1);
       }
     }
   }
@@ -12246,6 +13397,9 @@ function addPoint(who, options = {}){
       }
       const elapsed = getMatchElapsedMs();
       updateBotKillStats(p1.skin, elapsed);
+      if(p1?.skin){
+        addCharStat(p1.skin, 'points', 1);
+      }
       saveProgress(progress);
       registerPointStreak('p1');
       const serveSide = (Math.random() < 0.5) ? 'L' : 'R';
@@ -12338,6 +13492,7 @@ function drawGame(){
   drawPlayer(p2);
   drawHydraClones();
   drawDirectorClones();
+  drawMiniDirectors();
 
   // Pelota
   drawBall();
@@ -12481,26 +13636,50 @@ function drawBall(){
   ctx.beginPath(); ctx.arc(0,0, r*0.65, 0.4, TAU-0.4); ctx.stroke();
   ctx.beginPath(); ctx.arc(0,0, r*0.55, -0.8, TAU+0.8); ctx.stroke();
 
-  if(drumMine.attached){
+  // Bomba de drum - p1 a la izquierda, p2/bot a la derecha
+  if(drumMineL.attached){
     ctx.save();
-    ctx.translate(r * 0.45, -r * 0.3);
+    ctx.translate(-r * 0.55, -r * 0.25);
     drawDrumMineSprite(ctx, r * 0.23, {
+      owner: p1,
       spriteScale: SKIN_ASSETS.drumMine?.spriteScale,
       spriteOffsetX: SKIN_ASSETS.drumMine?.spriteOffsetX,
       spriteOffsetY: SKIN_ASSETS.drumMine?.spriteOffsetY
     });
     ctx.restore();
   }
-  if(drumMine.pulse > 0){
+  if(drumMineR.attached){
     ctx.save();
-    ctx.globalAlpha = 0.35 * drumMine.pulse;
+    ctx.translate(r * 0.55, -r * 0.25);
+    drawDrumMineSprite(ctx, r * 0.23, {
+      owner: p2,
+      spriteScale: SKIN_ASSETS.drumMine?.spriteScale,
+      spriteOffsetX: SKIN_ASSETS.drumMine?.spriteOffsetX,
+      spriteOffsetY: SKIN_ASSETS.drumMine?.spriteOffsetY
+    });
+    ctx.restore();
+  }
+  if(drumMineL.pulse > 0){
+    ctx.save();
+    ctx.globalAlpha = 0.35 * drumMineL.pulse;
     ctx.strokeStyle = '#ff9b68';
     ctx.lineWidth = 4;
     ctx.beginPath();
-    ctx.arc(0, 0, r * (1.2 + drumMine.pulse), 0, TAU);
+    ctx.arc(0, 0, r * (1.2 + drumMineL.pulse), 0, TAU);
     ctx.stroke();
     ctx.restore();
   }
+  if(drumMineR.pulse > 0){
+    ctx.save();
+    ctx.globalAlpha = 0.35 * drumMineR.pulse;
+    ctx.strokeStyle = '#ff9b68';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.arc(0, 0, r * (1.2 + drumMineR.pulse), 0, TAU);
+    ctx.stroke();
+    ctx.restore();
+  }
+
   if(mysteryBomb.attached){
     ctx.save();
     ctx.translate(-r * 0.45, -r * 0.3);
@@ -12544,8 +13723,29 @@ function drawBall(){
 
 function drawDrumMineSprite(ctx, radius = 14, options = {}){
   ctx.save();
-  const asset = SKIN_ASSETS.drumMine || {};
-  const photo = asset.spriteUrl ? SKIN_PHOTOS.drumMine : null;
+  
+  // Resolver variante dark si el dueño tiene dark tier desbloqueado
+  const owner = options.owner;
+  const isBot = (botActive && owner === p2);
+  const isBoss = (owner === p2 && owner?.isBoss === true);
+  const isBotClone = (owner?.isClone === true && owner?.ownerSide === p2?.side && botActive);
+  const isBotOwned = (owner?.ownerSide === p2?.side && botActive && !owner?.isClone);
+  const allowDark = !isBot && !isBoss && !isBotClone && !isBotOwned;
+  
+  const darkUnlocked = allowDark && owner?.darkTierUnlocked;
+  
+  let asset = SKIN_ASSETS.drumMine || {};
+  let photoKey = 'drumMine';
+  
+  if(darkUnlocked){
+    const darkAsset = SKIN_DARK_ASSETS.drumMineDark;
+    if(darkAsset && darkAsset.spriteUrl){
+      asset = darkAsset;
+      photoKey = 'drumMineDark';
+    }
+  }
+  
+  const photo = asset.spriteUrl ? SKIN_PHOTOS[photoKey] : null;
   const img = photo && photo.img ? photo.img : null;
   if(img && photo.loaded && !photo.error && img.complete && img.naturalWidth > 0){
     const scale = asset.spriteScale || 1.0;
@@ -12573,10 +13773,16 @@ function drawDrumMineSprite(ctx, radius = 14, options = {}){
 function drawGhostTubeRed(ctx, x, y, baseHeight, hFactor, opacity, b){
   ctx.save();
   
-  // Resolver variante dark si está desbloqueada
+  // Resolver variante dark solo si no es bot, boss, clon del bot o entidad del bot
   const player = b?.player;
+  const isBot = (botActive && player === p2);
+  const isBoss = (player === p2 && player?.isBoss === true);
+  const isBotClone = (player?.isClone === true && player?.ownerSide === p2?.side && botActive);
+  const isBotOwned = (player?.ownerSide === p2?.side && botActive && !player?.isClone);
+  const allowDark = !isBot && !isBoss && !isBotClone && !isBotOwned;
+  
   const stats = player?.charProgressStats || (player?.skin ? getCharStatsSnapshot(player.skin) : null);
-  const darkUnlocked = stats ? isDarkTierUnlocked(stats) : false;
+  const darkUnlocked = allowDark && stats ? isDarkTierUnlocked(stats) : false;
   
   let asset = SKIN_ASSETS.ghostTubeRed || {};
   let photoKey = 'ghostTubeRed';
@@ -13202,6 +14408,93 @@ for (const [skinName, asset] of Object.entries(SKIN_ASSETS)) {
   // Cargar variante estirada si está definida
   if (asset.stretchedSpriteUrl) {
     loadSkinPhoto(`${skinName}_stretched`, asset.stretchedSpriteUrl);
+  }
+}
+
+// Override final de renderFavoriteSkin: usa nivel visible y total de logros
+function renderFavoriteSkin(){
+  if(!uiRefs.favSkinName || !uiRefs.favSkinMeta) return;
+  const rosterReady = (typeof ROSTER !== 'undefined') && Array.isArray(ROSTER) && ROSTER.length > 0;
+  const fallbackSkin = rosterReady ? ROSTER[0] : 'violin';
+  const fav = getFavoriteChar() || { skin: fallbackSkin, stats: CHAR_DEFAULT_STATS };
+  const name = fav ? getSkinLabel(fav.skin) : '-';
+  const stats = fav?.stats || null;
+  const ach = getCharAchievementData(stats || {});
+  const displayLevel = ach.displayLevel || ach.level || 0;
+  const style = getAchFrameStyle(Math.min(displayLevel, ACH_COLORS.length - 1));
+  const levelName = getTierDisplayName(displayLevel);
+
+  if(uiRefs.favSkinFrame){
+    const frame = uiRefs.favSkinFrame;
+    frame.className = `skin-frame glow-level-${displayLevel || 0}`;
+    if(style){
+      const base = style.glow || '#ffffff';
+      const grad = `radial-gradient(circle at 50% 50%, ${hexToRgba(base,0.8)} 0%, ${hexToRgba(base,0.5)} 55%, ${hexToRgba(base,0)} 90%)`;
+      frame.style.background = `#0c1422, ${grad}`;
+      frame.style.backgroundBlendMode = 'screen';
+      frame.style.boxShadow = `0 0 0 2px ${hexToRgba(base,0.95)}, 0 0 32px ${hexToRgba(base,0.8)}, 0 0 60px ${hexToRgba(base,0.55)}`;
+      frame.style.borderColor = hexToRgba(base,0.85);
+    } else {
+      frame.style.boxShadow = '0 0 0 1px #1f365a';
+      frame.style.borderColor = '#1f365a';
+      frame.style.background = '#0c1422';
+      frame.style.backgroundBlendMode = 'normal';
+    }
+  }
+
+  if(levelName && style?.glow){
+    uiRefs.favSkinName.innerHTML = `${name} - <span style="color:${style.glow};">${levelName}</span>`;
+  } else {
+    uiRefs.favSkinName.textContent = name;
+  }
+
+  uiRefs.favSkinMeta.textContent = stats
+    ? `${stats.matches || 0} partidas - ${stats.wins || 0} victorias - Nivel ${displayLevel} - ${ach.met || 0} logros`
+    : 'Aún sin partidas';
+
+  if(uiRefs.favSkinChips){
+    uiRefs.favSkinChips.innerHTML = '';
+    if(stats){
+      const chips = [
+        { label:`W ${stats.wins || 0}` },
+        { label:`L ${stats.losses || 0}` },
+        { label:`Hab ${stats.abilityUses || 0}` },
+        { label:`Pts ${stats.points || 0}` },
+        { label:`Fatal ${stats.fatalities || 0}` },
+        { label:`Fouls ${stats.fouls || 0}` },
+        { label:`Dom ${stats.arcadeDominadasMax || 0}` },
+        { label:`Target ${stats.arcadeTargetHitsMax || 0}/${stats.arcadeTargetStreakMax || 0}` }
+      ];
+      chips.forEach(ch=>{
+        const span = document.createElement('span');
+        span.className = 'stat-chip';
+        span.textContent = ch.label;
+        uiRefs.favSkinChips.appendChild(span);
+      });
+    }
+  }
+
+  if(uiRefs.favAchProgress){
+    uiRefs.favAchProgress.innerHTML = '';
+    ach.lines.forEach(lineObj=>{
+      const line = typeof lineObj === 'string' ? { text: lineObj } : (lineObj || {});
+      const span = document.createElement('span');
+      span.className = 'stat-chip' + (line.done ? ' achieved' : '');
+      span.textContent = line.text || line;
+      uiRefs.favAchProgress.appendChild(span);
+    });
+  }
+
+  const cvs = uiRefs.favSkinCanvas;
+  if(cvs){
+    const ctx = cvs.getContext('2d');
+    ctx.clearRect(0,0,cvs.width,cvs.height);
+    if(fav){
+      ctx.save();
+      ctx.translate(cvs.width/2, cvs.height/2 + 6);
+      drawSkin(ctx, fav.skin, { r: Math.min(cvs.width, cvs.height) * 0.32, player:{ skin: fav.skin } });
+      ctx.restore();
+    }
   }
 }
 
