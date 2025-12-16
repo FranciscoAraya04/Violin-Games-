@@ -16,16 +16,18 @@
     --hudShadow:#00000055;
     --btn:#1f7aec;
     --btnText:#fff;
-    --menu-bg:url('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/beach.avif');
+    --menu-bg:url('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/beach.avif');
     /* // Reemplaza con la URL de la imagen que quieras para: Local PvP */
-    --mode-pvp-img: url('https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Gemini_Generated_Image_1bvdie1bvdie1bvd.png?raw=true');
+    --mode-pvp-img: url('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Gemini_Generated_Image_1bvdie1bvdie1bvd.png');
     /* // Reemplaza con la URL de la imagen que quieras para: Local vs Bot */
-    --mode-bot-img: url('https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Gemini_Generated_Image_trez19trez19trez.png?raw=true');
+    --mode-bot-img: url('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Gemini_Generated_Image_trez19trez19trez.png');
     /* // Reemplaza con la URL de la imagen que quieras para: PvP LAN/WiFi */
-    --mode-lan-img: url('https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Gemini_Generated_Image_lyjjkulyjjkulyjj.png?raw=true');
+    --mode-lan-img: url('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Gemini_Generated_Image_lyjjkulyjjkulyjj.png');
     /* Imagen o gradiente para Arcade */
     /* //foto de fondo para modo arcade */
-    --mode-arcade-img: url('https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Gemini_Generated_Image_bdsxtqbdsxtqbdsx.png?raw=true');
+    --mode-arcade-img: url('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Gemini_Generated_Image_bdsxtqbdsxtqbdsx.png');
+    /* una para modo historia */
+    --mode-story-img: url('https://multisenal.com.mx/wp-content/uploads/2025/07/obra-en-construccion-senal-solar-122x30-y-122x61-cm.webp');
   }
   html,body{height:100%;margin:0;background:#0b1420;color:#eee;font-family:'Barlow',system-ui,Segoe UI,Roboto,Arial}
   .wrap{display:flex;align-items:center;justify-content:center;height:100%;position:relative;}
@@ -99,6 +101,46 @@
     max-height:90vh;
     overflow-y:auto;
     padding-bottom:140px;
+  }
+  .story-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:14px;
+    margin-top:12px;
+  }
+  .story-card{
+    position:relative;
+    border-radius:14px;
+    overflow:hidden;
+    border:1px solid #1f365a;
+    background:#0f1a2b;
+    cursor:pointer;
+    min-height:140px;
+    box-shadow:0 12px 30px #0007;
+    transition:transform .08s ease, box-shadow .12s ease, opacity .12s;
+  }
+  .story-card:hover{transform:translateY(-2px); box-shadow:0 16px 36px #0009;}
+  .story-card:active{transform:translateY(0);}
+  .story-thumb{
+    position:absolute;inset:0;
+    background:#123 url('') center/cover no-repeat;
+    filter:saturate(1);
+    opacity:0.4;
+  }
+  .story-card h3{
+    position:relative;
+    margin:0;
+    padding:12px;
+    font:800 17px/1.2 'Barlow',system-ui;
+    color:#e8f2ff;
+    text-shadow:0 3px 12px #000;
+  }
+  .story-card p{
+    position:relative;
+    margin:0 12px 12px;
+    font:500 13px/1.4 'Barlow',system-ui;
+    color:#c7d5f3;
+    text-shadow:0 2px 8px #000b;
   }
   .panel h1{margin:0 0 8px;font:800 26px/1.2 'Barlow',system-ui}
   .panel h2{margin:12px 0 6px;font:700 18px/1.1 'Barlow',system-ui;color:#9dc6ff}
@@ -660,10 +702,19 @@
     letter-spacing:0.4px;
   }
 </style>
+<style>
+  /* Botón overlay fijo arriba a la derecha del canvas */
+  .overlay-btn{position:absolute; top:12px; right:12px; z-index:20; padding:8px 12px; border-radius:8px; border:1px solid #ffffff44; background:#0b1420cc; color:#eaf6ff; font-weight:600; box-shadow:0 6px 16px #0007; cursor:pointer;}
+  .overlay-btn.hidden{display:none;}
+  .overlay-btn:hover{filter:brightness(1.15);} 
+  .overlay-btn:active{transform:translateY(1px);}
+</style>
 </head>
 <body>
 <div class="wrap">
   <canvas id="game" width="1200" height="675" aria-label="Violin Beach Volley"></canvas>
+  <!-- Botón persistente para volver al menú de historia -->
+  <button id="storyExitBtn" class="overlay-btn hidden" aria-label="Volver a capítulos">⏎ Menú historia</button>
   <button class="hud-btn secondary hidden" id="btnToggleSkins" title="Toggle skins modernas/dibujos">🎨</button>
 </div>
 <div class="touch-overlay hidden" id="touchOverlay">
@@ -676,6 +727,7 @@
 <div class="net-status hidden" id="netStatus"></div>
 <button class="hud-btn hidden" id="btnPauseHud">Pausa</button>
 <button class="hud-btn secondary hidden" id="btnExitPause">Salir al menú</button>
+  <button class="hud-btn secondary hidden" id="btnStorySkip">Skipear combate (Historia)</button>
 <!-- Controles de HUD (se muestran dentro del canvas sólo en pausa) -->
 <div id="hudControls" class="hidden">
   <div class="hud-controls-bar">
@@ -707,6 +759,10 @@
         <button class="mode-card" id="btnArcade" style="--mode-img: var(--mode-arcade-img);">
           <span class="mode-tag">Arcade</span>
           <span class="mode-copy">Reta mini juegos: dominadas, targets y fatality practice.</span>
+        </button>
+        <button class="mode-card" id="btnStory" style="--mode-img: var(--mode-story-img);">
+          <span class="mode-tag">Modo historia</span>
+          <span class="mode-copy">16 capítulos: slides + combates encadenados.</span>
         </button>
       </div>
 <div class="menu-description">Elige un modo para saltar a la selección de personajes y entrar al combate en la playa.</div>
@@ -983,6 +1039,23 @@
       </div>
     </div>
   </div>
+
+  <div class="panel hidden scrollable" id="storyPanel">
+    <div class="tutorial-hero" style="margin-bottom:4px;">
+      <h1>Modo Historia</h1>
+      <span class="pill">16 capítulos</span>
+    </div>
+    <p class="menu-description" style="text-align:left;">
+      Edita la lista de cap¡tulos y sus pasos (slides o combates) en <code>STORY_CHAPTERS</code> dentro del archivo.
+      Cada paso acepta slides con URLs o combates configurables (modo 1v1 bot, arcade:target, arcade:dominadas, fondo, eventos de texto).
+    </p>
+    <div class="story-controls" style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+      <button class="ui-btn low-profile" id="btnStoryPrev">◀ Atrás</button>
+      <button class="ui-btn low-profile" id="btnStoryNext">Siguiente ▶</button>
+      <button class="ui-btn secondary" id="btnStoryBackMenu">Volver al menú</button>
+    </div>
+    <div class="story-grid" id="storyGrid"></div>
+  </div>
   <div class="ency-panel hidden scrollable" id="encyPanel">
     <div class="ency-header">
       <div>
@@ -1217,6 +1290,7 @@ const MUSIC ={
     suddendeathmusic: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/War%20&%20Epic%20(Royalty%20Free%20Music%20For%20YouTube)%20-%20WAR%20by%20@Makai-symphony.mp3'),
     menu1: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/music/Caprice%20No.%205.mp3'),
     menu2: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/music/Paganini%EF%BC%9A%20Caprice%20No.1%20for%20Violin%20(Augustin%20Hadelich).wav'),
+    menu3: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/music/MovimientoPerpetuo.mp3'),
     survival: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/music/Shadow-Fight-2-Act-1-Survival-Th.mp3'),
     survival2: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/music/Shadow-Fight-2-Act-2-Survival-Th.mp3'),
     survival3: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/music/Shadow-Fight-2-Act-3-Challenge-A.mp3'),
@@ -1233,8 +1307,9 @@ const MUSIC ={
 MUSIC.beach.volume = 0.3;
 MUSIC.mkmusic.volume = 0.85;
 MUSIC.suddendeathmusic.volume = 0.3;
-MUSIC.menu1.volume = 0.25; // ajuste de volumen
-MUSIC.menu2.volume = 0.4; // ajuste de volumen
+MUSIC.menu1.volume = 0.28; // ajuste de volumen
+MUSIC.menu2.volume = 0.30; // ajuste de volumen
+MUSIC.menu3.volume = 0.5; // ajuste de volumen
 MUSIC.survival.volume = 0.30; // ajuste de volumen
 MUSIC.survival2.volume = 0.20; // ajuste de volumen
 MUSIC.survival3.volume = 0.30; // ajuste de volumen
@@ -1250,6 +1325,7 @@ MUSIC.beach.loop = true;
 MUSIC.mkmusic.loop = true;
 MUSIC.menu1.loop = false;
 MUSIC.menu2.loop = false;
+MUSIC.menu3.loop = false;
 MUSIC.survival.loop = false; // se reproducen en secuencia, no en loop
 MUSIC.survival2.loop = false; // se reproducen en secuencia, no en loop
 MUSIC.survival3.loop = false; // se reproducen en secuencia, no en loop
@@ -1336,6 +1412,7 @@ const MENU_MUSIC = [MUSIC.menu1, MUSIC.menu2];
 const MENU_TRACKS = [
   { node: MUSIC.menu1, weight: 2 },
   { node: MUSIC.menu2, weight: 1 },
+  { node: MUSIC.menu3, weight: 2 },
 ];
 const SURVIVAL_TRACKS = [
   { node: MUSIC.survival, weight: 2 },
@@ -1516,6 +1593,12 @@ const CONFIG = {
 const bgImages = {};
 const IMAGES = {};
 const SKIN_PHOTOS = {}; // Almacena URLs de fotos de skins y su estado de carga
+// Skin del cohete de Violin Dark (actualiza la URL si cambias el asset)
+const VIOLIN_DARK_ROCKET_KEY = 'violinDarkRocket';
+const VIOLIN_DARK_ROCKET_URL = 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Violin/ViolinDarkRocket.png';
+// Skin de la espada láser para Theremin Dark
+const THEREMIN_LASER_SWORD_KEY = 'thereminLaserSword';
+const THEREMIN_LASER_SWORD_URL = 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Theremin/ThereminSword.png';
 
 function loadBackgroundImage(name, url) {
   const img = new Image();
@@ -1530,6 +1613,11 @@ function loadImageAsset(name, url){
   img.src = url;
   IMAGES[name] = img;
 }
+
+// Precargar rocket de Violin Dark
+loadImageAsset(VIOLIN_DARK_ROCKET_KEY, VIOLIN_DARK_ROCKET_URL);
+// Precargar espada láser de Theremin Dark
+loadImageAsset(THEREMIN_LASER_SWORD_KEY, THEREMIN_LASER_SWORD_URL);
 
 // Cargar foto de skin (con manejo de errores)
 function loadSkinPhoto(skin, url){
@@ -1562,43 +1650,56 @@ function loadSkinPhoto(skin, url){
 // O cualquier URL directa a una imagen
 const SKIN_ASSETS = {
   violin: {
-    spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Violin/ViolinSkin2.png?raw=true', // Pon aquí la foto del violín
+    spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Violin/ViolinSkin2.png', // Pon aquí la foto del violín
     spriteScale: 1.5,
     spriteOffsetX: 0,      // Ajusta para mover horizontalmente (negativo = izquierda, positivo = derecha)
     spriteOffsetY: -10     // Ajusta para mover verticalmente (negativo = arriba, positivo = abajo)
   },
+  violin_story: {
+    spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Violin/ViolinSkinRegular.png', // Violin normal para modo historia
+    spriteScale: 1.5,
+    spriteOffsetX: 0,
+    spriteOffsetY: -10
+  },
   cello: {
-    spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Cello/CelloSkin.png?raw=true', // Pon aquí la foto del violonchelo
+    spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Cello/CelloSkin.png', // Pon aquí la foto del violonchelo
+    spriteScale: 1.5,
+    spriteOffsetX: 5,
+    spriteOffsetY: 0
+  },
+  cello_story: {
+    spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Cello/CelloSkinRegular.png', // Cello normal para modo historia
     spriteScale: 1.5,
     spriteOffsetX: 5,
     spriteOffsetY: 0
   },
   piano: {
-    spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Piano/PianoSkin.png?raw=true', // Pon aquí la foto del piano (versión normal)
+    spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Piano/PianoSkin.png', // Pon aquí la foto del piano (versión normal)
     spriteScale: 1.25,
     spriteOffsetX: 0,
     spriteOffsetY: 0,
     // Versión estirada (habilidad / fatality)
-    stretchedSpriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Piano/PianoLongSkin.png?raw=true', // Pon aquí la foto de la versión estirada
+    stretchedSpriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Piano/PianoLongSkin.png', // Pon aquí la foto de la versión estirada
     stretchedSpriteScale: 1.6,
     stretchedSpriteOffsetX: 0,
     stretchedSpriteOffsetY: 0
   },
   metal: {
-    spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Metal/MetalSkin.png?raw=true', // Pon aquí la foto del metal
+    spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Metal/MetalSkin.png', // Pon aquí la foto del metal
     spriteScale: 1.3,
     spriteOffsetX: 0,
     spriteOffsetY: 0
   },
   dj: {
-    spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Dj/DjSkin.png?raw=true', // Pon aquí la foto del DJ
+    //nuevos links funcionales
+    spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Dj/DjSkin.png', // Pon aquí la foto del DJ
     spriteScale: 1.0,
     spriteOffsetX: 0,
     spriteOffsetY: 0  
   },
   queen: {
-    spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Queen/QueenSkin.png?raw=true', // Pon aquí la foto de la reina
-    spriteScale: 1.1,
+    spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Queen/QueenSkin.png', // Pon aquí la foto de la reina
+    spriteScale: 0.9,
     spriteOffsetX: 0,
     spriteOffsetY: 0
   },
@@ -1607,10 +1708,10 @@ const SKIN_ASSETS = {
     spriteScale: 1.2,
     spriteOffsetX: 0,
     spriteOffsetY: 0,
-    lightsUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Fire/FireLights.png?raw=true',
-    bodyUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Fire/FireBody.png?raw=true',
-    lightsDarkUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Fire/FireLightDark.png?raw=true',
-    bodyDarkUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Fire/FireBodyDark.png?raw=true',
+    lightsUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Fire/FireLights.png',
+    bodyUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Fire/FireBody.png',
+    lightsDarkUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Fire/FireLightDark.png',
+    bodyDarkUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Fire/FireBodyDark.png',
     // Configuración para versión DARK
     darkLightsScale: 1.6,      // Escala de las luces dark (1.0 = tamaño normal)
     darkBodyScale: 1.2,        // Escala del body dark (1.0 = tamaño normal)
@@ -1621,19 +1722,19 @@ const SKIN_ASSETS = {
     darkHitboxScale: 1.25       // Hitbox más grande para dark (1.0 = normal)
   },
   drum: {
-    spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Drumm/DrummSkin.png?raw=true', // Pon aquí la foto del tambor
+    spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Drumm/DrummSkin.png', // Pon aquí la foto del tambor
     spriteScale: 1.3,
     spriteOffsetX: 0,
     spriteOffsetY: 0
     },
     drumMine: {
-      spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Drumm/DrummMine.png?raw=true', // Pon aquí el link de la bomba de Drumm
+      spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Drumm/DrummMine.png', // Pon aquí el link de la bomba de Drumm
       spriteScale: 1.8,
       spriteOffsetX: 0,
       spriteOffsetY: 0
   },
   hydra: {
-    spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Hydra/HydraSkin.png?raw=true', // Pon aquí la foto de la hidra
+    spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Hydra/HydraSkin.png', // Pon aquí la foto de la hidra
     spriteScale: 1.1,
     spriteOffsetX: 0,
     spriteOffsetY: 0
@@ -1645,52 +1746,52 @@ const SKIN_ASSETS = {
     spriteOffsetY: 0
   },
   ghostTubeRed: {
-    spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Ghost/GhostTubeRed.png?raw=true', // Pon aquí la imagen del tubo rojo (vertical, transparente)
+    spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Ghost/GhostTubeRed.png', // Pon aquí la imagen del tubo rojo (vertical, transparente)
     spriteScale: 1.0,
     spriteWidth: 2.5, // multiplicador para hacer el tubo más ancho directamente desde SKIN_ASSETS
     spriteOffsetX: 0,
     spriteOffsetY: 23
   },
   ghostKeyGray: {
-    spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Ghost/GhostKey.png?raw=true', // Pon aquí la imagen de la tecla gris (vertical, transparente)
+    spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Ghost/GhostKey.png', // Pon aquí la imagen de la tecla gris (vertical, transparente)
     spriteScale: 1.0,
     spriteWidth: 5.0, // multiplicador para ajustar ancho de la tecla
     spriteOffsetX: 0,
     spriteOffsetY: 22.5
   },
   theremin: {
-    spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Theremin/ThereminSkin.png?raw=true', // Pon aquí la foto del theremin
+    spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Theremin/ThereminSkin.png', // Pon aquí la foto del theremin
     spriteScale: 1.1,
     spriteSpinSpeed: 1.2, // velocidad de giro similar al metal
     spriteOffsetX: 0,
     spriteOffsetY: 0
   },
   harp: {
-    spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Harp/HarpSkin.png?raw=true', // Pon aquí la foto del arpa
+    spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Harp/HarpSkin.png', // Pon aquí la foto del arpa
     spriteScale: 1.3,
     spriteOffsetX: 0,
     spriteOffsetY: 0
   },
   director: {
-    spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Director/DirectorSkinTilt.png?raw=true', // Pon aquí la foto del director
+    spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Director/DirectorSkinTilt.png', // Pon aquí la foto del director
     spriteScale: 1,
     spriteOffsetX: 1.8,
     spriteOffsetY: -1
   },
   flor: {
-    spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Flor/FlorSkin.png?raw=true', // Pon aquí la foto de la flor
-    spriteScale: 1.15, // 1.2 * 1.1 = 1.32 (ensanchado por 1.1)
+    spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Flor/FlorSkin.png', // Pon aquí la foto de la flor
+    spriteScale: 1.55, // 1.2 * 1.1 = 1.32 (ensanchado por 1.1)
     spriteOffsetX: 0,
-    spriteOffsetY: 0
+    spriteOffsetY: -5
   },
   mystery: {
-    spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Mistery/MisterySkin.png?raw=true', // Pon aquí la foto del misterio
+    spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Mistery/MisterySkin.png', // Pon aquí la foto del misterio
     spriteScale: 1.1,
     spriteOffsetX: 0,
     spriteOffsetY: 0
   },
   rock: {
-    spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Rock/RockSkin.png?raw=true', // Skin de Rock jugable
+    spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Rock/RockSkin.png', // Skin de Rock jugable
     spriteScale: 1.12,
     spriteOffsetX: 0,
     spriteOffsetY: 0
@@ -1702,31 +1803,32 @@ const SKIN_ASSETS = {
 // IMPORTANTE: Las escalas se copian del skin base, pero puedes sobreescribirlas si la imagen dark tiene proporciones diferentes.
 // hitboxScale: escala de hitbox específica para la versión dark (opcional, si no se define usa la del skin base)
 const SKIN_DARK_ASSETS = {
-  violin: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Violin/ViolinSkinDark.png?raw=true', spriteScale: 1.8, spriteOffsetX: 0, spriteOffsetY: -20, hitboxScale: 1.35 },
-  cello: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Cello/CelloSkinDark.png?raw=true', spriteScale: 1.5, spriteOffsetX: 5, spriteOffsetY: 0 },
-  piano: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Piano/PianoSkinDark.png?raw=true', spriteScale: 1.25, spriteOffsetX: 0, spriteOffsetY: 0, stretchedSpriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Piano/PianoLongSkinDark.png?raw=true', stretchedSpriteScale: 2.5, stretchedSpriteOffsetX: 0, stretchedSpriteOffsetY: 0 },
-  metal: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Metal/MetalSkinDark.png?raw=true', spriteScale: 1.5, spriteOffsetX: 0, spriteOffsetY: 0, hitboxScale: 1.2 },
-  dj: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Dj/DjSkinDark.png?raw=true', spriteScale: 1.0, spriteOffsetX: 0, spriteOffsetY: 0 },
-  queen: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Queen/QueenSkinDark.png?raw=true', spriteScale: 1.1, spriteOffsetX: 0, spriteOffsetY: 0 },
-  fire: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Fire/FireSkinDark.png?raw=true', spriteScale: 1.0, spriteOffsetX: 0, spriteOffsetY: 0 },
-  drum: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Drumm/DrummSkinDark.png?raw=true', spriteScale: 1.3, spriteOffsetX: 0, spriteOffsetY: 0 },
-  hydra: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Hydra/HydraSkinDark.png?raw=true', spriteScale: 1.1, spriteOffsetX: 0, spriteOffsetY: 0 },
+  //Nuevos links funcionales para skins dark 
+  violin: { spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Violin/ViolinSkinDark.png', spriteScale: 1.8, spriteOffsetX: 0, spriteOffsetY: -20, hitboxScale: 1.35 },
+  cello: { spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Cello/CelloSkinDark.png', spriteScale: 1.5, spriteOffsetX: 5, spriteOffsetY: 0 },
+  piano: { spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Piano/PianoSkinDark.png', spriteScale: 1.25, spriteOffsetX: 0, spriteOffsetY: 0, stretchedSpriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Piano/PianoLongSkinDark.png', stretchedSpriteScale: 2.5, stretchedSpriteOffsetX: 0, stretchedSpriteOffsetY: 0 },
+  metal: { spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Metal/MetalSkinDark.png', spriteScale: 1.5, spriteOffsetX: 0, spriteOffsetY: 0, hitboxScale: 1.2 },
+  dj: { spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Dj/DjSkinDark.png', spriteScale: 1.0, spriteOffsetX: 0, spriteOffsetY: 0 },
+  queen: { spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Queen/QueenSkinDark.png', spriteScale: 0.95, spriteOffsetX: 0, spriteOffsetY: 0, hitboxScale: 0.9 },
+  fire: { spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Fire/FireSkinDark.png', spriteScale: 1.0, spriteOffsetX: 0, spriteOffsetY: 0 },
+  drum: { spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Drumm/DrummSkinDark.png', spriteScale: 1.3, spriteOffsetX: 0, spriteOffsetY: 0 },
+  hydra: { spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Hydra/HydraSkinDark.png', spriteScale: 1.1, spriteOffsetX: 0, spriteOffsetY: 0 },
   ghost: { spriteUrl: '', spriteScale: 1.0, spriteOffsetX: 0, spriteOffsetY: 0 },
-  theremin: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Theremin/ThereminSkinDark.png?raw=true', spriteScale: 1.1, spriteSpinSpeed: 1.2, spriteOffsetX: 0, spriteOffsetY: 0 },
-  harp: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Harp/HarpSkinDark.png?raw=true', spriteScale: 1.5, spriteWidth: 0.73, spriteOffsetX: 0, spriteOffsetY: 8 },
-  director: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Director/DirectorSkinDark.png?raw=true', spriteScale: 1.4, spriteOffsetX: 1.8, spriteOffsetY: -1, hitboxScale: 1.2 },
-  flor: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Flor/FlorSkinDark.png?raw=true', spriteScale: 1.2, spriteOffsetX: 0, spriteOffsetY: 0 },
-  mystery: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Mistery/MisterySkinDark.png?raw=true', spriteScale: 1.1, spriteOffsetX: 0, spriteOffsetY: 0 },
-  rock: { spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Rock/RockSkinDark.png?raw=true', spriteScale: 1.12, spriteOffsetX: 0, spriteOffsetY: 0 },
-  ghostTubeDark: {
-    spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Ghost/GhostTubeDark.png?raw=true',
+  theremin: { spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Theremin/ThereminSkinDark.png', spriteScale: 1.1, spriteSpinSpeed: 1.2, spriteOffsetX: 0, spriteOffsetY: 0 },
+  harp: { spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Harp/HarpSkinDark.png', spriteScale: 1.5, spriteWidth: 0.73, spriteOffsetX: 0, spriteOffsetY: 8 },
+  director: { spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Director/DirectorSkinDark.png', spriteScale: 1.4, spriteOffsetX: 1.8, spriteOffsetY: -1, hitboxScale: 1.2 },
+  flor: { spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Flor/FlorSkinDark.png', spriteScale: 1.8, spriteOffsetX: 0, spriteOffsetY: -5 },
+  mystery: { spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Mistery/MisterySkinDark.png', spriteScale: 1.1, spriteOffsetX: 0, spriteOffsetY: 0 },
+  rock: { spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Rock/RockSkinDark.png', spriteScale: 1.12, spriteOffsetX: 0, spriteOffsetY: 0 },
+  ghostTubeDark: {//tambien con link funcional
+    spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Ghost/GhostTubeDark.png',
     spriteScale: 1.0,
     spriteWidth: 2.5,
     spriteOffsetX: 0,
     spriteOffsetY: 23
   },
   drumMineDark: {
-    spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Skins/Drumm/DrummMineDark.png?raw=true',
+    spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Drumm/DrummMineDark.png',
     spriteScale: 3.2,
     spriteOffsetX: 0,
     spriteOffsetY: 0
@@ -1759,12 +1861,19 @@ const hitboxScales = {
   harp: 1.00,
   mystery: 1.0,
   ghost: 1.1,
+  queen: 0.95,
   // Agrega aquí otros personajes si lo necesitas
 };
 
 // Para usarlo en el código: hitboxScales[skinId]
 if(SKIN_ASSETS.drumMine?.spriteUrl){
   loadSkinPhoto('drumMine', SKIN_ASSETS.drumMine.spriteUrl);
+}
+if(SKIN_ASSETS.violin_story?.spriteUrl){
+  loadSkinPhoto('violin_story', SKIN_ASSETS.violin_story.spriteUrl);
+}
+if(SKIN_ASSETS.cello_story?.spriteUrl){
+  loadSkinPhoto('cello_story', SKIN_ASSETS.cello_story.spriteUrl);
 }
 // Cargar sprites de ghost (tubos y teclas)
 if(SKIN_ASSETS.ghostTubeRed?.spriteUrl){
@@ -1789,13 +1898,13 @@ for(const [skinName, asset] of Object.entries(SKIN_DARK_ASSETS)){
     loadSkinPhoto(`${skinName}_dark_stretched`, asset.stretchedSpriteUrl);
   }
 }
-loadBackgroundImage('beachPhoto', 'https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/beach.avif');
-loadBackgroundImage('beachPhoto_night', 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/beach_nighted.png?raw=true');
-loadBackgroundImage('beachPhoto_weather', 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/beach_weather.jpg?raw=true');
+loadBackgroundImage('beachPhoto', 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/beach.avif');
+loadBackgroundImage('beachPhoto_night', 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/beach_nighted.png');
+loadBackgroundImage('beachPhoto_weather', 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/beach_weather.jpg');
 //cargamos la calavera con flor
-loadBackgroundImage('skullflower', 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/Captura%20de%20pantalla%202025-11-16%20154153-Photoroom.png?raw=true')
+loadBackgroundImage('skullflower', 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Captura%20de%20pantalla%202025-11-16%20154153-Photoroom.png')
 // Fondo especial Rock
-loadBackgroundImage('rockStage', 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/images/RockBackgroundStage.png?raw=true');
+loadBackgroundImage('rockStage', 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/images/RockBackgroundStage.png');
 // Cargar imágenes Fire
 if(SKIN_ASSETS.fire?.lightsUrl){
   loadSkinPhoto('fire_lights', SKIN_ASSETS.fire.lightsUrl);
@@ -1910,17 +2019,17 @@ const BALL_TYPES = [ //tipos de pelotas disponibles
 const BOSS_ASSETS = {
   rock: {
     // URL de la imagen del boss (cuerpo principal). Pon aqu� la foto de Rock.
-    spriteUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/images/RockSkinAlt.png?raw=true',
+    spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/images/RockSkinAlt.png',
     spriteScale: 1.3,
     hitboxScale: 1.11,
     // Tama�o/hitbox cuando Rock sea jugable como easter egg (m�s peque�o/nerfeado)
     playableScale: 1.12,
     playableHitboxScale: 1.05,
     // URL de meteorito que cae desde el cielo.
-    meteorUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/images/Rock%20Meteorite.png?raw=true',
+    meteorUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/images/Rock%20Meteorite.png',
     meteorRadius: 44,
     // URL de roca rodante (boulder) horizontal.
-    boulderUrl: 'https://github.com/FranciscoAraya04/Violin-Games-/blob/main/images/Rock%20Boulder.png?raw=true',
+    boulderUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/images/Rock%20Boulder.png',
     boulderRadius: 52
   }
 };
@@ -2613,10 +2722,12 @@ const touchOverlayLines = touchOverlay ? {
   horizLeft: touchOverlay.querySelector('.line.horiz-left'),
   horizRight: touchOverlay.querySelector('.line.horiz-right')
 } : {};
+if(cvs) cvs.addEventListener('pointerdown', handleStoryTap);
 const lobbyLayer = document.getElementById('lobbyLayer');
 const lobbyPanel = document.getElementById('lobbyPanel');
 const pauseHudBtn = document.getElementById('btnPauseHud');
 const exitPauseBtn = document.getElementById('btnExitPause');
+const storySkipBtn = document.getElementById('btnStorySkip');
 const toggleSkinsBtn = document.getElementById('btnToggleSkins');
 let menuFocusIndex = 0;
 if(document.getElementById('lobbyCode') && location.hostname){
@@ -2631,7 +2742,14 @@ const uiRefs = {
   btnLocalBot: document.getElementById('btnLocalBot'),
   btnLan: document.getElementById('btnLan'),
   btnArcade: document.getElementById('btnArcade'),
+  btnStory: document.getElementById('btnStory'),
+  storyExitBtn: document.getElementById('storyExitBtn'),
   arcadePanel: document.getElementById('arcadePanel'),
+  storyPanel: document.getElementById('storyPanel'),
+  storyGrid: document.getElementById('storyGrid'),
+  btnStoryPrev: document.getElementById('btnStoryPrev'),
+  btnStoryNext: document.getElementById('btnStoryNext'),
+  btnStoryBackMenu: document.getElementById('btnStoryBackMenu'),
   btnArcadeBack: document.getElementById('btnArcadeBack'),
   btnArcadeDominadas: document.getElementById('btnArcadeDominadas'),
   btnArcadeTarget: document.getElementById('btnArcadeTarget'),
@@ -2721,7 +2839,7 @@ const uiRefs = {
 };
 
 const APP_SCENE = { MENU:'menu', NET:'net', SELECT:'select', GAME:'game' };
-const MATCH_MODE = { LOCAL:'local', BOT:'bot', LAN:'lan', ARCADE:'arcade' };
+const MATCH_MODE = { LOCAL:'local', BOT:'bot', LAN:'lan', ARCADE:'arcade', STORY:'story' };
 let appScene = APP_SCENE.MENU;
 let lastMenuLike = true; // track last ui/game state to avoid restarting menu music when switching UI panels
 let matchMode = MATCH_MODE.LOCAL;
@@ -2729,9 +2847,11 @@ let netRole = null; // 'host' o 'client'
 let tutorialOpen = false;
 let encyOpen = false;
 let arcadeOpen = false;
+let storyOpen = false;
 let bossUiOpen = false;
 let bossSelectedId = 'rock';
 let encyReturnTarget = 'menu';
+let storyPage = 0; // paginación de capítulos (6 por página)
 let selectionUsedTouch = false;
 let modernSkinsEnabled = true; // Toggle para skins modernas con imágenes vs dibujos
 let lobbySocket = null;
@@ -2814,6 +2934,1025 @@ function createArcadeContext(){
 }
 let arcadeContext = createArcadeContext();
 
+/* ============================
+   EDITAR EL MODO HISTORIA - EDITA AQUÍ
+   ----------------------------
+   - STORY_CHAPTERS: 16 capítulos. Ajusta títulos, miniaturas y pasos.
+   - Cada paso puede ser:
+       type:'slides', slides:[url1,url2,...], minMs:5000 (cooldown entre taps)
+       type:'combat', mode:'1v1' | 'arcade:target' | 'arcade:dominadas',
+         p1Skin:'violin', botSkin:'cello' (para 1v1), scoreTarget:10,
+         bgUrl:'https://...', label:'Texto HUD',
+         events:{
+            botLife:[{ at:9, text:'Le quedan 9' }],
+            ability:[{ who:'p1', text:'Habilidad activada' }],
+            onBotDefeat:[{ text:'Bot cae' }],
+            onPlayerDefeat:[{ text:'Intento fallido' }]
+         }
+   - Ordena o agrega slides simplemente moviendo URLs en el array.
+   - Para insertar un combate entre slides, añade un objeto type:'combat' entre arrays de slides.
+*/
+const STORY_CHAPTERS = [
+  {
+    id:'cap1',
+    title:'Capítulo 1 - La isla que despertó',
+    thumb:'https://placehold.co/320x200/0d2444/ffffff?text=Cap1',
+    steps:[
+      {
+        type:'slides',
+        slides:[
+          //links correctos
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/pr%C3%B3logo/Slide%201.1.png',
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/pr%C3%B3logo/Slide%201.2.png',
+        ],
+        minMs:2000
+      },
+      {
+        type:'combat',
+        label:'Violin vs Cello (partido amistoso)',
+        mode:'1v1',
+        scoreTarget:5,
+        p1Skin:'violin_story',
+        botSkin:'cello_story',
+        bgUrl:'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/pr%C3%B3logo/Slide%201.3.png',
+        events:{
+          botLife:[
+            {at:4,text:'¿Se avecina una tormenta?'},
+            {at:2,text:'¡La isla empieza a vibrar!'}
+          ],
+          ability:[
+            {who:'p1',text:'Violín siente un impulso extraño'},
+            {who:'p2',text:'Cello responde con fuerza inusual'}
+          ],
+          onBotDefeat:[
+            {text:'Una ola de energía recorre la playa'}
+          ],
+          onPlayerDefeat:[
+            {text:'La energía se disipa. Intenta otra vez.'}
+          ]
+        }
+      },
+      {
+        type:'slides',
+        slides:[
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/pr%C3%B3logo/Slide%201.4.png',
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/pr%C3%B3logo/Slide%201.5.png',
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/pr%C3%B3logo/Slide%201.6.png'
+        ],
+        minMs:2000
+      }
+    ]
+  },
+  {
+    id:'cap2',
+    title:'Capítulo 2 - Primeras resonancias',
+    thumb:'https://placehold.co/320x200/102f5a/ffffff?text=Cap2',
+    steps:[
+      {
+        type:'slides',
+        slides:[
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap2/Slide%202.1.png',
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap2/Slide%202.2.png',
+        ],
+        minMs:2000
+      },
+      {
+        type:'combat',
+        label:'Violin vs Cello (prueba de fuerza y velocidad)',
+        mode:'1v1',
+        scoreTarget:5,
+        p1Skin:'violin',
+        botSkin:'cello',
+        bgUrl:'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap2/Slide%202.3.png',
+        events:{
+          botLife:[
+            {at:8,text:'Cello se vuelve una muralla'},
+            {at:4,text:'Violín acelera con sus turbinas'}
+          ],
+          ability:[
+            {who:'p1',text:'Legato Veloz despierta'},
+            {who:'p2',text:'Cañones de Cello retumban'}
+          ],
+          onBotDefeat:[
+            {text:'La arena vibra con la victoria de Violín'}
+          ],
+          onPlayerDefeat:[
+            {text:'La isla se resiste a tu nuevo ritmo. Reintenta.'}
+          ]
+        }
+      },
+      {
+        type:'slides',
+        slides:[
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap2/Slide%202.4.png',
+        ],
+        minMs:2000
+      },
+      {
+        type:'combat',
+        label:'Piano vs Violin (extensión armónica)',
+        mode:'1v1',
+        scoreTarget:5,
+        p1Skin:'piano',
+        botSkin:'violin',
+        bgUrl:'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap2/Slide%202.3.png',
+        events:{
+          botLife:[
+            {at:4,text:'Violín pierde el control de la cancha'},
+            {at:2,text:'Violín duda ante el alcance del Piano'}
+          ],
+          ability:[
+            {who:'p1',text:'Extensión Armónica activada'},
+            {who:'p2',text:'Violín intenta recuperar el ritmo'}
+          ],
+          onBotDefeat:[
+            {text:'El teclado se estira y domina la red'}
+          ],
+          onPlayerDefeat:[
+            {text:'La isla aún no reconoce tu nuevo rango. Inténtalo de nuevo.'}
+          ]
+        }
+      },
+      {
+        type:'slides',
+        slides:[
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap2/Slide%202.5.png',
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap2/Slide%202.6.png'
+        ],
+        minMs:2000
+      }
+    ]
+  },
+  {
+    id:'cap3',
+    title:'Capítulo 3 - Dominadas con los hermanos del ritmo',
+    thumb:'https://placehold.co/320x200/143452/ffffff?text=Cap3',
+    steps:[
+      {
+        type:'slides',
+        slides:[
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap3/Slide%203.1.png',
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap3/Slide%203.2.png',
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap3/Slide%203.3.png'
+        ],
+        minMs:2000
+      },
+      {
+        type:'combat',
+        label:'Desafío de Dominadas (5 golpes)',
+        mode:'keepup', // modo especial para dominadas
+        scoreTarget:5, // cantidad de dominadas requeridas
+        p1Skin:'violin',
+        botSkin:null,
+        bgUrl:'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap3/Slide%203.4.png',
+        events:{
+          onSuccess:[
+            {text:'DJ: \"Cinco dominadas limpias. Estás listo para escuchar la verdad.\"'},
+            {text:'Fire: \"Tus frecuencias están en sintonía con la isla... para bien o para mal.\"'}
+          ],
+          onFail:[
+            {text:'DJ: \"Se te cayó el beat. Vuelve a intentarlo.\"'},
+            {text:'Fire: \"La isla no respeta a quien deja caer el ritmo.\"'}
+          ]
+        }
+      },
+      {
+        type:'slides',
+        slides:[
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap3/Slide%203.5.png',
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap3/Slide%203.6.png'
+        ],
+        minMs:2000
+      }
+    ]
+  },
+  {
+    id:'cap4',
+    title:'Capítulo 4 - Ghost y la puerta al caos',
+    thumb:'https://placehold.co/320x200/152338/ffffff?text=Cap4',
+    steps:[
+      {
+        type:'slides',
+        slides:[
+          'https://placehold.co/1200x675/050914/ffffff?text=4-1+Entrada+al+cementerio',
+          'https://placehold.co/1200x675/070b18/ffffff?text=4-2+Aparicion+de+Ghost',
+          'https://placehold.co/1200x675/090f1f/ffffff?text=4-3+Rechazo+de+Ghost'
+        ],
+        minMs:2000
+      },
+      {
+        type:'combat',
+        label:'Piano vs Ghost (Muro Carmesí)',
+        mode:'1v1',
+        scoreTarget:15,
+        p1Skin:'piano',
+        botSkin:'ghost',
+        bgUrl:'https://placehold.co/1200x675/0b1222/ffffff?text=BG+Cementerio',
+        events:{
+          botLife:[
+            {at:8,text:'El Muro Carmesí presiona al teclado'},
+            {at:4,text:'Ghost empieza a fragmentarse'}
+          ],
+          ability:[
+            {who:'p1',text:'Extensión Armónica contra la barrera roja'},
+            {who:'p2',text:'Muro Carmesí se eleva'}
+          ],
+          onBotDefeat:[
+            {text:'Ghost cede y revela el portal oculto'}
+          ],
+          onPlayerDefeat:[
+            {text:'El cementerio te ahoga. Reintenta dominar el Muro Carmesí.'}
+          ]
+        }
+      },
+      {
+        type:'slides',
+        slides:[
+          'https://placehold.co/1200x675/0d1425/ffffff?text=4-5+Ghost+derrotado',
+          'https://placehold.co/1200x675/0f172a/ffffff?text=4-6+Portal+a+la+Tierra+del+Caos'
+        ],
+        minMs:2000
+      }
+    ]
+  },
+  {
+    id:'cap5',
+    title:'Capítulo 5 - Hydra, Queen y el trato inesperado',
+    thumb:'https://placehold.co/320x200/18314a/ffffff?text=Cap5',
+    steps:[
+      {
+        type:'slides',
+        slides:[
+          'https://placehold.co/1200x675/070b12/ffffff?text=5-1+Tierra+del+Caos',
+          'https://placehold.co/1200x675/09101b/ffffff?text=5-2+Aparicion+de+Hydra',
+          'https://placehold.co/1200x675/0b1724/ffffff?text=5-3+Cello+vs+Hydra+Preparacion'
+        ],
+        minMs:2000
+      },
+      {
+        type:'combat',
+        label:'Cello vs Hydra (guardia de la Reina)',
+        mode:'1v1',
+        scoreTarget:12,
+        p1Skin:'cello',
+        botSkin:'hydra',
+        bgUrl:'https://placehold.co/1200x675/101c2a/ffffff?text=BG+Tierra+del+Caos',
+        events:{
+          botLife:[
+            {at:9,text:'Hydra se multiplica y rodea a Cello'},
+            {at:5,text:'Cello contiene la oleada de cabezas'}
+          ],
+          ability:[
+            {who:'p1',text:'Forte Resonante: Cello se hace enorme'},
+            {who:'p2',text:'Células de Hydra intentan dividirse'}
+          ],
+          onBotDefeat:[
+            {text:'Hydra se repliega y abre paso hacia la Reina'}
+          ],
+          onPlayerDefeat:[
+            {text:'La multiplicación de Hydra te supera. Reintenta contenerla.'}
+          ]
+        }
+      },
+      {
+        type:'slides',
+        slides:[
+          'https://placehold.co/1200x675/101728/ffffff?text=5-4+Hydra+contenida',
+          'https://placehold.co/1200x675/111a2e/ffffff?text=5-5+Presentacion+de+Queen'
+        ],
+        minMs:2000
+      },
+      {
+        type:'combat',
+        label:'Violin vs Queen (tiara vampírica)',
+        mode:'1v1',
+        scoreTarget:13,
+        p1Skin:'violin',
+        botSkin:'queen',
+        bgUrl:'https://placehold.co/1200x675/141e33/ffffff?text=BG+Altar+de+Queen',
+        events:{
+          botLife:[
+            {at:10,text:'Queen absorbe vida pero empieza a tambalear'},
+            {at:6,text:'La tiara pierde parte de su brillo vampírico'}
+          ],
+          ability:[
+            {who:'p1',text:'Legato Veloz para esquivar drenajes'},
+            {who:'p2',text:'Majestad Coral roba energía vital'}
+          ],
+          onBotDefeat:[
+            {text:'Queen cede y escucha la propuesta de los héroes'}
+          ],
+          onPlayerDefeat:[
+            {text:'Tu vida es drenada por la Reina. Vuelve a intentarlo.'}
+          ]
+        }
+      },
+      {
+        type:'slides',
+        slides:[
+          'https://placehold.co/1200x675/10182a/ffffff?text=5-7+Trato+con+Queen',
+          'https://placehold.co/1200x675/0d1423/ffffff?text=5-8+Mapa+hacia+Theremin+y+Director'
+        ],
+        minMs:2000
+      }
+    ]
+  },
+  {
+    id:'cap6',
+    title:'Capítulo 6 - Theremin y el error temporal',
+    thumb:'https://placehold.co/320x200/173454/ffffff?text=Cap6',
+    steps:[
+      {
+        type:'slides',
+        slides:[
+          'https://placehold.co/1200x675/07101a/ffffff?text=6-1+Laboratorio+en+el+acantilado',
+          'https://placehold.co/1200x675/091421/ffffff?text=6-2+Theremin+habla+con+el+Director',
+          'https://placehold.co/1200x675/0b1928/ffffff?text=6-3+Portal+temporal'
+        ],
+        minMs:2000
+      },
+      {
+        type:'slides',
+        slides:[
+          'https://placehold.co/1200x675/0c1c2c/ffffff?text=6-4+Llegada+de+Harp',
+          'https://placehold.co/1200x675/0e2032/ffffff?text=6-5+Harp+se+niega'
+        ],
+        minMs:2000
+      },
+      {
+        type:'combat',
+        label:'Harp vs Theremin (futuro vs estabilización)',
+        mode:'1v1',
+        scoreTarget:11,
+        p1Skin:'harp',
+        botSkin:'theremin',
+        bgUrl:'https://placehold.co/1200x675/11243a/ffffff?text=BG+Laboratorio+Theremin',
+        events:{
+          botLife:[
+            {at:8,text:'Theremin pierde el control del círculo de energía'},
+            {at:4,text:'La Onda Theremin se debilita'}
+          ],
+          ability:[
+            {who:'p1',text:'Arpegio Celestial y doble salto entre máquinas'},
+            {who:'p2',text:'Onda Theremin intenta aturdir a Harp'}
+          ],
+          onBotDefeat:[
+            {text:'Harp rompe la maquinaria y abre una brecha de escape'}
+          ],
+          onPlayerDefeat:[
+            {text:'La estabilización de Theremin te atrapa. Intenta romper el círculo de nuevo.'}
+          ]
+        }
+      },
+      {
+        type:'slides',
+        slides:[
+          'https://placehold.co/1200x675/101e33/ffffff?text=6-6+Harp+escapa+del+laboratorio',
+          'https://placehold.co/1200x675/0b1727/ffffff?text=6-7+Caida+hacia+otra+playa'
+        ],
+        minMs:2000
+      }
+    ]
+  },
+  {
+    id:'cap7',
+    title:'Capítulo 7 - Harp vs los buenos',
+    thumb:'https://placehold.co/320x200/14314a/ffffff?text=Cap7',
+    steps:[
+      {
+        type:'slides',
+        slides:[
+          'https://placehold.co/1200x675/050914/ffffff?text=7-1+Playa+desgastada',
+          'https://placehold.co/1200x675/07101a/ffffff?text=7-2+Harp+caida',
+          'https://placehold.co/1200x675/091323/ffffff?text=7-3+Primer+contacto',
+          'https://placehold.co/1200x675/0b1728/ffffff?text=7-4+Acusaciones+y+desconfianza'
+        ],
+        minMs:2000
+      },
+      {
+        type:'combat',
+        label:'Harp vs Violin (mal menor)',
+        mode:'1v1',
+        scoreTarget:10,
+        p1Skin:'harp',
+        botSkin:'violin',
+        bgUrl:'https://placehold.co/1200x675/0c1b2a/ffffff?text=BG+Playa+restos+laboratorio',
+        events:{
+          botLife:[
+            {at:7,text:'Violín resiste sin contraatacar con odio'},
+            {at:4,text:'Harp percibe que hay contención en sus golpes'}
+          ],
+          ability:[
+            {who:'p1',text:'Arpegio Celestial y doble salto sobre la red'},
+            {who:'p2',text:'Dash de turbinas para seguir el ritmo'}
+          ],
+          onBotDefeat:[
+            {text:'Harp comprende que Violín no lucha como sirviente del Director'}
+          ],
+          onPlayerDefeat:[
+            {text:'El futuro roto pesa demasiado. Vuelve a intentarlo para convencerla.'}
+          ]
+        }
+      },
+      {
+        type:'slides',
+        slides:[
+          'https://placehold.co/1200x675/0e2033/ffffff?text=7-6+Harp+comprende',
+          'https://placehold.co/1200x675/101f35/ffffff?text=7-7+Decision+de+colaborar'
+        ],
+        minMs:2000
+      }
+    ]
+  },
+  {
+    id:'cap8',
+    title:'Capítulo 8 - Laboratorio y camino al Director',
+    thumb:'https://placehold.co/320x200/163754/ffffff?text=Cap8',
+    steps:[
+      {
+        type:'slides',
+        slides:[
+          'https://placehold.co/1200x675/050a13/ffffff?text=8-1+Laboratorio+herido',
+          'https://placehold.co/1200x675/07101b/ffffff?text=8-2+Theremin+revisa+datos',
+          'https://placehold.co/1200x675/091322/ffffff?text=8-3+Enfrentamiento+verbal'
+        ],
+        minMs:2000
+      },
+      {
+        type:'slides',
+        slides:[
+          'https://placehold.co/1200x675/0b1827/ffffff?text=8-4+Theremin+se+niega',
+          'https://placehold.co/1200x675/0d1b2b/ffffff?text=8-5+Post+combate+revelacion'
+        ],
+        minMs:2000
+      },
+      {
+        type:'combat',
+        label:'Violin vs Theremin (estabilización)',
+        mode:'1v1',
+        scoreTarget:11,
+        p1Skin:'violin',
+        botSkin:'theremin',
+        bgUrl:'https://placehold.co/1200x675/0f2134/ffffff?text=BG+Laboratorio+acantilado',
+        events:{
+          botLife:[
+            {at:8,text:'Los modelos de Theremin empiezan a fallar'},
+            {at:4,text:'El círculo de energía pierde estabilidad'}
+          ],
+          ability:[
+            {who:'p1',text:'Contraritmo de turbinas rompe patrones'},
+            {who:'p2',text:'Onda Theremin intenta predecir cada golpe'}
+          ],
+          onBotDefeat:[
+            {text:'Theremin acepta compartir el mapa hacia Metal y Drumm'}
+          ],
+          onPlayerDefeat:[
+            {text:'La estabilización te encierra. Reintenta romper sus patrones.'}
+          ]
+        }
+      },
+      {
+        type:'slides',
+        slides:[
+          'https://placehold.co/1200x675/111f32/ffffff?text=8-6+Mapa+fortaleza+Director',
+          'https://placehold.co/1200x675/0d1827/ffffff?text=8-7+Marcha+a+zona+industrial'
+        ],
+        minMs:2000
+      }
+    ]
+  },
+  {
+    id:'cap9',
+    title:'Capítulo 9 - Metal y Drumm, muro de choque',
+    thumb:'https://placehold.co/320x200/183b58/ffffff?text=Cap9',
+    steps:[
+      {
+        type:'slides',
+        slides:[
+          'https://placehold.co/1200x675/060a12/ffffff?text=9-1+Zona+industrial',
+          'https://placehold.co/1200x675/080e18/ffffff?text=9-2+Presentacion+Metal+Drumm',
+          'https://placehold.co/1200x675/0a121f/ffffff?text=9-3+Cello+vs+Metal+Preparacion'
+        ],
+        minMs:2000
+      },
+      {
+        type:'combat',
+        label:'Cello vs Metal (muro de acero)',
+        mode:'1v1',
+        scoreTarget:12,
+        p1Skin:'cello',
+        botSkin:'metal',
+        bgUrl:'https://placehold.co/1200x675/0c1525/ffffff?text=BG+Hornos+y+chispas',
+        events:{
+          botLife:[
+            {at:9,text:'La sierra de Metal pierde filo'},
+            {at:5,text:'El giro incandescente se vuelve inestable'}
+          ],
+          ability:[
+            {who:'p1',text:'Crecimiento blindado para aguantar cortes'},
+            {who:'p2',text:'Corte incandescente intenta partir la cancha'}
+          ],
+          onBotDefeat:[
+            {text:'Metal queda clavado en el suelo, fuera de combate'}
+          ],
+          onPlayerDefeat:[
+            {text:'El muro de acero te supera. Reintenta contener sus cortes.'}
+          ]
+        }
+      },
+      {
+        type:'slides',
+        slides:[
+          'https://placehold.co/1200x675/0e1828/ffffff?text=9-4+Metal+derrotado',
+          'https://placehold.co/1200x675/101b2d/ffffff?text=9-5+Piano+vs+Drumm+Preparacion'
+        ],
+        minMs:2000
+      },
+      {
+        type:'combat',
+        label:'Piano vs Drumm (bombas al compás)',
+        mode:'1v1',
+        scoreTarget:12,
+        p1Skin:'piano',
+        botSkin:'drum',
+        bgUrl:'https://placehold.co/1200x675/111f33/ffffff?text=BG+Plataformas+explosivas',
+        events:{
+          botLife:[
+            {at:9,text:'Las bombas de Drumm empiezan a fallar en timing'},
+            {at:5,text:'El redoble pierde fuerza y control'}
+          ],
+          ability:[
+            {who:'p1',text:'Timing perfecto para desactivar bombas'},
+            {who:'p2',text:'Cadenas de explosivos ruedan por la cancha'}
+          ],
+          onBotDefeat:[
+            {text:'Drumm queda silencioso; sus explosivos se apagan'}
+          ],
+          onPlayerDefeat:[
+            {text:'La percusión explosiva te sobrepasa. Reintenta marcar el compás.'}
+          ]
+        }
+      },
+      {
+        type:'slides',
+        slides:[
+          'https://placehold.co/1200x675/111d30/ffffff?text=9-6+Maquinaria+se+detiene',
+          'https://placehold.co/1200x675/0d1726/ffffff?text=9-7+Camino+nucleo+y+desvio+Flor'
+        ],
+        minMs:2000
+      }
+    ]
+  },
+  {
+    id:'cap10',
+    title:'Capítulo 10 - Flor entre calaveras',
+    thumb:'https://placehold.co/320x200/1a425b/ffffff?text=Cap10',
+    steps:[
+      {
+        type:'slides',
+        slides:[
+          'https://placehold.co/1200x675/071018/ffffff?text=10-1+Jardin+limbo',
+          'https://placehold.co/1200x675/091320/ffffff?text=10-2+Presentacion+Flor',
+          'https://placehold.co/1200x675/0b1726/ffffff?text=10-3+Desconfianza',
+          'https://placehold.co/1200x675/0d1a2b/ffffff?text=10-4+Malentendido+previo+combate'
+        ],
+        minMs:2000
+      },
+      {
+        type:'combat',
+        label:'Violin vs Flor (pulso evasivo)',
+        mode:'1v1',
+        scoreTarget:10,
+        p1Skin:'violin',
+        botSkin:'flor',
+        bgUrl:'https://placehold.co/1200x675/0f1d31/ffffff?text=BG+Jardin+calaveras',
+        events:{
+          botLife:[
+            {at:7,text:'Flor nota que Violín no busca destruirla'},
+            {at:4,text:'El pulso floral se vuelve menos agresivo'}
+          ],
+          ability:[
+            {who:'p1',text:'Sprint de turbinas entre flores y calaveras'},
+            {who:'p2',text:'Pulso Floral desvía la pelota en arco'}
+          ],
+          onBotDefeat:[
+            {text:'Flor reconoce que Violín contuvo su fuerza y escucha su historia'}
+          ],
+          onPlayerDefeat:[
+            {text:'Tu ímpetu parece demasiado agresivo. Reintenta mostrando contención.'}
+          ]
+        }
+      },
+      {
+        type:'slides',
+        slides:[
+          'https://placehold.co/1200x675/111f34/ffffff?text=10-5+Flor+comprende',
+          'https://placehold.co/1200x675/101b2f/ffffff?text=10-6+Se+une+y+abre+caminos'
+        ],
+        minMs:2000
+      }
+    ]
+  },
+  {
+    id:'cap11',
+    title:'Capítulo 11 - Plan en la playa y caída de Violín',
+    thumb:'https://placehold.co/320x200/1c465f/ffffff?text=Cap11',
+    steps:[
+      {
+        type:'slides',
+        slides:[
+          'https://placehold.co/1200x675/050912/ffffff?text=11-1+Playa+nocturna',
+          'https://placehold.co/1200x675/07101a/ffffff?text=11-2+Riesgo+energia+oscura',
+          'https://placehold.co/1200x675/091323/ffffff?text=11-3+Decision+entrenar+Violin'
+        ],
+        minMs:2000
+      },
+      {
+        type:'combat',
+        label:'Violin vs Fire (umbral de resonancia)',
+        mode:'1v1',
+        scoreTarget:11,
+        p1Skin:'violin',
+        botSkin:'fire',
+        bgUrl:'https://placehold.co/1200x675/0b1727/ffffff?text=BG+Playa+entrenamiento',
+        events:{
+          botLife:[
+            {at:8,text:'Los indicadores de carga oscura suben al rojo'},
+            {at:5,text:'Las luces de Fire empiezan a salirse de control'}
+          ],
+          ability:[
+            {who:'p1',text:'Turbinas al límite, cada salto deja chispas moradas'},
+            {who:'p2',text:'Ignición RGB carga la pelota con audio explosivo'}
+          ],
+          onBotDefeat:[
+            {text:'El umbral se alcanza: el Director irrumpe a través de los parlantes'}
+          ],
+          onPlayerDefeat:[
+            {text:'No alcanzas aún el umbral de prueba. Reintenta el entrenamiento.'}
+          ]
+        }
+      },
+      {
+        type:'slides',
+        slides:[
+          'https://placehold.co/1200x675/0d1b2d/ffffff?text=11-4+Intervencion+Director',
+          'https://placehold.co/1200x675/0f2034/ffffff?text=11-5+Violin+Dark+aparece',
+          'https://placehold.co/1200x675/111f33/ffffff?text=11-6+Se+gira+contra+sus+amigos'
+        ],
+        minMs:2000
+      }
+    ]
+  },
+  {
+    id:'cap12',
+    title:'Capítulo 12 - Violín Dark contra sus valores',
+    thumb:'https://placehold.co/320x200/1f4963/ffffff?text=Cap12',
+    steps:[
+      {
+        type:'slides',
+        slides:[
+          'https://placehold.co/1200x675/050a13/ffffff?text=12-1+Arena+distorsionada',
+          'https://placehold.co/1200x675/07101b/ffffff?text=12-2+Dialogo+Cello+ViolinDark'
+        ],
+        minMs:2000
+      },
+      {
+        type:'combat',
+        label:'Violin Dark vs Cello (recuperar la voluntad)',
+        mode:'1v1',
+        scoreTarget:12,
+        p1Skin:'violin',
+        botSkin:'cello',
+        bgUrl:'https://placehold.co/1200x675/0a1523/ffffff?text=BG+Arena+oscura',
+        events:{
+          botLife:[
+            {at:8,text:'Cello se debilita pero sigue hablándole como aliado'},
+            {at:4,text:'La energía oscura alrededor de Violín Dark se vuelve más densa'}
+          ],
+          ability:[
+            {who:'p1',text:'Impulso brutal de turbinas doradas con llamas moradas'},
+            {who:'p2',text:'Crecimiento defensivo para aguantar sin romper el lazo'}
+          ],
+          onBotDefeat:[
+            {text:'La runa Mystery responde a la mezcla de voluntad y oscuridad'}
+          ],
+          onPlayerDefeat:[
+            {text:'Te pierdes en la afinación del Director. Reintenta escuchando las palabras de Cello.'}
+          ]
+        }
+      },
+      {
+        type:'slides',
+        slides:[
+          'https://placehold.co/1200x675/0d1a2c/ffffff?text=12-3+Cello+al+borde',
+          'https://placehold.co/1200x675/0f2033/ffffff?text=12-4+Runa+Mystery+se+activa',
+          'https://placehold.co/1200x675/111f34/ffffff?text=12-5+Violin+Dark+recupera+voluntad',
+          'https://placehold.co/1200x675/101b2f/ffffff?text=12-6+Declaracion+y+preparativos'
+        ],
+        minMs:2000
+      }
+    ]
+  },
+  {
+    id:'cap13',
+    title:'Capítulo 13 - Malware en el Beat',
+    thumb:'https://placehold.co/320x200/214c66/ffffff?text=Cap13',
+    steps:[
+      {
+        type:'slides',
+        slides:[
+          'https://placehold.co/1200x675/050910/ffffff?text=13-1+Escenario+glitcheado',
+          'https://placehold.co/1200x675/07101a/ffffff?text=13-2+Ondas+rigidas',
+          'https://placehold.co/1200x675/091322/ffffff?text=13-3+Theremin+malware',
+          'https://placehold.co/1200x675/0b1728/ffffff?text=13-4+Fire+controlado+previo+combate'
+        ],
+        minMs:2000
+      },
+      {
+        type:'combat',
+        label:'Violin Dark vs Fire (Malware en el Beat)',
+        mode:'1v1',
+        scoreTarget:11,
+        p1Skin:'violin',
+        botSkin:'fire',
+        bgUrl:'https://placehold.co/1200x675/0c182a/ffffff?text=BG+Playa+glitch',
+        events:{
+          botLife:[
+            {at:8,text:'La proyección de Theremin-malware parpadea, Fire intenta resistir'},
+            {at:5,text:'Las ondas se vuelven más cuadradas; el malware intenta fijar el ritmo'}
+          ],
+          ability:[
+            {who:'p1',text:'Turbinas doradas cortan las ondas rígidas del malware'},
+            {who:'p2',text:'Impulso de audio forzado por el Director, no por Fire'}
+          ],
+          onBotDefeat:[
+            {text:'La imagen de Theremin-malware se rompe en fragmentos y Fire recupera el control'}
+          ],
+          onPlayerDefeat:[
+            {text:'El malware fija el compás. Reintenta buscar las brechas en la señal para contraatacar.'}
+          ]
+        }
+      },
+      {
+        type:'slides',
+        slides:[
+          'https://placehold.co/1200x675/0e1c2f/ffffff?text=13-5+Fire+liberado',
+          'https://placehold.co/1200x675/101f33/ffffff?text=13-6+Squad+rumbo+al+nucleo'
+        ],
+        minMs:2000
+      }
+    ]
+  },
+  {
+    id:'cap14',
+    title:'Capítulo 14 - Guerra Civil del Caos',
+    thumb:'https://placehold.co/320x200/23506a/ffffff?text=Cap14',
+    steps:[
+      {
+        type:'slides',
+        slides:[
+          'https://placehold.co/1200x675/050910/ffffff?text=14-1+Salon+del+caos',
+          'https://placehold.co/1200x675/07101a/ffffff?text=14-2+Plan+del+Director+revelado',
+          'https://placehold.co/1200x675/091322/ffffff?text=14-3+Ruptura+y+acusaciones'
+        ],
+        minMs:2000
+      },
+      {
+        type:'combat',
+        label:'Hydra + Queen vs Metal (Fase A)',
+        mode:'1v1',
+        scoreTarget:10,
+        p1Skin:'hydra',
+        botSkin:'metal',
+        bgUrl:'https://placehold.co/1200x675/08111c/ffffff?text=BG+Salon+caotico+A',
+        events:{
+          botLife:[
+            {at:7,text:'Hydra rodea a Metal con varias cabezas'},
+            {at:4,text:'Queen potencia los núcleos de Hydra con energía desviada del Director'}
+          ],
+          ability:[
+            {who:'p1',text:'División celular genera más cabezas para cerrar el paso'},
+            {who:'p2',text:'Púa metálica giratoria intenta cortar las hidras'}
+          ],
+          onBotDefeat:[
+            {text:'La sierra de Metal queda clavada y sus puntas incandescentes se apagan'}
+          ],
+          onPlayerDefeat:[
+            {text:'Metal corta demasiado tejido. Reajusta el ritmo de ataque de Hydra y vuelve a intentarlo.'}
+          ]
+        }
+      },
+      {
+        type:'combat',
+        label:'Queen vs Drumm (Fase B)',
+        mode:'1v1',
+        scoreTarget:10,
+        p1Skin:'queen',
+        botSkin:'drum',
+        bgUrl:'https://placehold.co/1200x675/091320/ffffff?text=BG+Salon+caotico+B',
+        events:{
+          botLife:[
+            {at:7,text:'Las bombas de Drumm pierden sincronización por la redistribución de energía de Queen'},
+            {at:4,text:'Hydra absorbe parte del impacto de una gran explosión'}
+          ],
+          ability:[
+            {who:'p1',text:'Majestad Coral roba y redistribuye vitalidad en el campo'},
+            {who:'p2',text:'Detonación en cadena intenta volar el trono de Queen'}
+          ],
+          onBotDefeat:[
+            {text:'Los explosivos de Drumm se apagan o se vuelven meras luces decorativas'}
+          ],
+          onPlayerDefeat:[
+            {text:'El ritmo de explosiones supera tu control. Ajusta el timing de Majestad Coral y reintenta.'}
+          ]
+        }
+      },
+      {
+        type:'slides',
+        slides:[
+          'https://placehold.co/1200x675/0b1727/ffffff?text=14-4+Metal+y+Drumm+caen',
+          'https://placehold.co/1200x675/0e1c2f/ffffff?text=14-5+Alianza+Queen+Hydra+Ghost+Theremin'
+        ],
+        minMs:2000
+      }
+    ]
+  },
+  {
+    id:'cap15',
+    title:'Capítulo 15 - Orden, Caos y Turbinas Doradas',
+    thumb:'https://placehold.co/320x200/265570/ffffff?text=Cap15',
+    steps:[
+      {
+        type:'slides',
+        slides:[
+          'https://placehold.co/1200x675/050910/ffffff?text=15-1+Nucleo+central',
+          'https://placehold.co/1200x675/07101a/ffffff?text=15-2+Discurso+del+Director',
+          'https://placehold.co/1200x675/091322/ffffff?text=15-3+Piano+y+Cello+adelante'
+        ],
+        minMs:2000
+      },
+      {
+        type:'combat',
+        label:'Piano (+Cello) vs Director (Fase 1)',
+        mode:'1v1',
+        scoreTarget:12,
+        p1Skin:'piano',
+        botSkin:'director',
+        bgUrl:'https://placehold.co/1200x675/08111c/ffffff?text=BG+Nucleo+Fase1',
+        events:{
+          botLife:[
+            {at:9,text:'Cello desvía parte de los ataques para que Piano lea el patrón'},
+            {at:5,text:'Mini-hydras empiezan a golpear nodos del Director en los bordes'}
+          ],
+          ability:[
+            {who:'p1',text:'Extensión de teclado para cubrir ángulos imposibles'},
+            {who:'p2',text:'Ondas de control intentan fijar un compás único'}
+          ],
+          onBotDefeat:[
+            {text:'Varios nodos del Director se apagan; su control sobre el campo se debilita'}
+          ],
+          onPlayerDefeat:[
+            {text:'El compás del Director supera tu lectura. Ajusta tus tiempos y vuelve a intentarlo.'}
+          ]
+        }
+      },
+      {
+        type:'slides',
+        slides:[
+          'https://placehold.co/1200x675/0b1727/ffffff?text=15-4+Nodos+apagados',
+          'https://placehold.co/1200x675/0d1a2c/ffffff?text=15-5+Tentacion+a+Harp'
+        ],
+        minMs:2000
+      },
+      {
+        type:'combat',
+        label:'Harp vs Flor (Tentacion del orden)',
+        mode:'1v1',
+        scoreTarget:9,
+        p1Skin:'harp',
+        botSkin:'flor',
+        bgUrl:'https://placehold.co/1200x675/091320/ffffff?text=BG+Centro+Harp+Flor',
+        events:{
+          botLife:[
+            {at:6,text:'Flor esquiva más que atacar, intentando no destruir a Harp'},
+            {at:3,text:'La influencia del Director sobre Harp fluctúa; sus notas se vuelven inestables'}
+          ],
+          ability:[
+            {who:'p1',text:'Arpegio Celestial presiona a Flor con precisión fría'},
+            {who:'p2',text:'Pulso Floral crea espacio y evita el golpe final'}
+          ],
+          onBotDefeat:[
+            {text:'Flor cae pero deja claro que Harp no completó el acto que el Director quería'}
+          ],
+          onPlayerDefeat:[
+            {text:'La culpa frena tus golpes. Ajusta la dosis de agresividad y reintenta.'}
+          ]
+        }
+      },
+      {
+        type:'slides',
+        slides:[
+          'https://placehold.co/1200x675/0f2033/ffffff?text=15-6+Flor+resiste+Harp+duda',
+          'https://placehold.co/1200x675/101f33/ffffff?text=15-7+Violin+Dark+entra+al+duelo+final'
+        ],
+        minMs:2000
+      },
+      {
+        type:'combat',
+        label:'Violin Dark vs Director Supremo (Fase final)',
+        mode:'1v1',
+        scoreTarget:13,
+        p1Skin:'violin',
+        botSkin:'director',
+        bgUrl:'https://placehold.co/1200x675/08111c/ffffff?text=BG+Nucleo+Fase3',
+        events:{
+          botLife:[
+            {at:10,text:'El Director intenta predecir cada movimiento pero el contra-ritmo de Violin Dark rompe el patrón'},
+            {at:6,text:'Las antenas caen una a una; el campo de control se reduce'}
+          ],
+          ability:[
+            {who:'p1',text:'Salto impulsado por turbinas doradas, llamas moradas trazan un arco en el cielo'},
+            {who:'p2',text:'Ráfaga de orden absoluto intenta fijar la posición de Violin Dark'}
+          ],
+          onBotDefeat:[
+            {text:'El núcleo del control del Director se fractura en notas sueltas, cayendo al abismo de energía'}
+          ],
+          onPlayerDefeat:[
+            {text:'El Director te recaptura como arma. Reintenta escuchando los ecos de tus aliados en el fondo.'}
+          ]
+        }
+      },
+      {
+        type:'slides',
+        slides:[
+          'https://placehold.co/1200x675/0e1c2f/ffffff?text=15-8+Batuta+rota+y+caida+del+Director',
+          'https://placehold.co/1200x675/111f34/ffffff?text=15-9+Harp+liberada+nucleo+estable',
+          'https://placehold.co/1200x675/12233a/ffffff?text=15-10+Todos+los+frentes+en+un+nuevo+equilibrio'
+        ],
+        minMs:2000
+      }
+    ]
+  },
+  {
+    id:'epilogo',
+    title:'Epílogo - Una Isla con Memoria',
+    thumb:'https://placehold.co/320x200/1b364c/ffffff?text=Epilogo',
+    steps:[
+      {
+        type:'slides',
+        slides:[
+          'https://placehold.co/1200x675/071019/ffffff?text=E-1+Amanecer+en+la+playa',
+          'https://placehold.co/1200x675/0a1520/ffffff?text=E-2+Trio+ViolinDark+Cello+Piano',
+          'https://placehold.co/1200x675/0c1723/ffffff?text=E-3+Flor+y+jardin+memorial',
+          'https://placehold.co/1200x675/0d1a27/ffffff?text=E-4+DJ+Fire+red+sonido',
+          'https://placehold.co/1200x675/0e1c2b/ffffff?text=E-5+Queen+Hydra+Ghost+Theremin',
+          'https://placehold.co/1200x675/101f30/ffffff?text=E-6+Harp+frente+al+mar',
+          'https://placehold.co/1200x675/122238/ffffff?text=E-7+Runa+Mystery+y+plano+final+isla'
+        ],
+        minMs:3500
+      }
+    ]
+  },
+];
+
+
+const storyAssets = { slides:{}, backgrounds:{} };
+function preloadStoryImage(url, bucket){
+  if(!url) return null;
+  const store = bucket === 'bg' ? storyAssets.backgrounds : storyAssets.slides;
+  if(store[url]) return store[url];
+  const img = new Image();
+  img.src = url;
+  store[url] = img;
+  return img;
+}
+
+function createStoryContext(){
+  return {
+    active:false,
+    chapterIndex:0,
+    stepIndex:0,
+    slideIndex:0,
+    stage:'idle', // slides | blackIn | combat | blackOut | done
+    steps:[],
+    currentStep:null,
+    cooldownUntil:0,
+    blackUntil:0,
+    bubbles:[],
+    lastBotLives:null,
+    lastPlayerLives:null,
+    pendingWinner:null,
+    retry:false,
+    arcadeGoal:0,
+    arcadeEvents:null
+  };
+}
+let storyContext = createStoryContext();
+
+function isStoryMode(){
+  return matchMode === MATCH_MODE.STORY;
+}
+
 function isArcadeMode(){
   return matchMode === MATCH_MODE.ARCADE;
 }
@@ -2826,6 +3965,36 @@ function getArcadeModeLabel(mode = arcadeContext.mode){
     case ARCADE_MODES.BOSS: return 'Arcade: Bossfight';
     default: return 'Arcade';
   }
+}
+
+function renderStoryGrid(){
+  if(!uiRefs.storyGrid) return;
+  uiRefs.storyGrid.innerHTML = '';
+  const perPage = 6;
+  const start = storyPage * perPage;
+  const slice = STORY_CHAPTERS.slice(start, start + perPage);
+  slice.forEach((ch, idx)=>{
+    const globalIdx = start + idx;
+    const card = document.createElement('div');
+    card.className = 'story-card';
+    const thumb = document.createElement('div');
+    thumb.className = 'story-thumb';
+    if(ch.thumb) thumb.style.backgroundImage = `url('${ch.thumb}')`;
+    card.appendChild(thumb);
+    const h3 = document.createElement('h3');
+    h3.textContent = ch.title || `Capítulo ${globalIdx+1}`;
+    const p = document.createElement('p');
+    p.textContent = `Pasos: ${ch.steps?.length || 0} · Tap para jugar`;
+    card.appendChild(h3);
+    card.appendChild(p);
+    card.addEventListener('click', ()=>{
+      startStoryChapter(globalIdx);
+    });
+    uiRefs.storyGrid.appendChild(card);
+  });
+  // habilitar/deshabilitar controles
+  if(uiRefs.btnStoryPrev) uiRefs.btnStoryPrev.disabled = storyPage === 0;
+  if(uiRefs.btnStoryNext) uiRefs.btnStoryNext.disabled = (start + perPage) >= STORY_CHAPTERS.length;
 }
 
 function getBossDef(id){
@@ -2884,13 +4053,18 @@ function setScene(scene){
   appScene = scene;
   if(lobbyLayer) lobbyLayer.classList.add('hidden');
   const showArcade = arcadeOpen && scene === APP_SCENE.MENU;
+  const showStory = storyOpen && scene === APP_SCENE.MENU;
   if(uiRefs.arcadePanel) uiRefs.arcadePanel.classList.toggle('hidden', !showArcade);
+  if(uiRefs.storyPanel) uiRefs.storyPanel.classList.toggle('hidden', !showStory);
+  // Mostrar/ocultar botón de salida de historia según escena
+  const showStoryExit = (scene === APP_SCENE.GAME) && matchMode === MATCH_MODE.STORY;
+  if(uiRefs.storyExitBtn) uiRefs.storyExitBtn.classList.toggle('hidden', !showStoryExit);
   if(scene === APP_SCENE.MENU){
-    if(tutorialPanel) tutorialPanel.classList.toggle('hidden', !tutorialOpen || encyOpen || arcadeOpen);
+    if(tutorialPanel) tutorialPanel.classList.toggle('hidden', !tutorialOpen || encyOpen || arcadeOpen || storyOpen);
     if(uiRefs.encyPanel) uiRefs.encyPanel.classList.toggle('hidden', !encyOpen);
     if(uiRefs.statsLayer) uiRefs.statsLayer.classList.add('hidden');
     uiLayer.classList.remove('hidden');
-    menuPanel.classList.toggle('hidden', tutorialOpen || encyOpen || arcadeOpen);
+    menuPanel.classList.toggle('hidden', tutorialOpen || encyOpen || arcadeOpen || storyOpen);
     lanPanel.classList.add('hidden');
     menuFocusIndex = 0;
     syncMenuFocus();
@@ -2914,8 +4088,10 @@ function setScene(scene){
     toggleProfileExport(false);
     toggleProfileImport(false);
     arcadeOpen = false;
+    storyOpen = false;
     closeBossfightBox();
     if(uiRefs.arcadePanel) uiRefs.arcadePanel.classList.add('hidden');
+    if(uiRefs.storyPanel) uiRefs.storyPanel.classList.add('hidden');
   }
   syncUiState();
   if(isUiScene()){
@@ -2930,6 +4106,11 @@ function getActiveMenuButtons(){
   if(appScene === APP_SCENE.MENU){
     if(encyOpen){
       ['btnEncyBack'].forEach(id=>{
+        const el = document.getElementById(id);
+        if(el && !el.disabled) buttons.push(el);
+      });
+    } else if(storyOpen){
+      ['btnStory'].forEach(id=>{
         const el = document.getElementById(id);
         if(el && !el.disabled) buttons.push(el);
       });
@@ -2954,6 +4135,10 @@ function getActiveMenuButtons(){
           const el = document.getElementById(id);
           if(el && !el.disabled && !el.classList.contains('hidden')) buttons.push(el);
         });
+      } else if(storyOpen){
+        // Las tarjetas se manejan con click/tap; se deja el botón del modo para foco básico
+        const el = uiRefs.btnStory;
+        if(el) buttons.push(el);
       } else {
         ['btnLocalPvp','btnLocalBot','btnLan','btnArcade','btnOpenTutorial','btnToggleFullscreen','btnMenuMute','btnEditName','btnExportProgress','btnImportProgress','btnOpenStats'].forEach(id=>{
           const el = document.getElementById(id);
@@ -3511,6 +4696,268 @@ function closeArcadeMenu(){
   refreshRosterFromProgress();
   setScene(APP_SCENE.MENU);
   badge.innerText = 'Selecciona modo';
+}
+
+function openStoryMenu(){
+  tutorialOpen = false;
+  encyOpen = false;
+  arcadeOpen = false;
+  storyOpen = true;
+  storyPage = 0;
+  setScene(APP_SCENE.MENU);
+  badge.innerText = 'Modo historia';
+  renderStoryGrid();
+}
+
+// Acción del botón overlay para salir de capítulo y volver al menú historia
+if(uiRefs.storyExitBtn){
+  uiRefs.storyExitBtn.addEventListener('click', ()=>{
+    // Desactivar contexto de historia si está activo
+    if(window.storyContext){
+      storyContext.active = false;
+    }
+    // Volver al menú de historia
+    openStoryMenu();
+  });
+}
+
+function closeStoryMenu(){
+  storyOpen = false;
+  if(uiRefs.storyPanel) uiRefs.storyPanel.classList.add('hidden');
+  matchMode = MATCH_MODE.LOCAL;
+  refreshRosterFromProgress();
+  setScene(APP_SCENE.MENU);
+  badge.innerText = 'Selecciona modo';
+}
+
+function startStoryChapter(index){
+  const chapter = STORY_CHAPTERS[index];
+  if(!chapter) return;
+  storyContext = createStoryContext();
+  storyContext.active = true;
+  storyContext.chapterIndex = index;
+  storyContext.steps = Array.isArray(chapter.steps) ? [...chapter.steps] : [];
+  storyContext.stepIndex = 0;
+  storyContext.slideIndex = 0;
+  storyContext.stage = 'slides';
+  storyContext.currentStep = storyContext.steps[0] || null;
+  storyContext.cooldownUntil = performance.now() + (storyContext.currentStep?.minMs || 500);
+  storyOpen = false;
+  stopAllMusic(); // silencio al entrar al modo historia
+  currentMusicTrack = null;
+  matchMode = MATCH_MODE.STORY;
+  useBot = false;
+  botActive = false;
+  selectionUsedTouch = false;
+  resetMatchTimer();
+  badge.innerText = chapter.title || 'Modo historia';
+  gameState = STATE.SELECT;
+  setScene(APP_SCENE.GAME);
+}
+
+function storyIsBlocking(){
+  return storyContext.active && (storyContext.stage === 'slides' || storyContext.stage === 'blackIn' || storyContext.stage === 'blackOut');
+}
+
+function handleStoryTap(){
+  if(!storyContext.active) return;
+  const step = storyContext.currentStep;
+  const nowTs = performance.now();
+  if(storyContext.stage === 'slides' && step?.slides){
+    if(nowTs < storyContext.cooldownUntil) return;
+    if(storyContext.slideIndex < step.slides.length - 1){
+      storyContext.slideIndex++;
+      storyContext.cooldownUntil = nowTs + (step.minMs || 500);
+    } else {
+      storyNextStep();
+    }
+  }
+}
+
+function storyNextStep(){
+  matchMode = MATCH_MODE.STORY;
+  gameState = STATE.SELECT;
+  storyContext.stepIndex++;
+  storyContext.slideIndex = 0;
+  const next = storyContext.steps[storyContext.stepIndex];
+  storyContext.currentStep = next || null;
+  if(!next){
+    const nextChapterIndex = storyContext.chapterIndex + 1;
+    const hasMore = nextChapterIndex < STORY_CHAPTERS.length;
+    if(hasMore){
+      startStoryChapter(nextChapterIndex);
+      return;
+    } else {
+      storyContext.stage = 'done';
+      storyContext.active = false;
+      closeStoryMenu();
+      setScene(APP_SCENE.MENU);
+      badge.innerText = 'Historia completada';
+      return;
+    }
+  }
+  if(next.type === 'slides'){
+    storyContext.stage = 'slides';
+    storyContext.cooldownUntil = performance.now() + (next.minMs || 500);
+    stopAllMusic(); // slides sin música
+    currentMusicTrack = null;
+  } else if(next.type === 'combat'){
+    storyContext.stage = 'blackIn';
+    storyContext.blackUntil = performance.now() + 1000;
+  }
+}
+
+function startStoryCombatStep(step){
+  if(!step) return;
+  suddenDeathActive = false; // reset estado previo (bordes/música)
+  storyContext.stage = 'combat';
+  storyContext.pendingWinner = null;
+  storyContext.lastBotLives = step.scoreTarget || CONFIG.BASE_POINTS_TO_WIN;
+  storyContext.lastPlayerLives = step.scoreTarget || CONFIG.BASE_POINTS_TO_WIN;
+  // En modo historia, por defecto ignorar upgrades DARK automáticos.
+  // Permitimos DARK solo si el step lo especifica explícitamente en la skin.
+  storyContext.allowDarkUpgrade = { p1:false, p2:false };
+  violinDarkRockets.length = 0;
+  thereminSwordsOrbit.length = 0;
+  thereminSwordProjectiles.length = 0;
+
+  if(step.mode === 'arcade:target' || step.mode === 'arcade:dominadas' || step.mode === 'keepup'){
+    const mode = (step.mode === 'arcade:target') ? ARCADE_MODES.TARGET : ARCADE_MODES.DOMINADAS;
+    storyContext.arcadeGoal = step.scoreTarget || 5;
+    storyContext.arcadeEvents = step.events || null;
+    arcadeContext.storyGoal = step.scoreTarget || 5; // pasar el objetivo al contexto arcade
+    startArcadeMode(mode, { forceSkin: step.p1Skin || 'violin', skipSelection:true, bgUrl: step.bgUrl, fromStory: true });
+    badge.innerText = step.label || 'Historia - Arcade';
+    return;
+  }
+
+  // Combate 1v1 vs bot espejo
+  matchMode = MATCH_MODE.STORY;
+  useBot = true;
+  botActive = true;
+  suddenDeathActive = false;
+  selectionUsedTouch = false;
+  currentBackground = BACKGROUNDS[0];
+  if(step.bgUrl){
+    const key = `story_${storyContext.chapterIndex}_${storyContext.stepIndex}`;
+    loadBackgroundImage(key, step.bgUrl);
+    currentBackground = { isPhoto:true, imageKey:key };
+  }
+  const p1Skin = step.p1Skin || 'violin';
+  const p2Skin = step.botSkin || p1Skin;
+  // Flags por jugador: permitir upgrade DARK solo si la skin explícita contiene 'dark'
+  try {
+    storyContext.allowDarkUpgrade.p1 = /dark/i.test(p1Skin);
+    storyContext.allowDarkUpgrade.p2 = /dark/i.test(p2Skin);
+  } catch(e) {
+    storyContext.allowDarkUpgrade = { p1:false, p2:false };
+  }
+  p1 = makePlayer(W*0.25,'L', p1Skin);
+  p2 = makePlayer(W*0.75,'R', p2Skin);
+  hydraClones.length = 0;
+  directorClones.length = 0;
+  miniDirectors.length = 0;
+  ghostBarriers.length = 0;
+  florBursts.length = 0;
+  violinDarkRockets.length = 0;
+  thereminSwordsOrbit.length = 0;
+  thereminSwordProjectiles.length = 0;
+  clearHazardProjectiles();
+  arcadeContext.bossFight = null;
+  score.p1 = 0;
+  score.p2 = 0;
+  // El marcador base (jugador) siempre 10; el objetivo del bot se toma del step
+  score.target = CONFIG.BASE_POINTS_TO_WIN;
+  resetScoreStreaks();
+  botKills = 0;
+  resetRally(Math.random()<0.5 ? 'L':'R');
+  gameState = STATE.PLAY;
+  resetMatchTimer();
+  badge.innerText = step.label || 'Historia - Combate';
+  if(!musicMuted) playCurrentMusic();
+}
+
+function storyHandleAbility(player){
+  if(!storyContext.active || storyContext.stage !== 'combat') return;
+  const step = storyContext.currentStep;
+  const events = step?.events?.ability || [];
+  const who = (player === p1) ? 'p1' : 'p2';
+  events.forEach(ev=>{
+    if(ev.who && ev.who !== who) return;
+    pushStoryBubble(ev.text || 'Habilidad', who);
+  });
+}
+
+function storyHandlePoint(who){
+  if(!storyContext.active || storyContext.stage !== 'combat') return;
+  const step = storyContext.currentStep;
+  const botTarget = step?.scoreTarget || score.target || CONFIG.BASE_POINTS_TO_WIN;
+  const playerTarget = CONFIG.BASE_POINTS_TO_WIN;
+  // Vidas restantes para cada lado
+  const botLives = Math.max(0, botTarget - score.p1);      // bot pierde vida cuando p1 anota
+  const playerLives = Math.max(0, playerTarget - score.p2);   // jugador pierde vida cuando bot anota
+
+  const botEvents = step?.events?.botLife || [];
+  const playerEvents = step?.events?.playerLife || [];
+
+  if(botLives < (storyContext.lastBotLives ?? target)){
+    botEvents.forEach(ev=>{
+      if(typeof ev.at === 'number' && ev.at === botLives){
+        pushStoryBubble(ev.text || `Bot: ${botLives} vidas`, 'p2');
+      }
+    });
+  }
+  if(playerLives < (storyContext.lastPlayerLives ?? target)){
+    playerEvents.forEach(ev=>{
+      if(typeof ev.at === 'number' && ev.at === playerLives){
+        pushStoryBubble(ev.text || `Jugador: ${playerLives} vidas`, 'p1');
+      }
+    });
+  }
+  storyContext.lastBotLives = botLives;
+  storyContext.lastPlayerLives = playerLives;
+}
+
+function storyHandleGameOver(winner){
+  if(!storyContext.active || storyContext.stage !== 'combat') return false;
+  const step = storyContext.currentStep || {};
+  const eventsWin = step.events?.onBotDefeat || [];
+  const eventsLose = step.events?.onPlayerDefeat || [];
+  if(winner === 'p1'){
+    eventsWin.forEach(ev=>pushStoryBubble(ev.text || 'Bot derrotado', 'center'));
+  } else {
+    eventsLose.forEach(ev=>pushStoryBubble(ev.text || 'Derrota', 'center'));
+  }
+  suddenDeathActive = false;
+  stopAllMusic();
+  gameState = STATE.GAMEOVER;
+  storyContext.pendingWinner = winner;
+  storyContext.retry = winner !== 'p1';
+  storyContext.stage = 'blackOut';
+  storyContext.blackUntil = performance.now() + 1000;
+  return true;
+}
+
+function storyTick(){
+  if(!storyContext.active) return;
+   // Mantener silencio fuera de combate.
+   if(storyContext.stage !== 'combat' && currentMusicTrack){
+     stopAllMusic();
+     currentMusicTrack = null;
+   }
+  if(storyContext.stage === 'blackIn' && performance.now() >= storyContext.blackUntil){
+    startStoryCombatStep(storyContext.currentStep);
+  } else if(storyContext.stage === 'blackOut' && performance.now() >= storyContext.blackUntil){
+    if(storyContext.retry){
+      storyContext.retry = false;
+      storyContext.pendingWinner = null;
+      gameState = STATE.SELECT;
+      storyContext.stage = 'blackIn';
+      storyContext.blackUntil = performance.now() + 1000;
+    } else {
+      storyNextStep();
+    }
+  }
 }
 
 function showLobbyPanel(show){
@@ -4438,6 +5885,10 @@ function syncUiState(){
     const showExit = !menuLike && (gameState === STATE.PAUSE || gameState === STATE.GAMEOVER);
     exitPauseBtn.classList.toggle('hidden', !showExit);
   }
+  if(storySkipBtn){
+    const showSkip = (gameState === STATE.PAUSE) && matchMode === MATCH_MODE.STORY;
+    storySkipBtn.classList.toggle('hidden', !showSkip);
+  }
   const showHudBtns = (gameState === STATE.PAUSE && !menuLike);
   const hudControls = document.getElementById('hudControls');
   if(hudControls){
@@ -5080,6 +6531,7 @@ function resetNetState(options = {}){
 }
 
 function startLocalMode(mode){
+  storyContext.active = false;
   matchMode = mode === 'bot' ? MATCH_MODE.BOT : MATCH_MODE.LOCAL;
   useBot = matchMode === MATCH_MODE.BOT;
   botActive = useBot;
@@ -5155,6 +6607,8 @@ function returnToArcadeModeMenu(){
 }
 
 function startArcadeMode(mode, options = {}){
+  // Contexto: si viene desde historia, mantener activo; si no, desactivar
+  storyContext.active = !!options.fromStory;
   resetArcadeState();
   arcadeContext.mode = mode || ARCADE_MODES.DOMINADAS;
   arcadeContext.singlePlayer = arcadeContext.mode !== ARCADE_MODES.BOSS;
@@ -5185,12 +6639,20 @@ function startArcadeMode(mode, options = {}){
     setPlayerNames({ p2:'Arcade' });
   }
   resetSelectionState();
-  setScene(APP_SCENE.SELECT);
-  gameState = STATE.SELECT;
   arcadeOpen = false;
   badge.innerText = getArcadeModeLabel();
   resetMusicSelection();
-  ensureMenuMusic();
+  // Si se fuerza skin/sin selección, arrancar directo
+  if(options.skipSelection || options.forceSkin){
+    startArcadeMatchDirect({
+      p1Skin: options.forceSkin || ROSTER[sel.p1Index] || 'violin',
+      bgUrl: options.bgUrl
+    });
+  } else {
+    setScene(APP_SCENE.SELECT);
+    gameState = STATE.SELECT;
+    ensureMenuMusic();
+  }
 }
 
 function openLanMenu(){
@@ -5211,6 +6673,7 @@ function getModeLabel(){
     return `Modo: ${side}`;
   }
   if(matchMode === MATCH_MODE.ARCADE) return getArcadeModeLabel();
+  if(matchMode === MATCH_MODE.STORY) return 'Modo: Historia';
   if(matchMode === MATCH_MODE.BOT) return 'Modo: Supervivencia Bot';
   return 'Modo: 1 vs 1';
 }
@@ -5219,6 +6682,10 @@ if(uiRefs.btnLocalPvp) uiRefs.btnLocalPvp.addEventListener('click', ()=>startLoc
 if(uiRefs.btnLocalBot) uiRefs.btnLocalBot.addEventListener('click', ()=>startLocalMode('bot'));
 if(uiRefs.btnLan) uiRefs.btnLan.addEventListener('click', ()=>openLanMenu());
 if(uiRefs.btnArcade) uiRefs.btnArcade.addEventListener('click', ()=>openArcadeMenu());
+if(uiRefs.btnStory) uiRefs.btnStory.addEventListener('click', ()=>openStoryMenu());
+if(uiRefs.btnStoryPrev) uiRefs.btnStoryPrev.addEventListener('click', ()=>{ storyPage = Math.max(0, storyPage - 1); renderStoryGrid(); });
+if(uiRefs.btnStoryNext) uiRefs.btnStoryNext.addEventListener('click', ()=>{ const perPage = 6; const maxPage = Math.floor((STORY_CHAPTERS.length - 1) / perPage); storyPage = Math.min(maxPage, storyPage + 1); renderStoryGrid(); });
+if(uiRefs.btnStoryBackMenu) uiRefs.btnStoryBackMenu.addEventListener('click', ()=>{ playUiBackSound(); closeStoryMenu(); });
 if(uiRefs.btnArcadeBack) uiRefs.btnArcadeBack.addEventListener('click', ()=>{ playUiBackSound(); closeArcadeMenu(); });
 if(uiRefs.btnArcadeDominadas) uiRefs.btnArcadeDominadas.addEventListener('click', ()=>startArcadeMode(ARCADE_MODES.DOMINADAS));
 if(uiRefs.btnArcadeTarget) uiRefs.btnArcadeTarget.addEventListener('click', ()=>startArcadeMode(ARCADE_MODES.TARGET));
@@ -5297,6 +6764,29 @@ if(pauseHudBtn) pauseHudBtn.addEventListener('click', ()=>{
     exitSelectionToMenu();
   } else {
     requestPauseToggle();
+  }
+});
+// Skippear combate de historia desde pausa
+if(storySkipBtn) storySkipBtn.addEventListener('click', ()=>{
+  if(matchMode !== MATCH_MODE.STORY) return;
+  if(window.storyContext && storyContext.active){
+    const nextStepIdx = (storyContext.stepIndex || 0) + 1;
+    const nextStep = storyContext.steps[nextStepIdx];
+    if(nextStep){
+      storyContext.stepIndex = nextStepIdx;
+      storyContext.currentStep = nextStep;
+      storyContext.stage = 'slides';
+      storyContext.slideIndex = 0;
+      storyContext.cooldownUntil = performance.now() + (nextStep.minMs || 500);
+      badge.innerText = STORY_CHAPTERS[storyContext.chapterIndex]?.title || 'Modo historia';
+    } else {
+      storyContext.active = false;
+      openStoryMenu();
+      return;
+    }
+    // Volver a selección/continuar historia
+    gameState = STATE.SELECT;
+    setScene(APP_SCENE.GAME);
   }
 });
 if(toggleSkinsBtn) toggleSkinsBtn.addEventListener('click', ()=>{
@@ -5971,6 +7461,9 @@ function startMatchLocalFromConfig(cfg = {}){
   miniDirectors.length = 0;
   ghostBarriers.length = 0;
   florBursts.length = 0;
+  violinDarkRockets.length = 0;
+  thereminSwordsOrbit.length = 0;
+  thereminSwordProjectiles.length = 0;
   clearHazardProjectiles();
   arcadeContext.bossFight = null;
 
@@ -6387,6 +7880,9 @@ const directorClones = [];
 const miniDirectors = [];
 const florBursts = [];
 const hazardProjectiles = [];
+const violinDarkRockets = [];
+const thereminSwordsOrbit = [];
+const thereminSwordProjectiles = [];
 const drumMineL = { attached:false, pulse:0 };
 const drumMineR = { attached:false, pulse:0 };
 const mysteryBomb = { attached:false, owner:null, pulse:0 };
@@ -6477,6 +7973,19 @@ const ABILITIES = {
     type: 'passive',
     description: 'Placeholder sin efecto.'
   }),
+  // Disparador neutro para skins de historia: no altera gameplay, pero permite lanzar diálogos al presionar habilidad
+  storyPing: defineAbility({
+    id: 'storyPing',
+    label: 'Narrativa',
+    type: 'active',
+    duration: 50,
+    cooldown: 6000,
+    staminaCost: 100,
+    description: 'Solo activa el disparador de diálogo en historia.',
+    staminaProfile: { max: 100, regen: 50, start: 50 },
+    onActivate(){},
+    onDeactivate(){}
+  }),
   pianoStretch: defineAbility({
     id: 'pianoStretch',
     label: 'Extensión Armónica',
@@ -6519,12 +8028,12 @@ const ABILITIES = {
   violinDash: defineAbility({
     id: 'violinDash',
     label: 'Legato Veloz',
-    duration: 5000,
-    cooldown: 30,
+    duration: 14000,
+    cooldown: 300,
     staminaCost: 50,
     description: 'Regenera al perder vida y duplica permanentemente su velocidad crítica hasta el final del partido.',
-    staminaProfile: { max: 100, regen: 10, start: 50 },
-    dashMultiplier: 2,
+    staminaProfile: { max: 100, regen: 30, start: 50 },
+    dashMultiplier: 1.7,
     dashDuration: 5,
     dashPermanent: true,
     onConcede(player){
@@ -6532,6 +8041,13 @@ const ABILITIES = {
     },
     onActivate(player, ability){
       applyViolinDash(player, ability);
+    },
+    onDeactivate(player){
+      if(!player || !player.status?.violinDash) return;
+      // Iniciar transición de 1 segundo para reducir velocidad gradualmente
+      player.status.violinDash.fadingOut = true;
+      player.status.violinDash.fadeTimer = 1.0; // 1 segundo para volver a normal
+      player.status.violinDash.startMult = player.status.violinDash.mult || 2;
     }
   }),
   djTempo: defineAbility({
@@ -6546,7 +8062,7 @@ const ABILITIES = {
     fieldForce: 380,
     onActivate(player, ability){
       activateDjField(player, ability);
-      //esperamos 10 segundos y luego desactivamos DjField:
+      //esperamos 12 segundos y luego desactivamos DjField:
       setTimeout(()=>{
         deactivateDjField(player, ability);
       }, 12000);
@@ -6565,7 +8081,7 @@ const ABILITIES = {
     staminaProfile: { max: 100, regen: 4, start: 10 },
     hitChargePercent: 10,
     powerMultiplier: 5.5,
-    scaleMultiplier: 2.05,
+    scaleMultiplier: 1.75,
     onActivate(player, ability){
       activateCelloPower(player, ability);
       //esperamos 5 segundos y luego desactivamos CelloPower:
@@ -6599,6 +8115,23 @@ const ABILITIES = {
       recoverStamina(player, (player.stamina?.max || 0) * 0.10);
     },
     onActivate(player){
+      giveQueenGrace(player);
+    }
+  }),
+  queenDarkMajesty: defineAbility({
+    id: 'queenDarkMajesty',
+    label: 'Majestad Oscura',
+    duration: 200,
+    cooldown: 2500,
+    staminaCost: 100,
+    staminaGain: 100,
+    description: 'Al activar, roba 1 vida al oponente y Queen recupera 1 vida.',
+    staminaProfile: { max: 100, regen: 10, start: 40 },
+    onConcede(player){
+      recoverStamina(player, (player.stamina?.max || 0) * 0.10);
+    },
+    onActivate(player){
+      // Roba una vida (oponente -1) y Queen regenera 1 (ya contemplado en blessing)
       giveQueenBlessing(player);
     }
   }),
@@ -6612,6 +8145,18 @@ const ABILITIES = {
     staminaProfile: { max: 100, regen: 30, start: 50 },
     onActivate(player){
       triggerFlorPulse(player);
+    }
+  }),
+  florDarkPulse: defineAbility({
+    id: 'florDarkPulse',
+    label: 'Pulso Floral Oscuro',
+    duration: 500,
+    cooldown: 18,
+    staminaCost: 34,
+    description: 'Versión dark: pulso más fuerte y recarga más rápido.',
+    staminaProfile: { max: 100, regen: 60, start: 60 },
+    onActivate(player){
+      triggerFlorPulseDark(player);
     }
   }),
   ghostWall: defineAbility({
@@ -6639,6 +8184,22 @@ const ABILITIES = {
     },
     onActivate(player){
       applyThereminShock(player);
+    }
+  }),
+  thereminDarkPulse: defineAbility({
+    id: 'thereminDarkPulse',
+    label: 'Onda Theremin Dark',
+    duration: 1400,
+    cooldown: 200,
+    staminaCost: 50,
+    description: 'Electrocuta como la versión normal y despliega una espada láser que orbita y luego se lanza como proyectil.',
+    staminaProfile: { max: 100, regen: 80, start: 70 },
+    onConcede(player){
+      recoverStamina(player, (player.stamina?.max || 0) * 0.45);
+    },
+    onActivate(player){
+      applyThereminShock(player);
+      spawnThereminLaserSword(player);
     }
   }),
   fireIgnition: defineAbility({
@@ -6751,7 +8312,7 @@ const ABILITIES = {
     cooldown: 160,
     staminaCost: 100,
     description: 'Carga una bomba en la pelota y la detona hacia el suelo, empujando al oponente radialmente.',
-    staminaProfile: { max: 100, regen: 50, start: 100 },
+    staminaProfile: { max: 100, regen: 85, start: 100 },
     canActivate(player){
       const mine = player.side === 'L' ? drumMineL : drumMineR;
       return player.ability.runtime.bombReady && mine.attached;
@@ -6837,6 +8398,22 @@ const ABILITIES = {
     staminaProfile: { max: 100, regen: 30, start: 100 },
     onActivate(player){
       triggerRockMeteorRain(player);
+    }
+  }),
+  violinDarkAccel: defineAbility({
+    id: 'violinDarkAccel',
+    label: 'Acelerador Dark',
+    duration: 100,
+    cooldown: 800,
+    staminaCost: 50,
+    description: '2x velocidad horizontal, salto más rápido, dispara un cohete parabólico hacia el enemigo que causa impulso vertical al golpear.',
+    staminaProfile: { max: 100, regen: 100, start: 100 },
+    speedMultiplier: 2.0,
+    jumpMultiplier: 1.05,
+    onActivate(player){
+      applyViolinDarkAccel(player);
+    },
+    onDeactivate(player){
     }
   })
 };
@@ -6978,6 +8555,14 @@ function buildSkinLibrary(){
     abilityId: 'drumDetonate'
   });
   if(hitboxScales.drum) library.drum.hitboxScale = (library.drum.hitboxScale || CONFIG.PLAYER_HITBOX_SCALE) * hitboxScales.drum;
+
+  // Story variants sin habilidad
+  library.violin_story = createSkinProfile('violin_story', {
+    abilityId: 'storyPing'
+  });
+  library.cello_story = createSkinProfile('cello_story', {
+    abilityId: 'storyPing'
+  });
 
   library.cello = createSkinProfile('cello', {
     abilityId: 'celloFortissimo'
@@ -8126,12 +9711,23 @@ function applySkinProfile(player, skinId){
   
   player.charProgressStats = getCharStatsSnapshot(skinId);
   player.charAchievementData = getCharAchievementData(player.charProgressStats);
-  player.darkTierUnlocked = isDarkTierUnlocked(player.charAchievementData);
+  // En modo historia o arcade desde historia, ignorar upgrades DARK automáticos salvo que el step lo autorice
+  const inStory = (matchMode === MATCH_MODE.STORY);
+  const inArcadeFromStory = (matchMode === MATCH_MODE.ARCADE && storyContext?.active);
+  const allowDarkForSide = (inStory || inArcadeFromStory) ? !!(storyContext?.allowDarkUpgrade?.[player.side]) : true;
+  const baseDarkUnlocked = isDarkTierUnlocked(player.charAchievementData);
+  player.darkTierUnlocked = baseDarkUnlocked && allowDarkForSide;
 
   // Determinar la habilidad: si es Director Dark y NO es bot, usar directorDarkDouble
   // Si es Drum Dark, usar drumDarkDetonate
   // Si es Metal Dark, usar metalDarkSpike
   let effectiveAbilityId = profile.abilityId;
+  if(player.darkTierUnlocked && skinId === 'violin'){
+    const isBot = botActive && player?.side === 'R';
+    if(!isBot){
+      effectiveAbilityId = 'violinDarkAccel';
+    }
+  }
   if(player.darkTierUnlocked && skinId === 'director'){
     const isBot = botActive && player?.side === 'R'; // bot es siempre p2
     if(!isBot){
@@ -8148,6 +9744,24 @@ function applySkinProfile(player, skinId){
     const isBot = botActive && player?.side === 'R';
     if(!isBot){
       effectiveAbilityId = 'metalDarkSpike';
+    }
+  }
+  if(player.darkTierUnlocked && skinId === 'flor'){
+    const isBot = botActive && player?.side === 'R';
+    if(!isBot){
+      effectiveAbilityId = 'florDarkPulse';
+    }
+  }
+  if(player.darkTierUnlocked && skinId === 'queen'){
+    const isBot = botActive && player?.side === 'R';
+    if(!isBot){
+      effectiveAbilityId = 'queenDarkMajesty';
+    }
+  }
+  if(player.darkTierUnlocked && skinId === 'theremin'){
+    const isBot = botActive && player?.side === 'R';
+    if(!isBot){
+      effectiveAbilityId = 'thereminDarkPulse';
     }
   }
   
@@ -8279,9 +9893,27 @@ function restorePlayerScale(player, snapshot){
 function giveQueenBlessing(player){
   if(!player) return;
   const opponentKey = (player === p1) ? 'p2' : 'p1';
-  score[opponentKey] = Math.max(0, (score[opponentKey] || 0) - 1);
-  player.lifeBonusAmount = 1;
-  player.lifeBonusTimer = 8000;
+  const playerKey = (player === p1) ? 'p1' : 'p2';
+  
+  // En modo BOT, Queen dark derrota al bot automáticamente
+  if(matchMode === MATCH_MODE.BOT && playerKey === 'p1'){
+    // Regenera 1 vida: en BOT la vida del jugador depende de score del bot,
+    // así que reducimos el score del bot para reflejar la curación visual.
+    score.p2 = (score.p2 || 0) - 1;
+    // Cuenta como bot derrotado (flujo normal de supervivencia)
+    addPoint('p1');
+  } else {
+    // Modo normal y story: restar/sumar puntos
+    score[opponentKey] = (score[opponentKey] || 0) - 1;
+    score[playerKey] = (score[playerKey] || 0) + 1;
+  }
+}
+
+function giveQueenGrace(player){
+  if(!player) return;
+  // Reina normal: ganar una vida afectando el score rival (no suma puntos propios)
+  const opponentKey = (player === p1) ? 'p2' : 'p1';
+  score[opponentKey] = (score[opponentKey] || 0) - 1;
 }
 
 function getOpponentPlayer(player){
@@ -8294,7 +9926,316 @@ function applyThereminShock(caster){
   const target = getOpponentPlayer(caster);
   if(!target) return;
   target.status = target.status || {};
-  target.status.theremin = { stun: 0.5, slow: 0.8 };
+  target.status.theremin = { stun: 0.4, slow: 0.8 };
+}
+
+function spawnThereminLaserSword(player){
+  if(!player) return;
+  if(!Number.isFinite(player.x) || !Number.isFinite(player.y) || !Number.isFinite(player.r)) return;
+  const dir = player.side === 'L' ? 1 : -1; // L gira horario (hacia derecha), R antihorario
+  const sword = {
+    owner: player,
+    ownerSide: player.side,
+    state: 'orbit',
+    angle: -Math.PI/2, // arranca arriba
+    radius: Math.max(120, player.r * 2.1),
+    angularSpeed: 8.5, // rad/s
+    orbitDuration: 0.71,
+    elapsed: 0,
+    dir,
+    length: 200,
+    width: 100,
+    rotation: 0,
+    x: player.x,
+    y: player.y
+  };
+  thereminSwordsOrbit.push(sword);
+}
+
+function releaseThereminSwordProjectile(sword){
+  const speed = 1050;
+  // Tangente de la órbita para dar “momentum” en el sentido de giro
+  const tangentX = -Math.sin(sword.angle) * sword.dir;
+  const tangentY =  Math.cos(sword.angle) * sword.dir;
+  const mag = Math.hypot(tangentX, tangentY) || 1;
+  const tx = tangentX / mag;
+  const ty = tangentY / mag;
+  thereminSwordProjectiles.push({
+    ownerSide: sword.ownerSide,
+    x: sword.x,
+    y: sword.y,
+    vx: tx * speed,
+    vy: ty * speed,
+    length: sword.length,
+    width: sword.width,
+    rotation: Math.atan2(ty, tx),
+    elapsed: 0,
+    duration: 0.95
+  });
+}
+
+function updateThereminSwords(dt){
+  if(!Number.isFinite(dt) || dt <= 0) return;
+  const ballExists = typeof ball === 'object' && ball;
+  // Órbitas
+  for(let i = thereminSwordsOrbit.length - 1; i >= 0; i--){
+    const s = thereminSwordsOrbit[i];
+    const owner = s.owner;
+    if(!owner || !Number.isFinite(owner.x) || !Number.isFinite(owner.y) || !Number.isFinite(owner.r)){
+      thereminSwordsOrbit.splice(i,1);
+      continue;
+    }
+    s.elapsed += dt;
+    s.angle += (s.angularSpeed || 0) * dt * s.dir;
+    const ox = owner.x;
+    const oy = owner.y - owner.r * 0.4;
+    const cos = Math.cos(s.angle);
+    const sin = Math.sin(s.angle);
+    s.x = ox + cos * s.radius;
+    s.y = oy + sin * s.radius;
+    // rotar siguiendo la tangente para que “barra”
+    const tangentX = -sin * s.dir;
+    const tangentY =  cos * s.dir;
+    s.rotation = Math.atan2(tangentY, tangentX);
+
+    if(s.elapsed >= s.orbitDuration){
+      releaseThereminSwordProjectile(s);
+      thereminSwordsOrbit.splice(i,1);
+    }
+  }
+
+  // Proyectiles
+  for(let i = thereminSwordProjectiles.length - 1; i >= 0; i--){
+    const p = thereminSwordProjectiles[i];
+    p.elapsed += dt;
+    // leve gravedad para caída estética
+    p.vy += CONFIG.GRAVITY * 0.25 * dt;
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+    p.rotation = Math.atan2(p.vy, p.vx);
+
+    // Colisión con enemigo
+    const target = p.ownerSide === 'L' ? p2 : p1;
+    if(target){
+      const rad = Math.max(p.length, p.width) * 0.45 + target.r;
+      const dx = p.x - target.x;
+      const dy = p.y - target.y;
+      if(dx*dx + dy*dy <= rad*rad){
+        target.vy = -1800;
+        target.onGround = false;
+        thereminSwordProjectiles.splice(i,1);
+        continue;
+      }
+    }
+
+    // Colisión simple con pelota para ayudar a golpear
+    if(ballExists && !p.hitBall){
+      const bdx = p.x - ball.x;
+      const bdy = p.y - ball.y;
+      const ballRad = Math.max(p.length, p.width) * 0.55 + ball.r;
+      if(bdx*bdx + bdy*bdy <= ballRad*ballRad){
+        const dirX = Math.cos(p.rotation);
+        const dirY = Math.sin(p.rotation);
+        const speedBoost = 1400;
+        ball.vx = dirX * speedBoost;
+        ball.vy = dirY * speedBoost * 0.35;
+        p.hitBall = true; // evita golpear múltiples veces en la misma trayectoria
+      }
+    }
+
+    // Expirar
+    if(p.elapsed >= p.duration || p.y > H + 200 || p.x < -200 || p.x > W + 200){
+      thereminSwordProjectiles.splice(i,1);
+    }
+  }
+}
+
+function drawThereminSwords(){
+  const img = IMAGES[THEREMIN_LASER_SWORD_KEY];
+  // Órbitas
+  for(const s of thereminSwordsOrbit){
+    ctx.save();
+    ctx.translate(s.x, s.y);
+    ctx.rotate(s.rotation + Math.PI/2); // imagen vertical
+    const w = s.width;
+    const h = s.length;
+    if(img && img.complete){
+      ctx.drawImage(img, -w/2, -h/2, w, h);
+    } else {
+      ctx.fillStyle = 'rgba(120, 220, 255, 0.9)';
+      ctx.fillRect(-w/2, -h/2, w, h);
+      ctx.fillStyle = 'rgba(50, 140, 255, 0.8)';
+      ctx.fillRect(-w/4, -h/2, w/2, h);
+    }
+    ctx.restore();
+  }
+
+  // Proyectiles
+  for(const p of thereminSwordProjectiles){
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.rotation + Math.PI/2);
+    const w = p.width;
+    const h = p.length;
+    if(img && img.complete){
+      ctx.drawImage(img, -w/2, -h/2, w, h);
+    } else {
+      ctx.fillStyle = 'rgba(120, 220, 255, 0.9)';
+      ctx.fillRect(-w/2, -h/2, w, h);
+      ctx.fillStyle = 'rgba(50, 140, 255, 0.8)';
+      ctx.fillRect(-w/4, -h/2, w/2, h);
+    }
+    ctx.restore();
+  }
+}
+
+function applyViolinDarkAccel(player){
+  if(!player) return;
+  player.status = player.status || {};
+  player.status.violinDarkAccel = { 
+    active: true, 
+    speedMult: 2.0, 
+    jumpMult: 1.1,
+    vyMult: 1,
+    timer: 25.0
+  };
+  
+  // Disparar cohete hacia la posición actual del enemigo
+  const enemy = getOpponentPlayer(player);
+  if(enemy){
+    spawnViolinDarkRocket(player, enemy.x, enemy.y);
+  }
+}
+
+function spawnViolinDarkRocket(owner, targetX, targetY){
+  if(!owner) return;
+  const rocket = {
+    x: owner.x,
+    y: owner.y - owner.r,
+    vx: 0,
+    vy: 0,
+    r: 50,
+    owner: owner.side,
+    targetX: targetX,
+    targetY: targetY +50,
+    startX: owner.x,
+    startY: owner.y - owner.r,
+    duration: 0.8, // 0.8 segundos de vuelo
+    elapsedTime: 0,
+    rotation: 0,
+    hit: false
+  };
+  violinDarkRockets.push(rocket);
+}
+
+function updateViolinDarkRockets(dt){
+  for(let i = violinDarkRockets.length - 1; i >= 0; i--){
+    const rocket = violinDarkRockets[i];
+    rocket.elapsedTime += dt;
+    
+    const progress = Math.min(1, rocket.elapsedTime / rocket.duration);
+    
+    // Trayectoria parabólica: (1-t)^2 * P0 + 2*(1-t)*t * C + t^2 * P1
+    // donde C es un punto de control más alto (parábola)
+    const t = progress;
+    const oneMinusT = 1 - t;
+    
+    // Punto de control (control point) para hacer la parábola
+    const controlX = (rocket.startX + rocket.targetX) / 2;
+    const controlY = Math.min(rocket.startY, rocket.targetY) - (rocket.targetX - rocket.startX)*0.8; // Punto más alto de la parábola
+    
+    rocket.x = oneMinusT * oneMinusT * rocket.startX + 
+               2 * oneMinusT * t * controlX + 
+               t * t * rocket.targetX;
+    
+    rocket.y = oneMinusT * oneMinusT * rocket.startY + 
+               2 * oneMinusT * t * controlY + 
+               t * t * rocket.targetY;
+    
+    // Calcular velocidad para rotación
+    const prevX = rocket.x;
+    const prevY = rocket.y;
+    
+    // Derivada de la parábola para ángulo
+    const dx = rocket.targetX - rocket.startX;
+    const dy = rocket.targetY - rocket.startY;
+    const ddx = 2 * (controlX - 2 * ((rocket.startX + rocket.targetX) / 2) + rocket.targetX) * (t - 0.5);
+    const ddy = 2 * (controlY - 2 * ((rocket.startY + rocket.targetY) / 2) + rocket.targetY) * (t - 0.5);
+    
+    rocket.vx = dx + ddx;
+    rocket.vy = dy + ddy;
+    
+    // Ángulo del cohete basado en velocidad (invertido)
+    rocket.rotation = -Math.atan2(-rocket.vy, -rocket.vx)+0.3 ;
+    
+    // Verificar colisión con enemigo
+    if(!rocket.hit){
+      const target = rocket.owner === 'L' ? p2 : p1;
+      if(target){
+        const dist = Math.hypot(rocket.x - target.x, rocket.y - target.y);
+        if(dist < rocket.r + target.r){
+          rocket.hit = true;
+          // Aplicar impulso vertical al enemigo
+          target.vy = -1800; // Impulso vertical fuerte hacia arriba
+          target.onGround = false;
+          // Remover el cohete después de un frame
+          violinDarkRockets.splice(i, 1);
+          continue;
+        }
+      }
+    }
+    
+    // Remover si pasó su duración
+    if(progress >= 1){
+      violinDarkRockets.splice(i, 1);
+    }
+  }
+}
+
+function drawViolinDarkRockets(){
+  for(const rocket of violinDarkRockets){
+    ctx.save();
+    ctx.translate(rocket.x, rocket.y);
+    const rotated = rocket.rotation + 5*Math.PI / 4; // Ajuste de textura: 45° a la derecha
+    ctx.rotate(rotated);
+    const img = IMAGES[VIOLIN_DARK_ROCKET_KEY];
+    const size = (rocket.rBase || rocket.r) * 2 * (rocket.scale || 1);
+    if(img && img.complete){
+      ctx.drawImage(img, -size*0.5, -size*0.5, 1.2*size, 1.2*size);
+    } else {
+      // Fallback vector si no carga la textura
+      const grad = ctx.createLinearGradient(-rocket.r, 0, rocket.r, 0);
+      grad.addColorStop(0, 'rgba(100, 150, 255, 0.8)');
+      grad.addColorStop(0.5, 'rgba(255, 100, 100, 0.9)');
+      grad.addColorStop(1, 'rgba(255, 200, 100, 1)');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, rocket.r * 2, rocket.r, 0, 0, TAU);
+      ctx.fill();
+
+      ctx.fillStyle = 'rgba(255, 255, 100, 1)';
+      ctx.beginPath();
+      ctx.moveTo(rocket.r * 2, 0);
+      ctx.lineTo(rocket.r * 2.5, -rocket.r * 0.6);
+      ctx.lineTo(rocket.r * 2.5, rocket.r * 0.6);
+      ctx.closePath();
+      ctx.fill();
+
+      const flameLength = rocket.r * 3;
+      const flameGrad = ctx.createLinearGradient(-rocket.r * 2, 0, -flameLength, 0);
+      flameGrad.addColorStop(0, 'rgba(255, 150, 0, 0.6)');
+      flameGrad.addColorStop(1, 'rgba(255, 50, 0, 0)');
+      ctx.fillStyle = flameGrad;
+      ctx.beginPath();
+      ctx.moveTo(-rocket.r * 1.5, -rocket.r * 0.8);
+      ctx.lineTo(-flameLength, -rocket.r * 0.5);
+      ctx.lineTo(-flameLength, rocket.r * 0.5);
+      ctx.lineTo(-rocket.r * 1.5, rocket.r * 0.8);
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.restore();
+  }
 }
 
 function applyViolinDash(player, ability){
@@ -8512,7 +10453,7 @@ function triggerFlorPulse(player){
   if(!player) return;
   const dir = (player.side === 'L') ? 1 : -1;
   const pushX = 900 * dir;
-  const lift = -220;
+  const lift = -520;
   ball.vx += pushX;
   ball.vy += lift;
   clearTimeout(flowerpulseTimeout);
@@ -8524,6 +10465,26 @@ function triggerFlorPulse(player){
     y: player.y - player.r * 0.5,
     born: performance.now(),
     life: 600,
+    side: player.side
+  });
+}
+
+function triggerFlorPulseDark(player){
+  if(!player) return;
+  const dir = (player.side === 'L') ? 1 : -1;
+  const pushX = 1800 * dir; // más fuerte que el normal
+  const lift = -460;        // mayor elevación
+  ball.vx += pushX;
+  ball.vy += lift;
+  clearTimeout(flowerpulseTimeout);
+  flowerpulseTimeout = setTimeout(()=>{
+    try{ SFX.flowerpulse.currentTime = 0; SFX.flowerpulse.play(); }catch(e){}
+  }, 0);
+  florBursts.push({
+    x: player.x,
+    y: player.y - player.r * 0.5,
+    born: performance.now(),
+    life: 750,
     side: player.side
   });
 }
@@ -9012,7 +10973,7 @@ function triggerDrumExplosion(player, ability){
         opponent.status.knockbackTimer = Math.max(opponent.status.knockbackTimer || 0, 1.1);
         
         // Empuje continuo durante 0.5s (como meteoritos)
-        const forceX = nx * kb * 120;
+        const forceX = nx * kb * 150;
         const forceY = ny * kb * 6.0;
         applyKnockForce(opponent, forceX, forceY, 0.1);
       }
@@ -9211,11 +11172,30 @@ function updateStatusEffects(player, dt){
   }
   const dash = player.status.violinDash;
   if(dash){
-    if(!dash.permanent){
+    // Si está en fade-out, reducir multiplicador gradualmente
+    if(dash.fadingOut){
+      dash.fadeTimer -= dt;
+      if(dash.fadeTimer <= 0){
+        // Fade completado, eliminar status
+        delete player.status.violinDash;
+      } else {
+        // Interpolar multiplicador de startMult a 1.0
+        const progress = 1 - (dash.fadeTimer / 1.0);
+        dash.mult = dash.startMult - (dash.startMult - 1.0) * progress;
+      }
+    } else if(!dash.permanent){
       dash.timer -= dt;
       if(dash.timer <= 0){
         delete player.status.violinDash;
       }
+    }
+  }
+  const darkAccel = player.status.violinDarkAccel;
+  if(darkAccel){
+    darkAccel.timer = Math.max(0, darkAccel.timer - dt);
+    if(darkAccel.timer <= 0){
+      darkAccel.active = false;
+      delete player.status.violinDarkAccel;
     }
   }
 }
@@ -9304,6 +11284,7 @@ function activatePlayerAbility(player){
   ability.active = true;
   ability.remainingMs = ability.def.duration;
   ability.def.onActivate(player, ability);
+  storyHandleAbility(player);
   if(!(botActive && player === p2)){
     addCharStat(player.skin, 'abilityUses', 1);
     saveProgress(progress);
@@ -9378,6 +11359,87 @@ function drawSkin(ctx, skin, b){
   const TAU = Math.PI * 2;
   const R = b.r;
   const t = now();
+
+  // Queen: aura radial basada en vidas extra
+  if(skin === 'queen' && b && b.player){
+    try{
+      // Calcular vidas y base para este jugador
+      const isP1 = (b.player === p1);
+      const isP2 = (b.player === p2);
+      let baseSegments = 10;
+      if(matchMode === MATCH_MODE.STORY){
+        if(isP2){
+          const step = storyContext?.currentStep || null;
+          baseSegments = step?.scoreTarget || CONFIG.BASE_POINTS_TO_WIN;
+        } else {
+          baseSegments = CONFIG.BASE_POINTS_TO_WIN;
+        }
+      }
+      let lifeRaw = 0;
+      if(matchMode === MATCH_MODE.STORY){
+        const playerTarget = CONFIG.BASE_POINTS_TO_WIN;
+        const botTarget = (storyContext?.currentStep?.scoreTarget) || CONFIG.BASE_POINTS_TO_WIN;
+        if(isP1){
+          lifeRaw = Math.max(0, playerTarget - (score.p2 || 0));
+        } else if(isP2){
+          lifeRaw = Math.max(0, botTarget - (score.p1 || 0));
+        }
+      } else {
+        if(isP1){
+          lifeRaw = scoreToLifeGlobal(score.p1 || 0, score.p2 || 0);
+        } else if(isP2){
+          lifeRaw = scoreToLifeGlobal(score.p2 || 0, score.p1 || 0);
+        }
+      }
+      const extras = Math.max(0, lifeRaw - baseSegments);
+
+      if(extras > 0){
+        const dark = !!b.player.darkTierUnlocked;
+        if(!dark){
+          // Queen normal: a 10 extras => 2R (desde R hasta 2R)
+          const k = Math.max(0, Math.min(1, extras / 10));
+          const outerR = R * (1 + k); // R..2R
+          if(outerR > R){
+            const grad = ctx.createRadialGradient(0, 0, R, 0, 0, outerR);
+            grad.addColorStop(0.0, 'rgba(255, 247, 210, 0.35)'); // blanco dorado pálido
+            grad.addColorStop(0.6, 'rgba(255, 232, 170, 0.18)');
+            grad.addColorStop(1.0, 'rgba(255, 232, 170, 0.00)');
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(0, 0, outerR, 0, TAU);
+            ctx.fill();
+          }
+        } else {
+          // Queen dark: a 15 extras => 3R (desde R hasta 3R), con capa dorada y núcleo morado
+          const k = Math.max(0, Math.min(1, extras / 15));
+          const outerR = R * (1 + 2 * k); // R..3R
+          if(outerR > R){
+            // Capa dorada clara
+            const gradGold = ctx.createRadialGradient(0, 0, R, 0, 0, outerR);
+            gradGold.addColorStop(0.0, 'rgba(245, 235, 170, 0.32)');
+            gradGold.addColorStop(0.7, 'rgba(245, 235, 170, 0.16)');
+            gradGold.addColorStop(1.0, 'rgba(245, 235, 170, 0.00)');
+            ctx.fillStyle = gradGold;
+            ctx.beginPath();
+            ctx.arc(0, 0, outerR, 0, TAU);
+            ctx.fill();
+
+            // Núcleo morado oscuro más pequeño
+            const coreR = Math.max(R, outerR * 0.55);
+            if(coreR > R){
+              const gradCore = ctx.createRadialGradient(0, 0, R, 0, 0, coreR);
+              gradCore.addColorStop(0.0, 'rgba(58, 12, 90, 0.35)');
+              gradCore.addColorStop(1.0, 'rgba(58, 12, 90, 0.00)');
+              ctx.fillStyle = gradCore;
+              ctx.beginPath();
+              ctx.arc(0, 0, coreR, 0, TAU);
+              ctx.fill();
+            }
+          }
+        }
+      }
+    }catch(e){ /* noop visual */ }
+  }
 
   // Si forceClassicSkin está activo (ej: clones), saltar directamente al fallback vectorial
   const skipModernSkins = b.forceClassicSkin === true;
@@ -10465,6 +12527,9 @@ function resetRally(servingTo='L'){
 
 function gameOver(who, options = {}){
   if(finishState.active) return;
+  if(matchMode === MATCH_MODE.STORY){
+    if(storyHandleGameOver(who)) return;
+  }
   clearHazardProjectiles();
   if(matchMode === MATCH_MODE.ARCADE){
     endArcadeRun(options.reason || 'end');
@@ -11006,9 +13071,43 @@ function endArcadeRun(reason='end'){
   });
   badge.innerText = '';
   arcadeContext.active = false;
-  gameState = STATE.GAMEOVER;
+  // Cortar música inmediatamente
   stopAllMusic();
   currentMusicTrack = null;
+  
+  // Si estamos en story mode arcade (arcade lanzado desde step de historia)
+  if(storyContext.active && storyContext.stage === 'combat'){
+    const isArcStory = arcadeContext.mode === ARCADE_MODES.TARGET || arcadeContext.mode === ARCADE_MODES.DOMINADAS;
+    if(isArcStory){
+      const step = storyContext.currentStep || {};
+      const arcadeGoal = storyContext.arcadeGoal || 5;
+      const arcadeScore = arcadeContext.score || 0;
+      const success = arcadeScore >= arcadeGoal;
+      
+      if(success){
+        // Arcade exitoso: disparar onSuccess y avanzar
+        const eventsSuccess = step.events?.onSuccess || [];
+        eventsSuccess.forEach(ev=>pushStoryBubble(ev.text || 'Completado', 'center'));
+        storyContext.pendingWinner = 'p1';
+        storyContext.retry = false;
+      } else {
+        // Arcade fallido: disparar onFail y permitir retry
+        const eventsFail = step.events?.onFail || [];
+        eventsFail.forEach(ev=>pushStoryBubble(ev.text || 'Intenta de nuevo', 'center'));
+        storyContext.pendingWinner = 'p2';
+        storyContext.retry = true;
+      }
+      
+      suddenDeathActive = false;
+      stopAllMusic();
+      gameState = STATE.GAMEOVER;
+      storyContext.stage = 'blackOut';
+      storyContext.blackUntil = performance.now() + 1000;
+      return; // storyTick manejará el blackOut -> retry o storyNextStep()
+    }
+  }
+  
+  gameState = STATE.GAMEOVER;
   syncUiState();
 }
 
@@ -11326,7 +13425,8 @@ function handleFinishMercy(){
   gameState = STATE.FATALITY;
   clearFinishTimers(finishState);
   const winnerKey = finishState.winner;
-  score[winnerKey] = Math.max(0, score[winnerKey]-1);
+  // Mercy: el ganador cede un punto; pierde 1 vida, el perdonado gana 1 vida; se mantiene el resto de vidas
+  score[winnerKey] = (score[winnerKey] || 0) - 1;
   refreshScoreTarget();
   resetScoreStreaks();
   suddenDeathActive = false;
@@ -11775,6 +13875,7 @@ function getTouchControlRole(){
   if(gameState === STATE.PAUSE || gameState === STATE.GAMEOVER) return null;
   if(matchMode === MATCH_MODE.LOCAL) return null;
   if(matchMode === MATCH_MODE.ARCADE) return 'p1';
+  if(matchMode === MATCH_MODE.STORY) return 'p1';
   if(matchMode === MATCH_MODE.BOT) return 'p1';
   if(matchMode === MATCH_MODE.LAN){
     if(netRole === 'host') return 'p1';
@@ -12057,10 +14158,113 @@ function startArcadeMatchFromSelection(){
   const p2Skin = isBossMode ? bossId : (arcadeContext.mode === ARCADE_MODES.FATALITY ? 'dummy' : 'theremin');
   if(isBossMode){
     currentBackground = BACKGROUNDS.find(b=>b.name === 'Rock Stage') || pickWeighted(BACKGROUNDS, 'weight');
+  } else if(arcadeContext.mode === ARCADE_MODES.DOMINADAS || arcadeContext.mode === ARCADE_MODES.TARGET){
+    const key = `arcade_fixed_${Date.now()}`;
+    loadBackgroundImage(key, 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap3/Slide%203.4.png');
+    currentBackground = { isPhoto:true, imageKey:key };
   } else {
     currentBackground = pickWeighted(BACKGROUNDS, 'weight');
   }
   currentBallType = pickWeighted(BALL_TYPES, 'weight');
+  p1 = makePlayer(W*0.38,'L', p1Skin);
+  if(isBossMode){
+    arcadeContext.bossFight = createBossFightState(bossId);
+    const bossAssets = arcadeContext.bossFight.assets || {};
+    arcadeContext.maxDrops = arcadeContext.bossFight.dropLimit || arcadeContext.maxDrops;
+    const spawnX = W*0.75;
+    p2 = makePlayer(spawnX,'R', p2Skin);
+    p2.isDummy = false;
+    p2.isBoss = true;
+    const visualScale = bossAssets.spriteScale || 1;
+    const hitScale = bossAssets.hitboxScale || CONFIG.PLAYER_HITBOX_SCALE;
+    applyScaleModifier(p2, {
+      radius: visualScale,
+      hitbox: hitScale,
+      hitboxX: hitScale,
+      hitboxY: hitScale,
+      visualX: visualScale,
+      visualY: visualScale
+    });
+    p2.ability = createAbilityState('rockBossPush', { boss:true });
+    p2.stamina = { max: 100, value: 100, regen: 40 };
+    p2.ability.cooldownMs = 0;
+    botActive = true;
+    useBot = false;
+    arcadeContext.hideNet = false;
+    arcadeContext.freeCourt = false;
+  } else {
+    const hideDummy = arcadeContext.mode !== ARCADE_MODES.FATALITY;
+    p2 = makePlayer(hideDummy ? W*1.5 : W*0.65,'R', p2Skin);
+    p2.isDummy = true;
+    if(hideDummy){
+      p2.finishHidden = true;
+      p2.hitboxScale = 0.01;
+      p2.hitboxScaleX = 0.01;
+      p2.hitboxScaleY = 0.01;
+      p2.r = 1;
+    }
+    botActive = false;
+  }
+  hydraClones.length = 0;
+  directorClones.length = 0;
+  miniDirectors.length = 0;
+  ghostBarriers.length = 0;
+  florBursts.length = 0;
+
+  score.p1=0;
+  score.p2=0;
+  score.target=CONFIG.BASE_POINTS_TO_WIN;
+  resetScoreStreaks();
+  botKills = 0;
+
+  arcadeContext.active = true;
+  arcadeContext.ended = false;
+  arcadeContext.drops = 0;
+  arcadeContext.score = 0;
+  arcadeContext.streak = 0;
+  arcadeContext.bestStreak = 0;
+  arcadeContext.target = null;
+  matchTimerMode = 'countup';
+  matchTimerMs = 0;
+  matchTimerExpired = false;
+
+  setScene(APP_SCENE.GAME);
+  badge.innerText = getArcadeModeLabel();
+  if(arcadeContext.mode === ARCADE_MODES.TARGET){
+    spawnArcadeTarget();
+  }
+  ball.type = currentBallType;
+  resetArcadeBall({ x: p1.x, vy: -680 });
+  gameState = STATE.PLAY;
+  if(arcadeContext.mode === ARCADE_MODES.FATALITY){
+    startArcadeFatalityWindow();
+  }
+  if(!musicMuted){
+    playCurrentMusic();
+  }
+}
+
+// Arranca arcade sin pasar por selección (útil para modo historia)
+function startArcadeMatchDirect(opts = {}){
+  matchMode = MATCH_MODE.ARCADE;
+  suddenDeathActive = false;
+  resetMusicSelection();
+  const p1Skin = opts.p1Skin || 'violin';
+  const isBossMode = arcadeContext.mode === ARCADE_MODES.BOSS;
+  const bossId = isBossMode ? (arcadeContext.bossId || bossSelectedId || 'rock') : null;
+  const p2Skin = isBossMode ? bossId : (arcadeContext.mode === ARCADE_MODES.FATALITY ? 'dummy' : 'theremin');
+
+  if(opts.bgUrl){
+    const key = `arcade_story_${Date.now()}`;
+    loadBackgroundImage(key, opts.bgUrl);
+    currentBackground = { isPhoto:true, imageKey:key };
+  } else {
+    currentBackground = isBossMode
+      ? (BACKGROUNDS.find(b=>b.name === 'Rock Stage') || pickWeighted(BACKGROUNDS, 'weight'))
+      : pickWeighted(BACKGROUNDS, 'weight');
+  }
+  currentBallType = pickWeighted(BALL_TYPES, 'weight');
+
   p1 = makePlayer(W*0.38,'L', p1Skin);
   if(isBossMode){
     arcadeContext.bossFight = createBossFightState(bossId);
@@ -12326,6 +14530,9 @@ function handleSelection(){
     miniDirectors.length = 0;
     ghostBarriers.length = 0;
     florBursts.length = 0;
+    violinDarkRockets.length = 0;
+    thereminSwordsOrbit.length = 0;
+    thereminSwordProjectiles.length = 0;
 
     score.p1=0;
     score.p2=0;
@@ -12609,11 +14816,14 @@ function handleInput(){
   }
   const thereminP = p.status?.theremin;
   const dashP = p.status?.violinDash;
+  const darkAccelP = p.status?.violinDarkAccel;
   const stunnedP = thereminP && thereminP.stun > 0;
   const slowFactorP = (thereminP && thereminP.slow > 0 && !stunnedP) ? 0.5 : 1;
   const dashFactorP = dashP ? dashP.mult : 1;
-  const speedP = (p.stats?.speed ?? CONFIG.PLAYER_SPEED) * slowFactorP * dashFactorP;
-  const jumpP = (p.stats?.jump ?? CONFIG.PLAYER_JUMP_V) * (stunnedP ? 0 : slowFactorP);
+  const darkAccelFactorP = darkAccelP?.active ? (darkAccelP.speedMult || 2.0) : 1;
+  const speedP = (p.stats?.speed ?? CONFIG.PLAYER_SPEED) * slowFactorP * dashFactorP * darkAccelFactorP;
+  const jumpFactorP = darkAccelP?.active ? (darkAccelP.jumpMult || 1.3) : 1;
+  const jumpP = (p.stats?.jump ?? CONFIG.PLAYER_JUMP_V) * (stunnedP ? 0 : slowFactorP) * jumpFactorP;
   const abilityIdP = p.ability?.def?.id;
   const harpP = abilityIdP === 'harpAria';
   const harpCostRatioP = harpP ? ((p.ability?.def?.doubleJumpCostPercent ?? 50) / 100) : 0;
@@ -12732,11 +14942,14 @@ function handleInput(){
     }
     const thereminQ = q.status?.theremin;
     const dashQ = q.status?.violinDash;
+    const darkAccelQ = q.status?.violinDarkAccel;
     const stunnedQ = thereminQ && thereminQ.stun > 0;
     const slowFactorQ = (thereminQ && thereminQ.slow > 0 && !stunnedQ) ? 0.5 : 1;
     const dashFactorQ = dashQ ? dashQ.mult : 1;
-    const speedQ = (q.stats?.speed ?? CONFIG.PLAYER_SPEED) * slowFactorQ * dashFactorQ;
-    const jumpQ = (q.stats?.jump ?? CONFIG.PLAYER_JUMP_V) * (stunnedQ ? 0 : slowFactorQ);
+    const darkAccelFactorQ = darkAccelQ?.active ? (darkAccelQ.speedMult || 2.0) : 1;
+    const speedQ = (q.stats?.speed ?? CONFIG.PLAYER_SPEED) * slowFactorQ * dashFactorQ * darkAccelFactorQ;
+    const jumpFactorQ = darkAccelQ?.active ? (darkAccelQ.jumpMult || 1.3) : 1;
+    const jumpQ = (q.stats?.jump ?? CONFIG.PLAYER_JUMP_V) * (stunnedQ ? 0 : slowFactorQ) * jumpFactorQ;
     const abilityIdQ = q.ability?.def?.id;
     const harpQ = abilityIdQ === 'harpAria';
     const harpCostRatioQ = harpQ ? ((q.ability?.def?.doubleJumpCostPercent ?? 50) / 100) : 0;
@@ -12910,6 +15123,14 @@ function queueMysteryInputFromCode(code){
 
 function botAI(){
   const p = p2;
+  
+  // Si el bot está congelado por theremin, no procesa input
+  const thereminStatus = p?.status?.theremin;
+  if(thereminStatus && thereminStatus.stun > 0){
+    p.vx = 0;
+    return; // Congelado completamente
+  }
+  
   const g = CONFIG.GRAVITY;
   const botSpeed = p.stats?.speed ?? CONFIG.PLAYER_SPEED;
   const botJump = p.stats?.jump ?? CONFIG.PLAYER_JUMP_V;
@@ -12934,9 +15155,10 @@ function botAI(){
 
   // --- 2. Posicionamiento: se mueve para interceptar la caída
   const dx = predictedLanding - p.x;
+  const slowFactor = (thereminStatus && thereminStatus.slow > 0) ? 0.5 : 1; // Aplicar ralentización si hay slow
   if(Math.abs(dx) > 10){
     const dir = Math.sign(dx);
-    p.vx = dir * botSpeed * moveSpeedFactor;
+    p.vx = dir * botSpeed * moveSpeedFactor * slowFactor;
   } else {
     p.vx = 0;
   }
@@ -12963,7 +15185,7 @@ function botAI(){
     // Ajusta levemente su posición para impactar el lado derecho del balón
     const desiredX = ball.x + jumpOffsetX;
     const offset = desiredX - p.x;
-    p.vx = clamp(offset * 8, -botSpeed, botSpeed);
+    p.vx = clamp(offset * 8 * slowFactor, -botSpeed * slowFactor, botSpeed * slowFactor);
   }
 
   // --- 5. Vuelta al centro defensivo cuando la pelota va al otro lado ---
@@ -12971,7 +15193,7 @@ function botAI(){
     const homeX = (CONFIG.NET_X + W) / 2.05;
     const diff = homeX - p.x;
     if(Math.abs(diff) > 20){
-      p.vx = clamp(diff * 3, -botSpeed, botSpeed);
+      p.vx = clamp(diff * 3 * slowFactor, -botSpeed * slowFactor, botSpeed * slowFactor);
     } else {
       p.vx = 0;
     }
@@ -13016,9 +15238,16 @@ function stepPhysics(dt){
     p.vy *= (1 - CONFIG.AIR_DRAG*0.6);
     const dashState = p.status?.violinDash;
     const dashCap = dashState ? dashState.mult : 1;
+    const darkAccelState = p.status?.violinDarkAccel;
+    const darkAccelCap = (darkAccelState && darkAccelState.active) ? (darkAccelState.speedMult || 2.0) : 1;
+    // Aumentar ligeramente la velocidad vertical cuando darkAccel está activo
+    if(darkAccelState && darkAccelState.active){
+      const vyMult = darkAccelState.vyMult || 1.12;
+      p.vy *= vyMult;
+    }
     const baseMaxVx = p.stats?.maxVx ?? CONFIG.PLAYER_MAX_VX;
     const kbBoost = (p.status?.knockbackTimer > 0) ? (p.status.knockbackBoost || 1) : 1;
-    const maxVx = baseMaxVx * dashCap * kbBoost;
+    const maxVx = baseMaxVx * dashCap * darkAccelCap * kbBoost;
     p.x += clamp(p.vx, -maxVx, maxVx)*dt;
     p.y += p.vy*dt;
     const freeCourt = isArcadeMode() && arcadeContext.freeCourt;
@@ -13038,6 +15267,8 @@ function stepPhysics(dt){
   updateHydraClones(dt);
   updateDirectorClones(dt);
   updateMiniDirectors(dt);
+  updateThereminSwords(dt);
+  updateViolinDarkRockets(dt);
 
   // Pelota (si está en espera de saque, dejamos la integración normal pero waitServe evita movimiento)
   const prevBallX = ball.x;
@@ -13422,6 +15653,7 @@ function addPoint(who, options = {}){
   } else {
     score.p2++;
   }
+  storyHandlePoint(who);
 
   const scoringPlayer = (who === 'p1') ? p1 : p2;
   emitAbilityEvent(scoringPlayer, 'score', {
@@ -13435,7 +15667,28 @@ function addPoint(who, options = {}){
   });
   registerPointStreak(who);
 
-  // Regla: ganar con >= BASE y diferencia >= 2
+  // Regla de victoria: modo historia sin finisher
+  if(matchMode === MATCH_MODE.STORY){
+    const step = storyContext.currentStep;
+    const botTarget = step?.scoreTarget || score.target || CONFIG.BASE_POINTS_TO_WIN;
+    const playerTarget = CONFIG.BASE_POINTS_TO_WIN;
+
+    // Jugador gana si llega al botTarget; bot gana si llega al playerTarget
+    if(score.p1 >= botTarget){
+      // En story: sin finish him, sin mercy, sin fatality - solo blackout y siguiente slide
+      storyHandleGameOver('p1');
+      return 'gameover';
+    }
+    if(score.p2 >= playerTarget){
+      // En story: sin finish him, sin mercy, sin fatality - solo blackout y siguiente slide
+      storyHandleGameOver('p2');
+      return 'gameover';
+    }
+    score.target = botTarget;
+    return 'continue';
+  }
+
+  // Regla: ganar con >= BASE y diferencia >= 2 (modos no historia)
   const a = score.p1, b = score.p2, base = CONFIG.BASE_POINTS_TO_WIN;
   const lead = Math.abs(a-b);
   const high = Math.max(a,b);
@@ -13459,8 +15712,8 @@ function addPoint(who, options = {}){
   } else {
     // En “deuce” implícito, no hay tope superior (12, 14, ...)
     score.target = Math.max(base, high+1);
-    }
-      return 'continue';
+  }
+  return 'continue';
   }
 
 
@@ -13493,6 +15746,8 @@ function drawGame(){
   drawHydraClones();
   drawDirectorClones();
   drawMiniDirectors();
+  drawThereminSwords();
+  drawViolinDarkRockets();
 
   // Pelota
   drawBall();
@@ -13515,6 +15770,7 @@ function drawGame(){
   drawHUD();
   drawFinishEffects();
   drawFinishOverlay();
+  drawStoryOverlay();
 
     // Glow de borde en SUDDEN DEATH (pulsante)
   if(suddenDeathActive){
@@ -13563,6 +15819,74 @@ function drawFinishOverlay(){
   ctx.fillText(text, W/2, H/2 - 140);
   ctx.restore();
 }
+
+function pushStoryBubble(text, side='center', ttl=3200){
+  if(!text) return;
+  const nowTs = performance.now();
+  storyContext.bubbles.push({
+    text,
+    side,
+    born: nowTs,
+    ttl
+  });
+  storyContext.bubbles = storyContext.bubbles.slice(-6);
+}
+
+function drawStoryOverlay(){
+  if(!storyContext.active) return;
+  const step = storyContext.currentStep;
+  const nowTs = performance.now();
+  ctx.save();
+
+  if(storyContext.stage === 'slides' && step?.slides){
+    const url = step.slides[storyContext.slideIndex] || step.slides[0];
+    const img = preloadStoryImage(url, 'slides');
+    ctx.fillStyle = '#050a15';
+    ctx.fillRect(0,0,W,H);
+    if(img && img.complete){
+      ctx.drawImage(img, 0,0,W,H);
+    }
+    // Only dim if the slide is still loading
+    if(!(img && img.complete)){
+      ctx.fillStyle = 'rgba(0,0,0,0.35)';
+      ctx.fillRect(0,0,W,H);
+    }
+    ctx.fillStyle = '#fff';
+    ctx.font = '700 22px system-ui';
+    ctx.textAlign = 'center';
+    const ready = nowTs >= storyContext.cooldownUntil;
+    const msg = ready ? 'Toca/click para continuar' : 'Espera...';
+    ctx.fillText(msg, W/2, H - 48);
+  }
+
+  if(storyContext.stage === 'blackIn' || storyContext.stage === 'blackOut'){
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0,0,W,H);
+  }
+
+  const bubbles = storyContext.bubbles || [];
+  let offsetY = 70;
+  bubbles.forEach(b=>{
+    const age = nowTs - b.born;
+    if(age > b.ttl) return;
+    const alpha = Math.max(0, 1 - age / b.ttl);
+    ctx.globalAlpha = alpha;
+    const w = 420;
+    const x = b.side === 'p2' ? W - w - 24 : 24;
+    ctx.fillStyle = 'rgba(10,14,24,0.75)';
+    ctx.fillRect(x, offsetY, w, 46);
+    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+    ctx.strokeRect(x, offsetY, w, 46);
+    ctx.fillStyle = '#fff';
+    ctx.font = '700 16px system-ui';
+    ctx.textAlign = 'left';
+    ctx.fillText(b.text, x + 12, offsetY + 28);
+    offsetY += 52;
+  });
+  ctx.globalAlpha = 1;
+  ctx.restore();
+}
+
 function drawPlayer(p){
   if(!p || p.finishHidden) return;
   ctx.save();
@@ -14043,10 +16367,19 @@ function drawHUD(){
 
   const MAX_SEGMENTS = 10;
 
-  const bonusP1 = p1.lifeBonusAmount || 0;
-  const bonusP2 = p2.lifeBonusAmount || 0;
-  const p1Life = clamp(scoreToLife(p1Score, p2Score) + bonusP1, 0, MAX_SEGMENTS);
-  const p2Life = clamp(scoreToLife(p2Score, p1Score) + bonusP2, 0, MAX_SEGMENTS);
+  const bonusP1 = 0;
+  const bonusP2 = 0;
+  const storyStep = matchMode === MATCH_MODE.STORY ? (storyContext?.currentStep || null) : null;
+  const botTarget = storyStep?.scoreTarget || CONFIG.BASE_POINTS_TO_WIN;
+  const playerTarget = CONFIG.BASE_POINTS_TO_WIN;
+  const p1LifeRaw = (matchMode === MATCH_MODE.STORY)
+    ? Math.max(0, playerTarget - p2Score)
+    : scoreToLife(p1Score, p2Score);
+  const p2LifeRaw = (matchMode === MATCH_MODE.STORY)
+    ? Math.max(0, botTarget - p1Score)
+    : scoreToLife(p2Score, p1Score);
+  const p1Life = Math.max(0, p1LifeRaw + bonusP1);
+  const p2Life = Math.max(0, p2LifeRaw + bonusP2);
   handleLifeBasedAbilities(p1, p1Life, MAX_SEGMENTS);
   handleLifeBasedAbilities(p2, p2Life, MAX_SEGMENTS);
 
@@ -14055,21 +16388,52 @@ const inSuddenDeath = suddenDeathActive;
   // ===============================
   //     DIBUJAR BARRA SEGMENTADA
   // ===============================
-  function drawLifeBar(x, y, w, h, life, alignLeft){
-    const segW = w / MAX_SEGMENTS;
-    for(let i=0;i<MAX_SEGMENTS;i++){
+  function drawLifeBar(x, y, w, h, myLife, myMaxLife, alignLeft){
+    // myMaxLife = segmentos base que se muestran (10 para jugador, scoreTarget para oponente)
+    // Si myLife > myMaxLife, dibujamos capas de dorados encima (apiladas)
+    const displaySegments = myMaxLife;
+    const segW = w / displaySegments;
+    
+    // Dibujar los segmentos rojos de base
+    for(let i=0;i<displaySegments;i++){
       ctx.strokeStyle = '#550000';
       ctx.lineWidth = 0.5;
-
-      const fill = (i < life);
+      const fill = (i < myLife);
       ctx.fillStyle = fill ? '#b80606' : '#330000';
 
-      const sx = alignLeft ? (x + i*segW) : (x + (MAX_SEGMENTS-1-i)*segW);
-
+      const sx = alignLeft ? (x + i*segW) : (x + (displaySegments-1-i)*segW);
       ctx.beginPath();
       ctx.rect(sx, y, segW - 1, h);
       ctx.fill();
       ctx.stroke();
+    }
+    
+    // Dibujar capas de dorado encima (extras apiladas)
+    const extras = Math.max(0, myLife - myMaxLife);
+    if(extras > 0){
+      const extraLayers = Math.ceil(extras / displaySegments);
+      for(let layer=0; layer<extraLayers; layer++){
+        const layerStart = layer * displaySegments;
+        const layerEnd = Math.min(layerStart + displaySegments, extras);
+        const layerFill = layerEnd - layerStart;
+        
+        ctx.globalAlpha = 0.25;
+        ctx.strokeStyle = '#aa8800';
+        ctx.lineWidth = 0.5;
+        
+        for(let i=0; i<displaySegments; i++){
+          const globalIndex = layer * displaySegments + i;
+          const fill = (i < layerFill);
+          ctx.fillStyle = fill ? '#f0d050' : 'transparent';
+          
+          const sx = alignLeft ? (x + i*segW) : (x + (displaySegments-1-i)*segW);
+          ctx.beginPath();
+          ctx.rect(sx, y, segW - 1, h);
+          if(fill) ctx.fill();
+          ctx.stroke();
+        }
+      }
+      ctx.globalAlpha = 1;
     }
   }
 
@@ -14118,24 +16482,7 @@ if (!suddenDeathActive && p1Life === 1 && p2Life === 1) {
 }
 
 function handleLifeBasedAbilities(playerRef, lifeSegments, maxSegments){
-  if(!playerRef || !playerRef.ability) return;
-  playerRef.status = playerRef.status || {};
-  const abilityId = playerRef.ability.def?.id;
-  if(abilityId === 'violinDash' && lifeSegments <= maxSegments/(10/8)){
-    if(playerRef.stamina){
-      playerRef.stamina.value = playerRef.stamina.max;
-    }
-    playerRef.ability.cooldownMs = 0;
-    playerRef.ability.active = false;
-    playerRef.ability.remainingMs = 0;
-    if(!playerRef.status.violinDash){
-      applyViolinDash(playerRef, playerRef.ability);
-      if(playerRef.status.violinDash){
-        playerRef.status.violinDash.timer = Infinity;
-        playerRef.status.violinDash.permanent = true;
-      }
-    }
-  }
+  // Feature removed: violin no longer gets permanent dash at low health
 }
 
   function drawStaminaBar(x, y, w, h, playerRef, alignLeft){
@@ -14190,10 +16537,27 @@ function handleLifeBasedAbilities(playerRef, lifeSegments, maxSegments){
   }
 
 const lifeWidth = inSuddenDeath ? (W * 0.28) : (W * 0.38);
-if(!botActive){
+if(botActive && matchMode === MATCH_MODE.BOT){
+  // Supervivencia clásica
+  drawLifeBar(40, 15, lifeWidth, 10, p1Life, MAX_SEGMENTS, true);
+  ctx.save();
+  ctx.textAlign = 'right';
+  ctx.font = '900 20px system-ui';
+  ctx.fillStyle = '#ff6b6b';
+  ctx.shadowColor = '#a30000';
+  ctx.shadowBlur = 6;
+  ctx.fillText(`Bots destruidos: ${botKills}`, W - 40, 30);
+  ctx.shadowBlur = 0;
+  ctx.restore();
+} else {
+  // Modo normal y Story (bot con barra)
   if(!inSuddenDeath){
-    drawLifeBar(40, 15, lifeWidth, 10, p1Life, true);
-    drawLifeBar(W - 40 - lifeWidth, 15, lifeWidth, 10, p2Life, false);
+    const p1MaxLife = 10; // Jugador siempre 10 segmentos base
+    const p2MaxLife = (matchMode === MATCH_MODE.STORY && storyContext?.currentStep?.scoreTarget) 
+      ? storyContext.currentStep.scoreTarget 
+      : MAX_SEGMENTS;
+    drawLifeBar(40, 15, lifeWidth, 10, p1Life, p1MaxLife, true);
+    drawLifeBar(W - 40 - lifeWidth, 15, lifeWidth, 10, p2Life, p2MaxLife, false);
   } else {
     const barHeight = 16;
     drawSuddenDeathBar(40, 12, lifeWidth, barHeight, p1Life, true);
@@ -14208,18 +16572,6 @@ if(!botActive){
     ctx.fillText('SUDDEN DEATH', W/2, 54);
     ctx.restore();
   }
-} else {
-  // Supervivencia: barra solo P1 y contador de bots destruidos a la derecha
-  drawLifeBar(40, 15, lifeWidth, 10, p1Life, true);
-  ctx.save();
-  ctx.textAlign = 'right';
-  ctx.font = '900 20px system-ui';
-  ctx.fillStyle = '#ff6b6b';
-  ctx.shadowColor = '#a30000';
-  ctx.shadowBlur = 6;
-  ctx.fillText(`Bots destruidos: ${botKills}`, W - 40, 30);
-  ctx.shadowBlur = 0;
-  ctx.restore();
 }
 
   const staminaWidth = lifeWidth * 0.75;
@@ -14293,6 +16645,7 @@ function loop(){
   last = t;
   if (foulTimer > 0) foulTimer -= (dt * 1000);
   updateGamepadInput();
+  storyTick();
 
   if(appScene === APP_SCENE.MENU || appScene === APP_SCENE.NET){
     ctx.save();
@@ -14308,6 +16661,13 @@ function loop(){
   const shouldTickTimer = ((gameState === STATE.PLAY) || (isArcadeMode() && arcadeContext.active && !arcadeContext.ended)) && (matchMode !== MATCH_MODE.LAN || netRole === 'host');
   if(shouldTickTimer){
     updateMatchTimer(dt);
+  }
+
+  if(storyIsBlocking()){
+    drawGame();
+    keyTaps.clear();
+    requestAnimationFrame(loop);
+    return;
   }
 
   switch(gameState){
@@ -14503,7 +16863,3 @@ loop();
 </script>
 </body>
 </html>
-
-
-
-
