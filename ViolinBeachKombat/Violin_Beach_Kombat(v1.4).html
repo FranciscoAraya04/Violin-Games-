@@ -28,6 +28,12 @@
     --mode-arcade-img: url('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Gemini_Generated_Image_bdsxtqbdsxtqbdsx.png');
     /* una para modo historia */
     --mode-story-img: url('https://multisenal.com.mx/wp-content/uploads/2025/07/obra-en-construccion-senal-solar-122x30-y-122x61-cm.webp');
+    /* Glassmorphism & Vibrant Palette */
+    --primary-glow: #1f7aec;
+    --accent-glow: #5ec3e6;
+    --glass-bg: rgba(12, 20, 35, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-highlight: rgba(255, 255, 255, 0.05);
   }
   html,body{height:100%;margin:0;background:#0b1420;color:#eee;font-family:'Barlow',system-ui,Segoe UI,Roboto,Arial}
   .wrap{display:flex;align-items:center;justify-content:center;height:100%;position:relative;}
@@ -70,9 +76,10 @@
   /* Capas de interfaz */
   .ui-layer{
     position:fixed;inset:0;display:flex;align-items:flex-start;justify-content:center;pointer-events:auto;z-index:10;
-    background:linear-gradient(180deg,rgba(2,7,18,0.7),rgba(1,5,12,0.8)),var(--menu-bg);
+    background:radial-gradient(circle at 50% 30%, rgba(31, 122, 236, 0.15), transparent 70%),linear-gradient(180deg,rgba(2,7,18,0.8),rgba(1,5,12,0.95)),var(--menu-bg);
     background-size:cover;
     background-position:center;
+    background-attachment:fixed;
     filter:saturate(95%);
     padding:24px 12px 96px;
     box-sizing:border-box;
@@ -88,9 +95,11 @@
     }
   }
   .panel{
-    background:rgba(7,12,24,0.92);
-    border:1px solid #20365c;
-    box-shadow:0 20px 50px #000a, 0 0 0 1px #10203a;
+    background:var(--glass-bg);
+    backdrop-filter:blur(16px) saturate(120%);
+    border:1px solid var(--glass-border);
+    border-top:1px solid rgba(255,255,255,0.2);
+    box-shadow:0 25px 50px -12px rgba(0, 0, 0, 0.6);
     border-radius:14px;
     padding:18px 20px;
     width:min(820px,96vw);
@@ -112,14 +121,14 @@
     position:relative;
     border-radius:14px;
     overflow:hidden;
-    border:1px solid #1f365a;
-    background:#0f1a2b;
+    border:1px solid rgba(255,255,255,0.05);
+    background:rgba(15, 24, 43, 0.6);
     cursor:pointer;
     min-height:140px;
     box-shadow:0 12px 30px #0007;
-    transition:transform .08s ease, box-shadow .12s ease, opacity .12s;
+    transition:transform .08s ease, box-shadow .12s ease, opacity .12s, border-color .12s ease;
   }
-  .story-card:hover{transform:translateY(-2px); box-shadow:0 16px 36px #0009;}
+  .story-card:hover{transform:translateY(-2px); box-shadow:0 16px 36px #0009;background:rgba(31,122,236,0.1);border-color:var(--primary-glow);}
   .story-card:active{transform:translateY(0);}
   .story-thumb{
     position:absolute;inset:0;
@@ -146,8 +155,8 @@
   .panel h2{margin:12px 0 6px;font:700 18px/1.1 'Barlow',system-ui;color:#9dc6ff}
   .panel p{margin:6px 0 10px;font:400 14px/1.5 'Barlow',system-ui;color:#c9d9ff}
   .ui-btn{
-    border:none;
-    background:linear-gradient(135deg,#1f7aec,#10b2ff);
+    border:1px solid rgba(255,255,255,0.1);
+    background:linear-gradient(145deg,#1f7aec,#1062c5);
     color:#fff;
     padding:12px 14px;
     border-radius:12px;
@@ -155,6 +164,20 @@
     cursor:pointer;
     box-shadow:0 8px 20px #0006;
     transition:transform .08s ease,box-shadow .08s ease,opacity .15s;
+    position:relative;
+    overflow:hidden;
+  }
+  .ui-btn::after{
+    content:'';
+    position:absolute;
+    top:0;left:-100%;
+    width:50%;height:100%;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);
+    transform:skewX(-20deg);
+    transition:.5s;
+  }
+  .ui-btn:hover::after{
+    left:150%;
   }
   .ui-btn.low-profile{
     background:rgba(31,122,236,0.5);
@@ -258,9 +281,11 @@
   .profile-transfer{margin-top:10px;}
   .profile-transfer-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
   .stats-panel{
-    background:rgba(7,12,24,0.92);
-    border:1px solid #20365c;
-    box-shadow:0 20px 50px #000a, 0 0 0 1px #0f2038;
+    background:var(--glass-bg);
+    backdrop-filter:blur(16px) saturate(120%);
+    border:1px solid var(--glass-border);
+    border-top:1px solid rgba(255,255,255,0.2);
+    box-shadow:0 25px 50px -12px rgba(0, 0, 0, 0.6);
     border-radius:14px;
     padding:18px 20px 22px;
     width:min(940px,96vw);
@@ -354,8 +379,18 @@
     position:fixed;inset:0;pointer-events:none;z-index:8;
   }
   .touch-overlay .line{
-    position:absolute;background:rgba(160,160,160,0.18);
+    position:absolute;
+    background:transparent;
+    border:1px dashed rgba(94, 195, 230, 0.25);
     box-shadow:0 0 8px #0006;
+  }
+  .touch-overlay .line::after{
+    content:attr(data-label);
+    position:absolute;
+    font:600 9px system-ui;
+    color:rgba(94, 195, 230, 0.5);
+    top:-12px;left:4px;
+    white-space:nowrap;
   }
   .touch-overlay .line.vert{width:1px;height:1px;}
   .touch-overlay .line.horiz-left,
@@ -414,12 +449,13 @@
     background:linear-gradient(180deg,rgba(12,17,28,0.25),rgba(0,0,0,0.7)),var(--mode-img, var(--mode-pvp-img));
     background-size:cover;
     background-position:center;
+    background-blend-mode:overlay;
     color:#e9f4ff;
     min-height:190px;
     cursor:pointer;
     box-shadow:0 12px 30px #000b,0 0 0 1px #182436;
     overflow:hidden;
-    transition:transform .08s ease, box-shadow .12s ease, filter .12s ease;
+    transition:all .3s cubic-bezier(0.25,0.8,0.25,1);
     display:flex;
     flex-direction:column;
     align-items:flex-start;
@@ -433,12 +469,16 @@
     pointer-events:none;
   }
   .mode-card:hover{
-    transform:translateY(-3px);
-    box-shadow:0 18px 40px #000d,0 0 0 1px #2c4d7d;
+    transform:translateY(-5px) scale(1.02);
+    box-shadow:0 20px 40px rgba(31,122,236,0.2);
+    border-color:var(--accent-glow);
     filter:saturate(110%);
   }
   .mode-card:active{transform:translateY(-1px);}
   .mode-tag{
+    background:var(--primary-glow);
+    color:white;
+    box-shadow:0 4px 10px rgba(0,0,0,0.3);
     position:relative;
     font:700 15px/1 'Barlow',system-ui;
     text-transform:uppercase;
@@ -471,6 +511,18 @@
     margin:12px 0 10px;
   }
   .menu-actions .ui-btn{min-width:160px}
+  .menu-actions .volume-control{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:var(--glass-bg);
+    border:1px solid var(--glass-border);
+    border-radius:12px;
+    padding:10px 12px;
+    color:#e8f2ff;
+  }
+  .menu-actions .volume-control span{font:700 14px system-ui;}
+  .menu-actions .volume-control input[type=range]{width:160px;}
   .arcade-grid{
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
@@ -478,14 +530,30 @@
     margin:12px 0;
   }
   .arcade-card{
-    background:#0e1727;
-    border:1px solid #1f365a;
+    background:rgba(15, 24, 43, 0.6);
+    border:1px solid rgba(255,255,255,0.05);
     border-radius:12px;
     padding:12px;
     box-shadow:0 12px 28px #0008;
     display:flex;
     flex-direction:column;
     gap:6px;
+    transition:all .2s ease;
+  }
+  .arcade-card.bossfight-card{
+    grid-column:span 2;
+    padding:16px;
+    gap:10px;
+  }
+  .bossfight-meta{display:flex;flex-wrap:wrap;gap:8px;font:700 12px 'Barlow',system-ui;color:#8fa5c8;}
+  .bossfight-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+  .bossfight-actions .ui-btn{min-width:140px;}
+  .bossfight-select{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+  .bossfight-select label{font:700 13px 'Barlow',system-ui;color:#c9d9ff;}
+  .bossfight-select select{background:#0e1827;color:#e8f2ff;border:1px solid #2a3c57;border-radius:10px;padding:8px 10px;min-width:200px;font:600 13px 'Barlow',system-ui;}
+  .arcade-card:hover{
+    background:rgba(31,122,236,0.1);
+    border-color:var(--primary-glow);
   }
   .arcade-card h3{
     margin:0;
@@ -505,9 +573,11 @@
     color:#8fa5c8;
   }
   .tutorial-panel{
-    background:rgba(7,12,24,0.94);
-    border:1px solid #20365c;
-    box-shadow:0 20px 50px #000a, 0 0 0 1px #0f2038;
+    background:var(--glass-bg);
+    backdrop-filter:blur(16px) saturate(120%);
+    border:1px solid var(--glass-border);
+    border-top:1px solid rgba(255,255,255,0.2);
+    box-shadow:0 25px 50px -12px rgba(0, 0, 0, 0.6);
     border-radius:14px;
     padding:18px 20px 22px;
     width:min(940px,96vw);
@@ -566,9 +636,11 @@
   }
   .tutorial-download small{width:100%;color:#9bb3d7;font:600 12px system-ui}
   .ency-panel{
-    background:rgba(7,12,24,0.94);
-    border:1px solid #20365c;
-    box-shadow:0 20px 50px #000a, 0 0 0 1px #0f2038;
+    background:var(--glass-bg);
+    backdrop-filter:blur(16px) saturate(120%);
+    border:1px solid var(--glass-border);
+    border-top:1px solid rgba(255,255,255,0.2);
+    box-shadow:0 25px 50px -12px rgba(0, 0, 0, 0.6);
     border-radius:14px;
     padding:18px 20px 22px;
     width:min(980px,96vw);
@@ -583,8 +655,8 @@
   .ency-header h1{margin:0;font:800 26px/1.1 'Barlow',system-ui}
   .ency-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-top:12px}
   .ency-card{
-    background:#0f182a;
-    border:1px solid #21375c;
+    background:rgba(15, 24, 43, 0.6);
+    border:1px solid rgba(255,255,255,0.05);
     border-radius:12px;
     padding:12px;
     box-shadow:0 12px 28px #0007;
@@ -592,6 +664,11 @@
     grid-template-columns:140px 1fr;
     align-items:flex-start;
     gap:12px;
+    transition:all .2s ease;
+  }
+  .ency-card:hover{
+    background:rgba(31,122,236,0.1);
+    border-color:var(--primary-glow);
   }
   .ency-card canvas{width:96px;height:96px;background:#0c1422;border:1px solid #1b2d4c;border-radius:10px;box-shadow:inset 0 0 18px #0006;display:block}
   .ency-card h3{margin:0;font:800 16px/1.2 'Barlow',system-ui;color:#9dc6ff}
@@ -612,14 +689,16 @@
     z-index:20;
   }
   .ency-overlay.hidden{display:none;}
+  /* Lock background scroll when any modal/overlay is open */
+  body.modal-open{overflow:hidden;}
   .ency-overlay-card{
     background:#050915f0;
     border:1px solid #21375c;
     border-radius:16px;
     box-shadow:0 24px 60px #000d,0 0 0 1px #0f2038;
     padding:14px 16px 16px;
-    width:min(520px,96vw);
-    max-height:82vh;
+    width:min(1180px,98vw);
+    max-height:90vh;
     display:flex;
     flex-direction:column;
     gap:10px;
@@ -695,11 +774,75 @@
     flex-wrap:wrap;
     gap:6px;
   }
+  /* Enciclopedia: logros por categoría */
+  .ency-ach-grid{margin-top:8px;display:grid;grid-template-columns:repeat(3, minmax(0,1fr));gap:10px}
+  .ency-ach-section{background:rgba(15,24,43,0.55);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:10px;box-shadow:0 12px 28px #0006}
+  .ency-ach-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+  .ency-ach-title{display:flex;align-items:center;gap:8px;font:800 13px 'Barlow',system-ui;color:#cfe1ff}
+  .ency-ach-count{font:800 11px 'Barlow',system-ui;color:#9bb3d7}
+  .ency-ach-list{display:flex;flex-wrap:wrap;gap:6px}
+  .ency-ach-bar{position:relative;height:5px;border-radius:999px;background:#0c1624;border:1px solid #1d2f4a;overflow:hidden;margin:4px 0 6px;box-shadow:inset 0 2px 6px #0007}
+  .ency-ach-bar-fill{position:absolute;inset:0;transform-origin:left center;background:linear-gradient(90deg, rgba(255,255,255,0.18), rgba(255,255,255,0.35));box-shadow:0 0 12px rgba(255,255,255,0.18)}
+  /* Neutral base for unachieved chips */
+  .ency-ach-section .stat-chip{background:#0f1a2a;border-color:#233956;color:#cfe1ff}
+  /* Compact chips for enciclopedia achievements */
+  .stat-chip.chip-compact{padding:4px 6px;font:700 11px 'Barlow',system-ui}
+  /* Category color accents */
+  .cat-arcade .ency-ach-title{color:#10b2ff}
+  .cat-combat .ency-ach-title{color:#ff6b4a}
+  .cat-training .ency-ach-title{color:#12b886}
+  .cat-multiplayer .ency-ach-title{color:#8a6cff}
+  .cat-collection .ency-ach-title{color:#f1c40f}
+  .cat-story .ency-ach-title{color:#ff7ab3}
+  .cat-other .ency-ach-title{color:#7aa0b7}
+  .cat-arcade .stat-chip.achieved{background:rgba(16,178,255,0.22);border-color:rgba(16,178,255,0.55);color:#e6f7ff;box-shadow:0 0 0 1px rgba(16,178,255,0.35),0 0 16px rgba(16,178,255,0.25)}
+  .cat-combat .stat-chip.achieved{background:rgba(255,107,74,0.22);border-color:rgba(255,107,74,0.55);color:#ffe7e1;box-shadow:0 0 0 1px rgba(255,107,74,0.35),0 0 16px rgba(255,107,74,0.25)}
+  .cat-training .stat-chip.achieved{background:rgba(18,184,134,0.22);border-color:rgba(18,184,134,0.55);color:#e9fff7;box-shadow:0 0 0 1px rgba(18,184,134,0.35),0 0 16px rgba(18,184,134,0.25)}
+  .cat-multiplayer .stat-chip.achieved{background:rgba(138,108,255,0.22);border-color:rgba(138,108,255,0.55);color:#f1eaff;box-shadow:0 0 0 1px rgba(138,108,255,0.35),0 0 16px rgba(138,108,255,0.25)}
+  .cat-collection .stat-chip.achieved{background:rgba(241,196,15,0.22);border-color:rgba(241,196,15,0.55);color:#fff6d5;box-shadow:0 0 0 1px rgba(241,196,15,0.35),0 0 16px rgba(241,196,15,0.25)}
+  .cat-story .stat-chip.achieved{background:rgba(255,122,179,0.22);border-color:rgba(255,122,179,0.55);color:#ffe6f1;box-shadow:0 0 0 1px rgba(255,122,179,0.35),0 0 16px rgba(255,122,179,0.25)}
+  .cat-other .stat-chip.achieved{background:rgba(122,160,183,0.22);border-color:rgba(122,160,183,0.55);color:#eff6fa;box-shadow:0 0 0 1px rgba(122,160,183,0.35),0 0 16px rgba(122,160,183,0.25)}
+  /* Responsive columns & favorite section width */
+  .char-stat-grid .ency-ach-grid{width:100%}
+  #favAchProgress{display:block;width:100%}
+  @media (max-width: 1000px){
+    .ency-ach-grid{grid-template-columns:repeat(2, minmax(0,1fr))}
+  }
+  @media (max-width: 640px){
+    .ency-ach-grid{grid-template-columns:1fr}
+  }
   .menu-footer{
     text-align:center;
     color:#8aa2c8;
     font:500 11px/1.4 'Barlow',system-ui;
     letter-spacing:0.4px;
+  }
+  /* Glassmorphism & Animation Effects */
+  @keyframes slideUpFade{
+    from{
+      opacity:0;
+      transform:translateY(20px);
+    }
+    to{
+      opacity:1;
+      transform:translateY(0);
+    }
+  }
+  .panel, .stats-panel, .ency-panel, .tutorial-panel{
+    animation:slideUpFade .5s ease-out backwards;
+  }
+  .panel:nth-child(1){animation-delay:0.1s}
+  .panel:nth-child(2){animation-delay:0.2s}
+  .panel:nth-child(3){animation-delay:0.3s}
+  .mode-card{
+    animation:slideUpFade .6s cubic-bezier(0.25, 0.8, 0.25, 1) backwards;
+  }
+  .mode-card:nth-child(1){animation-delay:0.15s}
+  .mode-card:nth-child(2){animation-delay:0.3s}
+  .mode-card:nth-child(3){animation-delay:0.45s}
+  .mode-card:nth-child(4){animation-delay:0.6s}
+  h1, h2, h3, .menu-title{
+    text-shadow:0 0 10px rgba(31,122,236,0.4), 0 0 20px rgba(94,195,230,0.2);
   }
 </style>
 <style>
@@ -714,7 +857,7 @@
 <div class="wrap">
   <canvas id="game" width="1200" height="675" aria-label="Violin Beach Volley"></canvas>
   <!-- Botón persistente para volver al menú de historia -->
-  <button id="storyExitBtn" class="overlay-btn hidden" aria-label="Volver a capítulos">⏎ Menú historia</button>
+  <button id="storyExitBtn" class="overlay-btn hidden" aria-label="Volver a capítulos">⏎</button>
   <button class="hud-btn secondary hidden" id="btnToggleSkins" title="Toggle skins modernas/dibujos">🎨</button>
 </div>
 <div class="touch-overlay hidden" id="touchOverlay">
@@ -844,7 +987,10 @@
       <div class="menu-actions">
         <button class="ui-btn low-profile" id="btnOpenTutorial">Tutorial</button>
         <button class="ui-btn low-profile" id="btnToggleFullscreen">Pantalla completa</button>
-        <button class="ui-btn low-profile" id="btnMenuMute">🔊 Música</button>
+        <label class="volume-control" for="menuVolume">
+          <span>Volumen</span>
+          <input type="range" id="menuVolume" min="0" max="1" step="0.05" value="1">
+        </label>
       </div>
       <div class="menu-footer">Violin Beach Kombat v1.7 · diciembre de 2025 · francisco.araya.work@gmail.com</div>
     </div>
@@ -884,33 +1030,26 @@
         </div>
         <button class="ui-btn low-profile" id="btnArcadeFatality">Entrar a fatality practice</button>
       </div>
-      <div class="arcade-card">
-        <h3>Bossfight</h3>
-        <p>Enfrenta a Rock en 3 fases con targets y proyectiles especiales.</p>
-        <div class="arcade-meta">
-          <span>60 de vida · empuje radial</span>
-          <span>Targets, meteoritos y rocas rodantes</span>
+      <div class="arcade-card bossfight-card">
+        <div style="display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;">
+          <h3>Bossfight</h3>
+          <span class="pill">Selección directa</span>
         </div>
-        <button class="ui-btn low-profile" id="btnArcadeBossfight">Elegir boss</button>
-      </div>
-    </div>
-    <div class="arcade-card hidden" id="bossfightBox" style="margin-top:8px;">
-      <h3>Selecci�n de boss</h3>
-      <p>Abre el selector de personaje y luego pelea contra el boss elegido.</p>
-      <div class="field">
-        <label>Boss disponible</label>
-        <select id="bossfightSelect">
-          <option value="rock" selected>Rock (60 HP, empuje radial)</option>
-        </select>
-      </div>
-      <div class="arcade-meta">
-        <span>Fase 1: con malla hasta bajar vida a 2/3</span>
-        <span>Fase 2: targets sin malla, drop 5= -1 vida</span>
-        <span>Fase 3: meteoritos y boulders, 5 toques = -1 HP boss</span>
-      </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;">
-        <button class="ui-btn" id="btnBossfightPlay">Lucha</button>
-        <button class="ui-btn secondary" id="btnBossfightClose">Cerrar</button>
+        <p>Elige boss y juega sin salir de aquí. Todo en una sola tarjeta, lista para crecer con más bosses.</p>
+        <div class="bossfight-select">
+          <label for="bossfightSelect">Boss</label>
+          <select id="bossfightSelect">
+            <option value="rock" selected>Rock (60 HP, empuje radial)</option>
+          </select>
+        </div>
+        <div class="bossfight-meta">
+          <span>Fase 1: con malla hasta 2/3 de vida</span>
+          <span>Fase 2: targets sin malla (drop 5 = -1 HP)</span>
+          <span>Fase 3: meteoritos y rocas, 5 toques = -1 HP boss</span>
+        </div>
+        <div class="bossfight-actions">
+          <button class="ui-btn" id="btnBossfightPlay">Lucha</button>
+        </div>
       </div>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
@@ -1056,7 +1195,7 @@
     </div>
     <div class="story-grid" id="storyGrid"></div>
   </div>
-  <div class="ency-panel hidden scrollable" id="encyPanel">
+  <div class="ency-panel hidden" id="encyPanel">
     <div class="ency-header">
       <div>
         <h1>Enciclopedia de personajes</h1>
@@ -1065,11 +1204,13 @@
       <button class="ui-btn low-profile" id="btnEncyBack">Volver</button>
     </div>
     <div class="ency-list" id="encyList"></div>
-    <div class="ency-overlay hidden" id="encyDetailOverlay">
-      <div class="ency-overlay-card" id="encyDetailCard"></div>
-    </div>
   </div>
 
+</div>
+
+<!-- Enciclopedia: overlay global fuera del panel para cubrir viewport -->
+<div class="ency-overlay hidden" id="encyDetailOverlay">
+  <div class="ency-overlay-card" id="encyDetailCard"></div>
 </div>
 
 <div class="ui-layer hidden" id="statsLayer">
@@ -1316,11 +1457,33 @@ MUSIC.survival3.volume = 0.30; // ajuste de volumen
 MUSIC.arcade.volume = 0.3; // ajuste de volumen
 MUSIC.arcade2.volume = 0.3; // ajuste de volumen
 MUSIC.arcade3.volume = 0.3; // ajuste de volumen
-MUSIC.bossfight.volume = 0.2; // ajuste de volumen
+MUSIC.bossfight.volume = 0.15; // ajuste de volumen
 MUSIC.fatalityPractice.volume = 0.5; // ajuste de volumen
 MUSIC.versus2.volume = 0.85; // ajuste de volumen
 MUSIC.versus3.volume = 0.85; // ajuste de volumen
 MUSIC.matchEnd.volume = 0.95; // ajuste de volumen
+
+let masterVolume = 1;
+const BASE_SFX_VOLUME = {};
+Object.keys(SFX).forEach(k=>{ BASE_SFX_VOLUME[k] = SFX[k]?.volume ?? 1; });
+const BASE_MUSIC_VOLUME = {};
+Object.keys(MUSIC).forEach(k=>{ BASE_MUSIC_VOLUME[k] = MUSIC[k]?.volume ?? 1; });
+
+function applyMasterVolume(scale){
+  masterVolume = Math.max(0, Math.min(1, Number.isFinite(scale) ? scale : 1));
+  Object.entries(SFX).forEach(([k,a])=>{
+    if(!a) return;
+    const base = BASE_SFX_VOLUME[k] ?? a.volume ?? 1;
+    a.volume = base * masterVolume;
+  });
+  Object.entries(MUSIC).forEach(([k,a])=>{
+    if(!a) return;
+    const base = BASE_MUSIC_VOLUME[k] ?? a.volume ?? 1;
+    a.volume = base * masterVolume;
+  });
+}
+
+applyMasterVolume(masterVolume);
 MUSIC.beach.loop = true;
 MUSIC.mkmusic.loop = true;
 MUSIC.menu1.loop = false;
@@ -1331,9 +1494,9 @@ MUSIC.survival2.loop = false; // se reproducen en secuencia, no en loop
 MUSIC.survival3.loop = false; // se reproducen en secuencia, no en loop
 MUSIC.arcade.loop = true;
 MUSIC.arcade2.loop = true;
-MUSIC.arcade3.loop = true;
-MUSIC.bossfight.loop = true;
-MUSIC.fatalityPractice.loop = true;
+MUSIC.beach.loop = true;
+MUSIC.mkmusic.loop = true;
+MUSIC.suddendeathmusic.loop = true;
 MUSIC.versus2.loop = true;
 MUSIC.versus3.loop = true;
 MUSIC.matchEnd.loop = false;
@@ -2553,6 +2716,78 @@ function getCharAchievementData(stats){
   };
 }
 
+// Utilidad: grid de logros agrupados por categoría con icono, conteo y barra
+function buildAchGrid(ach){
+  const categorize = (txt)=>{
+    if(!txt || typeof txt !== 'string') return 'other';
+    const t = txt.toLowerCase();
+    if(t.startsWith('bots ') || t.startsWith('tiempo ') || t.startsWith('20 bots')) return 'training';
+    if(t.startsWith('hab ') || t.startsWith('pts ') || t.startsWith('fouls ') || t.startsWith('fatalities ') || t.startsWith('local ')) return 'combat';
+    if(t.startsWith('dom ') || t.startsWith('targets ') || t.startsWith('targets seg') || t.includes('rock')) return 'arcade';
+    if(t.startsWith('lan ')) return 'multiplayer';
+    if(t.startsWith('descargar') || t.startsWith('fav') || t.startsWith('?:') || t.startsWith('¿?:') || t.startsWith('modos?:')) return 'collection';
+    return 'other';
+  };
+  const CAT_META = {
+    combat:      { label: 'Combate',      icon: '⚔️' },
+    arcade:      { label: 'Arcade',       icon: '👑' },
+    training:    { label: 'Entrenamiento',icon: '🏋️' },
+    multiplayer: { label: 'Multijugador', icon: '🔗' },
+    collection:  { label: 'Colección',    icon: '⭐' },
+    story:       { label: 'Historia',     icon: '🎬' },
+    other:       { label: 'Otros',        icon: '✨' }
+  };
+  const catsOrder = ['combat','arcade','training','multiplayer','collection','story','other'];
+  const buckets = {};
+  (ach?.lines || []).forEach(lineObj=>{
+    const line = typeof lineObj === 'string' ? { text: lineObj } : (lineObj || {});
+    const key = categorize(line.text || '');
+    if(!buckets[key]) buckets[key] = [];
+    buckets[key].push(line);
+  });
+  const grid = document.createElement('div');
+  grid.className = 'ency-ach-grid';
+  catsOrder.forEach(cat=>{
+    const lines = buckets[cat] || [];
+    if(!lines.length) return;
+    const section = document.createElement('div');
+    section.className = 'ency-ach-section cat-' + cat;
+    const header = document.createElement('div');
+    header.className = 'ency-ach-header';
+    const title = document.createElement('div');
+    title.className = 'ency-ach-title';
+    const meta = CAT_META[cat] || CAT_META.other;
+    const titleText = document.createElement('span');
+    titleText.textContent = `${meta.icon} ${meta.label}`;
+    title.appendChild(titleText);
+    const count = document.createElement('div');
+    count.className = 'ency-ach-count';
+    const doneCount = lines.filter(l=>!!l.done).length;
+    count.textContent = `${doneCount}/${lines.length}`;
+    header.appendChild(title);
+    header.appendChild(count);
+    const bar = document.createElement('div');
+    bar.className = 'ency-ach-bar';
+    const fill = document.createElement('div');
+    fill.className = 'ency-ach-bar-fill';
+    fill.style.width = `${Math.round((doneCount/lines.length)*100)}%`;
+    bar.appendChild(fill);
+    const listBox = document.createElement('div');
+    listBox.className = 'ency-ach-list';
+    lines.forEach(l=>{
+      const chip = document.createElement('span');
+      chip.className = 'stat-chip chip-compact' + (l.done ? ' achieved' : '');
+      chip.textContent = l.text || '';
+      listBox.appendChild(chip);
+    });
+    section.appendChild(header);
+    section.appendChild(bar);
+    section.appendChild(listBox);
+    grid.appendChild(section);
+  });
+  return grid;
+}
+
 function unlockAchievement(id){
   if(!id) return false;
   if(!Array.isArray(progress.achievements)) progress.achievements = [];
@@ -2809,7 +3044,7 @@ const uiRefs = {
   btnOpenTutorial: document.getElementById('btnOpenTutorial'),
   btnTutorialBack: document.getElementById('btnTutorialBack'),
   btnOpenEncy: document.getElementById('btnOpenEncy'),
-  btnMenuMute: document.getElementById('btnMenuMute'),
+  menuVolume: document.getElementById('menuVolume'),
   btnEncyBack: document.getElementById('btnEncyBack'),
   encyPanel: document.getElementById('encyPanel'),
   encyList: document.getElementById('encyList'),
@@ -3262,7 +3497,8 @@ const STORY_CHAPTERS = [
       {
         type:'slides',
         slides:[
-          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap5/Slide%205.8.png',        ],
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap5/Slide%205.8.png'
+        ],
         minMs:2000
       }
     ]
@@ -3994,6 +4230,7 @@ function renderStoryGrid(){
     const globalIdx = start + idx;
     const card = document.createElement('div');
     card.className = 'story-card';
+    card.tabIndex = 0;
     const thumb = document.createElement('div');
     thumb.className = 'story-thumb';
     if(ch.thumb) thumb.style.backgroundImage = `url('${ch.thumb}')`;
@@ -4073,9 +4310,32 @@ function setScene(scene){
   const showStory = storyOpen && scene === APP_SCENE.MENU;
   if(uiRefs.arcadePanel) uiRefs.arcadePanel.classList.toggle('hidden', !showArcade);
   if(uiRefs.storyPanel) uiRefs.storyPanel.classList.toggle('hidden', !showStory);
-  // Mostrar/ocultar botón de salida de historia según escena
-  const showStoryExit = (scene === APP_SCENE.GAME) && matchMode === MATCH_MODE.STORY;
-  if(uiRefs.storyExitBtn) uiRefs.storyExitBtn.classList.toggle('hidden', !showStoryExit);
+  // Mostrar/ocultar botón de salida de historia solo en slides (no en combate) y fijarlo discreto a la izquierda
+  const showStoryExit = (scene === APP_SCENE.GAME) && matchMode === MATCH_MODE.STORY && storyIsBlocking();
+  if(uiRefs.storyExitBtn){
+    uiRefs.storyExitBtn.classList.toggle('hidden', !showStoryExit);
+    if(showStoryExit){
+      const canvas = document.getElementById('game');
+      const canvasRect = canvas.getBoundingClientRect();
+      uiRefs.storyExitBtn.style.position = 'fixed';
+      uiRefs.storyExitBtn.style.left = (canvasRect.left + 8) + 'px';
+      uiRefs.storyExitBtn.style.right = 'auto';
+      uiRefs.storyExitBtn.style.top = (canvasRect.top + 8) + 'px';
+      uiRefs.storyExitBtn.style.width = 'auto';
+      uiRefs.storyExitBtn.style.maxWidth = '';
+      uiRefs.storyExitBtn.style.opacity = '0.4';
+      uiRefs.storyExitBtn.style.zIndex = '100';
+    } else {
+      uiRefs.storyExitBtn.style.position = '';
+      uiRefs.storyExitBtn.style.left = '';
+      uiRefs.storyExitBtn.style.right = '';
+      uiRefs.storyExitBtn.style.top = '';
+      uiRefs.storyExitBtn.style.width = '';
+      uiRefs.storyExitBtn.style.maxWidth = '';
+      uiRefs.storyExitBtn.style.opacity = '';
+      uiRefs.storyExitBtn.style.zIndex = '';
+    }
+  }
   if(scene === APP_SCENE.MENU){
     if(tutorialPanel) tutorialPanel.classList.toggle('hidden', !tutorialOpen || encyOpen || arcadeOpen || storyOpen);
     if(uiRefs.encyPanel) uiRefs.encyPanel.classList.toggle('hidden', !encyOpen);
@@ -4127,14 +4387,20 @@ function getActiveMenuButtons(){
         if(el && !el.disabled) buttons.push(el);
       });
     } else if(storyOpen){
-      ['btnStory'].forEach(id=>{
+      // Agregar tarjetas de capítulos visibles
+      const storyCards = document.querySelectorAll('.story-card');
+      storyCards.forEach(card=>{
+        if(!card.classList.contains('hidden')) buttons.push(card);
+      });
+      // Agregar botones de navegación
+      ['btnStoryPrev','btnStoryNext','btnStoryBackMenu'].forEach(id=>{
         const el = document.getElementById(id);
-        if(el && !el.disabled) buttons.push(el);
+        if(el && !el.disabled && !el.classList.contains('hidden')) buttons.push(el);
       });
     } else if(arcadeOpen){
-      ['btnArcadeBack','btnArcadeDominadas','btnArcadeTarget','btnArcadeFatality'].forEach(id=>{
+      ['btnArcadeBack','btnArcadeDominadas','btnArcadeTarget','btnArcadeFatality','bossfightSelect','btnBossfightPlay'].forEach(id=>{
         const el = document.getElementById(id);
-        if(el && !el.disabled) buttons.push(el);
+        if(el && !el.disabled && !el.classList?.contains?.('hidden')) buttons.push(el);
       });
     } else if(tutorialOpen){
       ['btnTutorialBack','btnOpenEncy'].forEach(id=>{
@@ -4152,12 +4418,8 @@ function getActiveMenuButtons(){
           const el = document.getElementById(id);
           if(el && !el.disabled && !el.classList.contains('hidden')) buttons.push(el);
         });
-      } else if(storyOpen){
-        // Las tarjetas se manejan con click/tap; se deja el botón del modo para foco básico
-        const el = uiRefs.btnStory;
-        if(el) buttons.push(el);
       } else {
-        ['btnLocalPvp','btnLocalBot','btnLan','btnArcade','btnOpenTutorial','btnToggleFullscreen','btnMenuMute','btnEditName','btnExportProgress','btnImportProgress','btnOpenStats'].forEach(id=>{
+        ['btnLocalPvp','btnLocalBot','btnLan','btnArcade','btnStory','btnOpenTutorial','btnToggleFullscreen','menuVolume','btnEditName','btnExportProgress','btnImportProgress','btnOpenStats'].forEach(id=>{
           const el = document.getElementById(id);
           if(el && !el.disabled) buttons.push(el);
         });
@@ -4290,13 +4552,8 @@ function renderFavoriteSkin(){
   }
   if(uiRefs.favAchProgress){
     uiRefs.favAchProgress.innerHTML = '';
-    ach.lines.forEach(lineObj=>{
-      const line = typeof lineObj === 'string' ? { text: lineObj } : (lineObj || {});
-      const span = document.createElement('span');
-      span.className = 'stat-chip' + (line.done ? ' achieved' : '');
-      span.textContent = line.text || line;
-      uiRefs.favAchProgress.appendChild(span);
-    });
+    const grid = buildAchGrid(ach);
+    uiRefs.favAchProgress.appendChild(grid);
   }
 
   const cvs = uiRefs.favSkinCanvas;
@@ -4834,6 +5091,8 @@ function startStoryCombatStep(step){
   storyContext.pendingWinner = null;
   storyContext.lastBotLives = step.scoreTarget || CONFIG.BASE_POINTS_TO_WIN;
   storyContext.lastPlayerLives = step.scoreTarget || CONFIG.BASE_POINTS_TO_WIN;
+  // Actualizar UI (pausa visible, menú historia oculto)
+  syncUiState();
   // En modo historia, por defecto ignorar upgrades DARK automáticos.
   // Permitimos DARK solo si el step lo especifica explícitamente en la skin.
   storyContext.allowDarkUpgrade = { p1:false, p2:false };
@@ -5075,6 +5334,8 @@ function closeEncy(){
   arcadeOpen = false;
   if(uiRefs.encyPanel) uiRefs.encyPanel.classList.add('hidden');
    if(uiRefs.btnOpenEncy) uiRefs.btnOpenEncy.textContent = 'Abrir enciclopedia de personajes';
+  if(uiRefs.encyDetailOverlay) uiRefs.encyDetailOverlay.classList.add('hidden');
+  document.body.classList.remove('modal-open');
   if(encyReturnTarget === 'tutorial'){
     tutorialOpen = true;
     if(tutorialPanel) tutorialPanel.classList.remove('hidden');
@@ -5400,6 +5661,7 @@ function openEncyDetail(skin){
   btnClose.addEventListener('click', (ev)=>{
     ev.stopPropagation();
     uiRefs.encyDetailOverlay.classList.add('hidden');
+    document.body.classList.remove('modal-open');
   });
   actions.appendChild(btnFav);
   actions.appendChild(btnClose);
@@ -5441,23 +5703,17 @@ function openEncyDetail(skin){
   }
   body.appendChild(abilityP);
 
-  const progBox = document.createElement('div');
-  progBox.className = 'ency-overlay-progress';
-  ach.lines.forEach(lineObj=>{
-    const line = typeof lineObj === 'string' ? { text: lineObj } : (lineObj || {});
-    const span = document.createElement('span');
-    span.className = 'stat-chip' + (line.done ? ' achieved' : '');
-    span.textContent = line.text || line;
-    progBox.appendChild(span);
-  });
+  const grid = buildAchGrid(ach);
 
   card.appendChild(header);
   card.appendChild(body);
-  card.appendChild(progBox);
+  card.appendChild(grid);
   uiRefs.encyDetailOverlay.classList.remove('hidden');
+  document.body.classList.add('modal-open');
   uiRefs.encyDetailOverlay.onclick = (ev)=>{
     if(ev.target === uiRefs.encyDetailOverlay){
       uiRefs.encyDetailOverlay.classList.add('hidden');
+      document.body.classList.remove('modal-open');
     }
   };
 }
@@ -5746,6 +6002,7 @@ function openEncyDetail(skin){
   btnClose.addEventListener('click', (ev)=>{
     ev.stopPropagation();
     uiRefs.encyDetailOverlay.classList.add('hidden');
+    document.body.classList.remove('modal-open');
   });
   actions.appendChild(btnFav);
   actions.appendChild(btnClose);
@@ -5762,23 +6019,17 @@ function openEncyDetail(skin){
   }
   body.appendChild(abilityP);
 
-  const progBox = document.createElement('div');
-  progBox.className = 'ency-overlay-progress';
-  ach.lines.forEach(lineObj=>{
-    const line = typeof lineObj === 'string' ? { text: lineObj } : (lineObj || {});
-    const span = document.createElement('span');
-    span.className = 'stat-chip' + (line.done ? ' achieved' : '');
-    span.textContent = line.text || line;
-    progBox.appendChild(span);
-  });
+  const grid = buildAchGrid(ach);
 
   card.appendChild(header);
   card.appendChild(body);
-  card.appendChild(progBox);
+  card.appendChild(grid);
   uiRefs.encyDetailOverlay.classList.remove('hidden');
+  document.body.classList.add('modal-open');
   uiRefs.encyDetailOverlay.onclick = (ev)=>{
     if(ev.target === uiRefs.encyDetailOverlay){
       uiRefs.encyDetailOverlay.classList.add('hidden');
+      document.body.classList.remove('modal-open');
     }
   };
 }
@@ -5891,10 +6142,10 @@ function syncMusicUi(){
     uiRefs.btnHudMute.textContent = musicMuted ? '🔇' : '🔊';
     uiRefs.btnHudMute.setAttribute('aria-pressed', musicMuted ? 'true' : 'false');
   }
-  if(uiRefs.btnMenuMute){
-    uiRefs.btnMenuMute.textContent = musicMuted ? '🔇 Música' : '🔊 Música';
-    uiRefs.btnMenuMute.setAttribute('aria-pressed', musicMuted ? 'true' : 'false');
-    uiRefs.btnMenuMute.setAttribute('aria-label', musicMuted ? 'Activar música' : 'Silenciar música');
+  if(uiRefs.menuVolume){
+    uiRefs.menuVolume.value = masterVolume.toFixed(2);
+    uiRefs.menuVolume.setAttribute('aria-valuenow', masterVolume.toFixed(2));
+    uiRefs.menuVolume.setAttribute('aria-label', 'Volumen general');
   }
 }
 
@@ -5914,8 +6165,57 @@ function syncUiState(){
   if(pauseHudBtn){
     const inSelection = (gameState === STATE.SELECT && appScene === APP_SCENE.SELECT);
     const paused = (gameState === STATE.PAUSE);
+    const inStorySlides = matchMode === MATCH_MODE.STORY && storyIsBlocking();
     pauseHudBtn.textContent = inSelection ? '🏠︎' : (paused ? '►' : '⏸');
-    pauseHudBtn.classList.toggle('hidden', !!menuLike || gameState === STATE.GAMEOVER);
+    // Ocultar: en menú, gameover, o durante slides de historia
+    const hidePause = !!menuLike || gameState === STATE.GAMEOVER || inStorySlides;
+    pauseHudBtn.classList.toggle('hidden', hidePause);
+    if(!hidePause){
+      const canvas = document.getElementById('game');
+      const canvasRect = canvas.getBoundingClientRect();
+      const rightOffset = Math.max(0, window.innerWidth - canvasRect.right);
+      pauseHudBtn.style.position = 'fixed';
+      pauseHudBtn.style.right = (rightOffset + 8) + 'px';
+      pauseHudBtn.style.left = 'auto';
+      pauseHudBtn.style.top = (canvasRect.top + 8) + 'px';
+      pauseHudBtn.style.opacity = '0.4';
+      pauseHudBtn.style.zIndex = '100';
+    } else {
+      pauseHudBtn.style.position = '';
+      pauseHudBtn.style.right = '';
+      pauseHudBtn.style.left = '';
+      pauseHudBtn.style.top = '';
+      pauseHudBtn.style.opacity = '';
+      pauseHudBtn.style.zIndex = '';
+    }
+  }
+  // Botón de Menú historia: solo visible en slides de historia (no en combate) y en escena de juego
+  if(uiRefs.storyExitBtn){
+    const isPaused = (gameState === STATE.PAUSE);
+    const inStorySlides = matchMode === MATCH_MODE.STORY && storyIsBlocking();
+    const showStoryExit = matchMode === MATCH_MODE.STORY && inStorySlides && !isPaused && appScene === APP_SCENE.GAME;
+    uiRefs.storyExitBtn.classList.toggle('hidden', !showStoryExit);
+    if(showStoryExit){
+      const canvas = document.getElementById('game');
+      const canvasRect = canvas.getBoundingClientRect();
+      uiRefs.storyExitBtn.style.position = 'fixed';
+      uiRefs.storyExitBtn.style.left = (canvasRect.left + 8) + 'px';
+      uiRefs.storyExitBtn.style.right = 'auto';
+      uiRefs.storyExitBtn.style.top = (canvasRect.top + 8) + 'px';
+      uiRefs.storyExitBtn.style.width = 'auto';
+      uiRefs.storyExitBtn.style.maxWidth = '';
+      uiRefs.storyExitBtn.style.opacity = '0.4';
+      uiRefs.storyExitBtn.style.zIndex = '100';
+    } else {
+      uiRefs.storyExitBtn.style.position = '';
+      uiRefs.storyExitBtn.style.left = '';
+      uiRefs.storyExitBtn.style.right = '';
+      uiRefs.storyExitBtn.style.top = '';
+      uiRefs.storyExitBtn.style.width = '';
+      uiRefs.storyExitBtn.style.maxWidth = '';
+      uiRefs.storyExitBtn.style.opacity = '';
+      uiRefs.storyExitBtn.style.zIndex = '';
+    }
   }
   if(toggleSkinsBtn){
     const inSelection = (gameState === STATE.SELECT && appScene === APP_SCENE.SELECT);
@@ -5937,14 +6237,19 @@ function syncUiState(){
     }
   }
   if(exitPauseBtn){
-    const showExit = !menuLike && (gameState === STATE.PAUSE || gameState === STATE.GAMEOVER);
+    // No mostrar en story mode en ningún estado
+    const inStoryMode = matchMode === MATCH_MODE.STORY && (storyContext?.active || false);
+    const showExit = !menuLike && !inStoryMode && (gameState === STATE.PAUSE || gameState === STATE.GAMEOVER);
     exitPauseBtn.classList.toggle('hidden', !showExit);
   }
   if(storySkipBtn){
-    const showSkip = (gameState === STATE.PAUSE) && matchMode === MATCH_MODE.STORY;
+    // Solo visible en story mode, pausado, y en combate (no en slides)
+    const inStorySlides = matchMode === MATCH_MODE.STORY && storyIsBlocking();
+    const showSkip = matchMode === MATCH_MODE.STORY && gameState === STATE.PAUSE && !inStorySlides && (storyContext?.stage === 'combat' || false);
     storySkipBtn.classList.toggle('hidden', !showSkip);
   }
-  const showHudBtns = (gameState === STATE.PAUSE && !menuLike);
+  const inStorySlides = matchMode === MATCH_MODE.STORY && storyIsBlocking();
+  const showHudBtns = (gameState === STATE.PAUSE && !menuLike && !inStorySlides);
   const hudControls = document.getElementById('hudControls');
   if(hudControls){
     hudControls.classList.toggle('hidden', !showHudBtns);
@@ -6762,7 +7067,11 @@ if(uiRefs.btnApplyImport) uiRefs.btnApplyImport.addEventListener('click', ()=>ap
 if(uiRefs.btnCancelImport) uiRefs.btnCancelImport.addEventListener('click', ()=>{ toggleProfileImport(false); setProfileNote(PROFILE_NOTE_DEFAULT); });
 if(uiRefs.btnResetProgress) uiRefs.btnResetProgress.addEventListener('click', ()=>handleResetProgress());
 if(uiRefs.btnToggleFullscreen) uiRefs.btnToggleFullscreen.addEventListener('click', ()=>toggleFullscreen());
-if(uiRefs.btnMenuMute) uiRefs.btnMenuMute.addEventListener('click', ()=>toggleMusicMute());
+if(uiRefs.menuVolume) uiRefs.menuVolume.addEventListener('input', (e)=>{
+  const val = Math.max(0, Math.min(1, parseFloat(e.target.value) || 0));
+  applyMasterVolume(val);
+  syncMusicUi();
+});
 if(uiRefs.btnOpenTutorial) uiRefs.btnOpenTutorial.addEventListener('click', ()=>openTutorial());
 if(uiRefs.btnTutorialBack) uiRefs.btnTutorialBack.addEventListener('click', ()=>{ playUiBackSound(); closeTutorial(); });
 if(uiRefs.btnOpenEncy) uiRefs.btnOpenEncy.addEventListener('click', ()=>openEncy(tutorialOpen ? 'tutorial' : 'menu'));
@@ -6824,25 +7133,12 @@ if(pauseHudBtn) pauseHudBtn.addEventListener('click', ()=>{
 // Skippear combate de historia desde pausa
 if(storySkipBtn) storySkipBtn.addEventListener('click', ()=>{
   if(matchMode !== MATCH_MODE.STORY) return;
-  if(window.storyContext && storyContext.active){
-    const nextStepIdx = (storyContext.stepIndex || 0) + 1;
-    const nextStep = storyContext.steps[nextStepIdx];
-    if(nextStep){
-      storyContext.stepIndex = nextStepIdx;
-      storyContext.currentStep = nextStep;
-      storyContext.stage = 'slides';
-      storyContext.slideIndex = 0;
-      storyContext.cooldownUntil = performance.now() + (nextStep.minMs || 500);
-      badge.innerText = STORY_CHAPTERS[storyContext.chapterIndex]?.title || 'Modo historia';
-    } else {
-      storyContext.active = false;
-      openStoryMenu();
-      return;
-    }
-    // Volver a selección/continuar historia
-    gameState = STATE.SELECT;
-    setScene(APP_SCENE.GAME);
-  }
+  if(!storyContext.active || storyContext.stage !== 'combat') return;
+  // Simular victoria instantánea usando el flujo correcto
+  playUiSelectSound();
+  gameOver('p1', {});
+  // Asegurar que syncUiState se llame para actualizar botones
+  requestAnimationFrame(syncUiState);
 });
 if(toggleSkinsBtn) toggleSkinsBtn.addEventListener('click', ()=>{
   modernSkinsEnabled = !modernSkinsEnabled;
@@ -13986,6 +14282,20 @@ addEventListener('keydown', e=>{
   if(!e.repeat && finishState.active){
     registerFinishInput(e.code);
   }
+  // Barra espaciadora para avanzar slides de historia
+  if(e.code === 'Space' && storyContext.active && storyContext.stage === 'slides'){
+    handleStoryTap();
+    e.preventDefault();
+    return;
+  }
+  // Escape en modo historia para volver al menú de capítulos
+  if(e.code === 'Escape' && matchMode === MATCH_MODE.STORY && storyContext.active){
+    playUiBackSound();
+    storyContext.active = false;
+    openStoryMenu();
+    e.preventDefault();
+    return;
+  }
 if(appScene === APP_SCENE.MENU || appScene === APP_SCENE.NET){
     if(appScene === APP_SCENE.MENU && encyOpen && e.code === 'Escape'){
       playUiBackSound();
@@ -17250,7 +17560,7 @@ for (const [skinName, asset] of Object.entries(SKIN_ASSETS)) {
   }
 }
 
-// Override final de renderFavoriteSkin: usa nivel visible y total de logros
+// Override final de renderFavoriteSkin: usa buildAchGrid para logros agrupados
 function renderFavoriteSkin(){
   if(!uiRefs.favSkinName || !uiRefs.favSkinMeta) return;
   const rosterReady = (typeof ROSTER !== 'undefined') && Array.isArray(ROSTER) && ROSTER.length > 0;
@@ -17315,13 +17625,8 @@ function renderFavoriteSkin(){
 
   if(uiRefs.favAchProgress){
     uiRefs.favAchProgress.innerHTML = '';
-    ach.lines.forEach(lineObj=>{
-      const line = typeof lineObj === 'string' ? { text: lineObj } : (lineObj || {});
-      const span = document.createElement('span');
-      span.className = 'stat-chip' + (line.done ? ' achieved' : '');
-      span.textContent = line.text || line;
-      uiRefs.favAchProgress.appendChild(span);
-    });
+    const grid = buildAchGrid(ach);
+    uiRefs.favAchProgress.appendChild(grid);
   }
 
   const cvs = uiRefs.favSkinCanvas;
