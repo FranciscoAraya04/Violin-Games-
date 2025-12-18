@@ -1599,6 +1599,11 @@ const VIOLIN_DARK_ROCKET_URL = 'https://raw.githubusercontent.com/FranciscoAraya
 // Skin de la espada láser para Theremin Dark
 const THEREMIN_LASER_SWORD_KEY = 'thereminLaserSword';
 const THEREMIN_LASER_SWORD_URL = 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Theremin/ThereminSword.png';
+// Skins para Hydra Dark
+const HYDRA_HEAD_KEY = 'hydraHead';
+const HYDRA_HEAD_URL = 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Hydra/HydraHead.png';
+const HYDRA_TENTACLE_KEY = 'hydraTentacle';
+const HYDRA_TENTACLE_URL = 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Hydra/HydraTentacle.png';
 
 function loadBackgroundImage(name, url) {
   const img = new Image();
@@ -1618,6 +1623,9 @@ function loadImageAsset(name, url){
 loadImageAsset(VIOLIN_DARK_ROCKET_KEY, VIOLIN_DARK_ROCKET_URL);
 // Precargar espada láser de Theremin Dark
 loadImageAsset(THEREMIN_LASER_SWORD_KEY, THEREMIN_LASER_SWORD_URL);
+// Precargar cabeza y tentáculo de Hydra Dark
+loadImageAsset(HYDRA_HEAD_KEY, HYDRA_HEAD_URL);
+loadImageAsset(HYDRA_TENTACLE_KEY, HYDRA_TENTACLE_URL);
 
 // Cargar foto de skin (con manejo de errores)
 function loadSkinPhoto(skin, url){
@@ -3134,9 +3142,10 @@ const STORY_CHAPTERS = [
       {
         type:'slides',
         slides:[
-          'https://placehold.co/1200x675/050914/ffffff?text=4-1+Entrada+al+cementerio',
-          'https://placehold.co/1200x675/070b18/ffffff?text=4-2+Aparicion+de+Ghost',
-          'https://placehold.co/1200x675/090f1f/ffffff?text=4-3+Rechazo+de+Ghost'
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap4/Slide%204.1.png',
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap4/Slide%204.2.png',
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap4/Slide%204.3.png',
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap4/Slide%204.4.png'
         ],
         minMs:2000
       },
@@ -3144,10 +3153,10 @@ const STORY_CHAPTERS = [
         type:'combat',
         label:'Piano vs Ghost (Muro Carmesí)',
         mode:'1v1',
-        scoreTarget:15,
+        scoreTarget:8,
         p1Skin:'piano',
         botSkin:'ghost',
-        bgUrl:'https://placehold.co/1200x675/0b1222/ffffff?text=BG+Cementerio',
+        bgUrl:'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap4/Slide%204.5.png',
         events:{
           botLife:[
             {at:8,text:'El Muro Carmesí presiona al teclado'},
@@ -3168,8 +3177,8 @@ const STORY_CHAPTERS = [
       {
         type:'slides',
         slides:[
-          'https://placehold.co/1200x675/0d1425/ffffff?text=4-5+Ghost+derrotado',
-          'https://placehold.co/1200x675/0f172a/ffffff?text=4-6+Portal+a+la+Tierra+del+Caos'
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap4/Slide%204.6.png',
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap4/Slide%204.7.png'
         ],
         minMs:2000
       }
@@ -3183,9 +3192,8 @@ const STORY_CHAPTERS = [
       {
         type:'slides',
         slides:[
-          'https://placehold.co/1200x675/070b12/ffffff?text=5-1+Tierra+del+Caos',
-          'https://placehold.co/1200x675/09101b/ffffff?text=5-2+Aparicion+de+Hydra',
-          'https://placehold.co/1200x675/0b1724/ffffff?text=5-3+Cello+vs+Hydra+Preparacion'
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap5/Slide%205.1.png',
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap5/Slide%205.2.png',
         ],
         minMs:2000
       },
@@ -3193,13 +3201,13 @@ const STORY_CHAPTERS = [
         type:'combat',
         label:'Cello vs Hydra (guardia de la Reina)',
         mode:'1v1',
-        scoreTarget:12,
+        scoreTarget:1,
         p1Skin:'cello',
         botSkin:'hydra',
-        bgUrl:'https://placehold.co/1200x675/101c2a/ffffff?text=BG+Tierra+del+Caos',
+        bgUrl:'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap5/Slide%205.3.png',
         events:{
           botLife:[
-            {at:9,text:'Hydra se multiplica y rodea a Cello'},
+            {at:8,text:'Hydra se multiplica y rodea a Cello'},
             {at:5,text:'Cello contiene la oleada de cabezas'}
           ],
           ability:[
@@ -3217,8 +3225,10 @@ const STORY_CHAPTERS = [
       {
         type:'slides',
         slides:[
-          'https://placehold.co/1200x675/101728/ffffff?text=5-4+Hydra+contenida',
-          'https://placehold.co/1200x675/111a2e/ffffff?text=5-5+Presentacion+de+Queen'
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap5/Slide%205.4.png',  
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap5/Slide%205.5.png',
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap5/Slide%205.6.png',
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap5/Slide%205.6%20video.mp4'
         ],
         minMs:2000
       },
@@ -3226,14 +3236,16 @@ const STORY_CHAPTERS = [
         type:'combat',
         label:'Violin vs Queen (tiara vampírica)',
         mode:'1v1',
-        scoreTarget:13,
+        scoreTarget:10,
         p1Skin:'violin',
         botSkin:'queen',
-        bgUrl:'https://placehold.co/1200x675/141e33/ffffff?text=BG+Altar+de+Queen',
+        bgUrl:'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap5/Slide%205.7.png',
         events:{
           botLife:[
             {at:10,text:'Queen absorbe vida pero empieza a tambalear'},
-            {at:6,text:'La tiara pierde parte de su brillo vampírico'}
+            {at:6,text:'La tiara pierde parte de su brillo vampírico'},
+            {at:5,text:'Queen invoca a Hydra para que la ayude'},
+            {at:3,text:'Queen está débil y vulnerable'}
           ],
           ability:[
             {who:'p1',text:'Legato Veloz para esquivar drenajes'},
@@ -3250,9 +3262,7 @@ const STORY_CHAPTERS = [
       {
         type:'slides',
         slides:[
-          'https://placehold.co/1200x675/10182a/ffffff?text=5-7+Trato+con+Queen',
-          'https://placehold.co/1200x675/0d1423/ffffff?text=5-8+Mapa+hacia+Theremin+y+Director'
-        ],
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap5/Slide%205.8.png',        ],
         minMs:2000
       }
     ]
@@ -3917,6 +3927,10 @@ const STORY_CHAPTERS = [
 
 
 const storyAssets = { slides:{}, backgrounds:{} };
+function isVideoUrl(url){
+  if(!url || typeof url !== 'string') return false;
+  return /\.(mp4|webm|ogg|mov)$/i.test(url);
+}
 function preloadStoryImage(url, bucket){
   if(!url) return null;
   const store = bucket === 'bg' ? storyAssets.backgrounds : storyAssets.slides;
@@ -3944,7 +3958,10 @@ function createStoryContext(){
     pendingWinner:null,
     retry:false,
     arcadeGoal:0,
-    arcadeEvents:null
+    arcadeEvents:null,
+    videoElement:null,
+    isPlayingVideo:false,
+    videoAutoadvanced:false
   };
 }
 let storyContext = createStoryContext();
@@ -4764,9 +4781,12 @@ function handleStoryTap(){
   const step = storyContext.currentStep;
   const nowTs = performance.now();
   if(storyContext.stage === 'slides' && step?.slides){
+    // Si hay un video en reproducción, ignorar taps (solo auto-avance)
+    if(storyContext.isPlayingVideo) return;
     if(nowTs < storyContext.cooldownUntil) return;
     if(storyContext.slideIndex < step.slides.length - 1){
       storyContext.slideIndex++;
+      storyContext.videoAutoadvanced = false;
       storyContext.cooldownUntil = nowTs + (step.minMs || 500);
     } else {
       storyNextStep();
@@ -4820,6 +4840,15 @@ function startStoryCombatStep(step){
   violinDarkRockets.length = 0;
   thereminSwordsOrbit.length = 0;
   thereminSwordProjectiles.length = 0;
+  hydraDarkHeads.length = 0;
+  // Cancelar spawns programados de clones de Hydra
+  if(Array.isArray(hydraCloneSpawnTimeouts)){
+    while(hydraCloneSpawnTimeouts.length){
+      const t = hydraCloneSpawnTimeouts.pop();
+      try{ clearTimeout(t); }catch(e){}
+    }
+  }
+  hydraDarkProjectiles.length = 0;
 
   if(step.mode === 'arcade:target' || step.mode === 'arcade:dominadas' || step.mode === 'keepup'){
     const mode = (step.mode === 'arcade:target') ? ARCADE_MODES.TARGET : ARCADE_MODES.DOMINADAS;
@@ -4862,6 +4891,14 @@ function startStoryCombatStep(step){
   violinDarkRockets.length = 0;
   thereminSwordsOrbit.length = 0;
   thereminSwordProjectiles.length = 0;
+  hydraDarkHeads.length = 0;
+  hydraDarkProjectiles.length = 0;
+  if(Array.isArray(hydraCloneSpawnTimeouts)){
+    while(hydraCloneSpawnTimeouts.length){
+      const t = hydraCloneSpawnTimeouts.pop();
+      try{ clearTimeout(t); }catch(e){}
+    }
+  }
   clearHazardProjectiles();
   arcadeContext.bossFight = null;
   score.p1 = 0;
@@ -4875,6 +4912,18 @@ function startStoryCombatStep(step){
   resetMatchTimer();
   badge.innerText = step.label || 'Historia - Combate';
   if(!musicMuted) playCurrentMusic();
+  
+  // Capítulo 5: Violin vs Queen - spawnar 6 mini hydras del lado de Queen
+  if(storyContext.chapterIndex === 4 && step.label && step.label.includes('Violin vs Queen')){
+    for(let i=0; i<6; i++){
+      spawnHydraClone(p2, { count:1, skin:'hydra' });
+    }
+  }
+    if(storyContext.chapterIndex === 4 && step.label && step.label.includes('Cello vs Hydra')){
+    for(let i=0; i<3; i++){
+      spawnHydraClone(p2, { count:1, skin:'hydra' });
+    }
+  }
 }
 
 function storyHandleAbility(player){
@@ -4906,6 +4955,12 @@ function storyHandlePoint(who){
         pushStoryBubble(ev.text || `Bot: ${botLives} vidas`, 'p2');
       }
     });
+    // Capítulo 5: Violin vs Queen - al llegar a 5 vidas, spawnar 6 mini hydras del lado de Queen
+    if(storyContext.chapterIndex === 4 && step?.label && step.label.includes('Violin vs Queen') && botLives === 5){
+      for(let i=0;i<4;i++){
+        spawnHydraClone(p2, { count:1, skin:'hydra' });
+      }
+    }
   }
   if(playerLives < (storyContext.lastPlayerLives ?? target)){
     playerEvents.forEach(ev=>{
@@ -7464,6 +7519,14 @@ function startMatchLocalFromConfig(cfg = {}){
   violinDarkRockets.length = 0;
   thereminSwordsOrbit.length = 0;
   thereminSwordProjectiles.length = 0;
+  hydraDarkHeads.length = 0;
+  hydraDarkProjectiles.length = 0;
+  if(Array.isArray(hydraCloneSpawnTimeouts)){
+    while(hydraCloneSpawnTimeouts.length){
+      const t = hydraCloneSpawnTimeouts.pop();
+      try{ clearTimeout(t); }catch(e){}
+    }
+  }
   clearHazardProjectiles();
   arcadeContext.bossFight = null;
 
@@ -7876,6 +7939,9 @@ const PLAYER_CONTROLS = {
 const STAMINA_REGEN_SCALE = 0.1; // 90% más lento
 const ghostBarriers = [];
 const hydraClones = [];
+const hydraDarkHeads = [];
+const hydraCloneSpawnTimeouts = [];
+const hydraDarkProjectiles = [];
 const directorClones = [];
 const miniDirectors = [];
 const florBursts = [];
@@ -8164,9 +8230,9 @@ const ABILITIES = {
     label: 'Muro Carmesí',
     duration: 3000,
     cooldown: 360,
-    staminaCost: 34,
+    staminaCost: 65,
     description: 'Extiende la red con una barrera rojiza por 3 segundos.',
-    staminaProfile: { max: 100, regen: 20, start: 100 },
+    staminaProfile: { max: 100, regen: 50, start: 100 },
     onActivate(player){
       spawnGhostBarrier(player);
     }
@@ -8219,7 +8285,7 @@ const ABILITIES = {
     label: 'Eco Hidra',
     duration: 20,
     cooldown: 40,
-    staminaCost: 30,
+    staminaCost: 60,
     staminaGain: 120,
     hitChargePercent: 1,
     description: 'Racha de puntos para clonar a la Hydra al activarse.',
@@ -8227,6 +8293,24 @@ const ABILITIES = {
     onActivate(player){
       const count = (player?.skin === 'mystery') ? 3 : 1;
       spawnHydraClone(player, { count });
+    }
+  }),
+  hydraDarkPulse: defineAbility({
+    id: 'hydraDarkPulse',
+    label: 'Hidra Tentacular Dark',
+    duration: 200,
+    cooldown: 30,
+    staminaCost: 40,
+    staminaGain: 120,
+    hitChargePercent: 1,
+    description: 'Desata cabezas de Hydra conectadas por tentáculos oscuros. Golpean con fuerza y se lanzan como proyectiles.',
+    staminaProfile: { max: 120, regen: 30, start: 120 },
+    onActivate(player){
+      const count = (player?.skin === 'mystery') ? 3 : 1;
+      spawnHydraClone(player, { count });
+      //2 cabezas:
+      spawnHydraDarkHead(player);
+      spawnHydraDarkHead(player);
     }
   }),
   directorDouble: defineAbility({
@@ -9764,6 +9848,12 @@ function applySkinProfile(player, skinId){
       effectiveAbilityId = 'thereminDarkPulse';
     }
   }
+  if(player.darkTierUnlocked && skinId === 'hydra'){
+    const isBot = botActive && player?.side === 'R';
+    if(!isBot){
+      effectiveAbilityId = 'hydraDarkPulse';
+    }
+  }
   
   const abilityState = createAbilityState(effectiveAbilityId, profile.abilitySettings);
   const abilityDef = abilityState.def;
@@ -10086,6 +10176,331 @@ function drawThereminSwords(){
       ctx.fillRect(-w/4, -h/2, w/2, h);
     }
     ctx.restore();
+  }
+}
+
+function spawnHydraDarkHead(player){
+  if(!player || !Number.isFinite(player.x) || !Number.isFinite(player.y)) return;
+  const head = {
+    owner: player,
+    ownerSide: player.side,
+    x: player.x,
+    y: player.y - player.r * 2.5,
+    vx: 0,
+    vy: 0,
+    radius: 28,
+    minDistance: 65,
+    maxDistance: 85,
+    springForce: 2500,
+    springDamping: 18,
+    repelForce: 3000,
+    elasticity: 0.8,
+    elapsed: 0,
+    // Tiempo base antes de lanzarse + jitter aleatorio (0–3s)
+    duration: 20 + Math.random() * 3,
+    lastJumpTime: 0,
+    groundJumpChance: 0.15,
+    hitBall: false,
+    slowTarget: null,
+    slowEndTime: 0
+  };
+  hydraDarkHeads.push(head);
+}
+
+function updateHydraDarkHeads(dt){
+  if(!Number.isFinite(dt) || dt <= 0) return;
+
+  for(let i = hydraDarkHeads.length - 1; i >= 0; i--){
+    const head = hydraDarkHeads[i];
+    const owner = head.owner;
+    
+    // Validar propietario
+    if(!owner || !Number.isFinite(owner.x) || !Number.isFinite(owner.y)){
+      hydraDarkHeads.splice(i, 1);
+      continue;
+    }
+
+    head.elapsed += dt;
+
+    // Gravedad
+    head.vy += CONFIG.GRAVITY * dt;
+
+    // Movimiento
+    head.x += head.vx * dt;
+    head.y += head.vy * dt;
+
+    // Resorte hacia el propietario (mantener distancia máxima y mínima)
+    const ox = owner.x;
+    const oy = owner.y - owner.r * 0.3;
+    const dx = ox - head.x;
+    const dy = oy - head.y;
+    const dist = Math.hypot(dx, dy);
+
+    // Fuerza de atracción si está muy lejos + amortiguación (damping)
+    if(dist > head.maxDistance && dist > 0){
+      const ux = dx / dist;
+      const uy = dy / dist;
+      const pullForce = head.springForce * (dist - head.maxDistance) / (head.maxDistance || 1);
+      const pullX = ux * pullForce * dt;
+      const pullY = uy * pullForce * dt;
+      // Amortiguación proporcional a la velocidad relativa hacia el dueño
+      const rvx = head.vx - (owner.vx || 0);
+      const rvy = head.vy - (owner.vy || 0);
+      const vAlong = rvx * ux + rvy * uy;
+      const damp = (head.springDamping || 0) * vAlong;
+      const dampX = -ux * damp * dt;
+      const dampY = -uy * damp * dt;
+      head.vx += pullX + dampX;
+      head.vy += pullY + dampY;
+    }
+    
+    // Fuerza de repulsión si está muy cerca
+    if(dist < head.minDistance && dist > 0){
+      const repelForce = head.repelForce * (head.minDistance - dist) / (head.minDistance || 1);
+      const repelX = -(dx / dist) * repelForce * dt;
+      const repelY = -(dy / dist) * repelForce * dt;
+      head.vx += repelX;
+      head.vy += repelY;
+    }
+
+    // Fricción en el aire (ligeramente mayor para ayudar a amortiguar)
+    head.vx *= 0.9;
+
+    // Colisión con suelo
+    const groundY = CONFIG.GROUND_Y - head.radius;
+    if(head.y > groundY){
+      // Solo fijar a suelo si sigue moviéndose hacia abajo
+      if(head.vy > 0){
+        head.y = groundY;
+        head.vy *= -head.elasticity;
+      }
+      // Impulso hacia arriba asistido por el resorte si el dueño está arriba
+      const upTowardOwner = oy - head.y;
+      if(upTowardOwner > 0){
+        head.vy -= Math.min(300, (head.springForce * 0.02));
+      }
+      // Salto ocasional muy bajo
+      if(Math.random() < head.groundJumpChance * dt){
+        head.vy = Math.min(head.vy, -350);
+      }
+    }
+
+    // Colisión con la pelota
+    if(typeof ball === 'object' && ball && !head.hitBall){
+      const bdx = head.x - ball.x;
+      const bdy = head.y - ball.y;
+      const ballRad = head.radius * 0.7 + ball.r;
+      if(bdx*bdx + bdy*bdy <= ballRad*ballRad){
+        const dirX = Math.cos(Math.atan2(bdy, bdx) + Math.PI);
+        const dirY = Math.sin(Math.atan2(bdy, bdx) + Math.PI);
+        ball.vx = dirX * 1600;
+        ball.vy = dirY * 1600 * 0.4;
+        head.hitBall = true;
+      }
+    }
+
+    // Colisión con el rival - marcar para lanzar
+    const target = head.ownerSide === 'L' ? p2 : p1;
+    if(target && !head.slowTarget){
+      const rx = head.x - target.x;
+      const ry = head.y - target.y;
+      const rad = head.radius + target.r;
+      if(rx*rx + ry*ry <= rad*rad){
+        head.slowTarget = target;
+        head.shouldLaunch = true;
+      }
+    }
+
+    // Colisión entre cabezas (evitar stacking pero permitir proximidad)
+    for(let j = 0; j < hydraDarkHeads.length; j++){
+      if(i === j) continue;
+      const other = hydraDarkHeads[j];
+      const hdx = other.x - head.x;
+      const hdy = other.y - head.y;
+      const hdist = Math.hypot(hdx, hdy);
+      const minDist = head.radius * 2.2;
+      if(hdist < minDist && hdist > 0){
+        const pushForce = (minDist - hdist) * 300 * dt;
+        const pushX = (hdx / hdist) * pushForce;
+        const pushY = (hdy / hdist) * pushForce;
+        head.vx -= pushX;
+        head.vy -= pushY;
+        other.vx += pushX * 0.5;
+        other.vy += pushY * 0.5;
+      }
+    }
+
+    // Corrección dura de distancia máxima para evitar que se "pegue" por bloqueos
+    if(dist > head.maxDistance && dist > 0){
+      const ux2 = dx / dist;
+      const uy2 = dy / dist;
+      head.x = ox - ux2 * head.maxDistance;
+      head.y = oy - uy2 * head.maxDistance;
+    }
+
+    // Expirar: hacer salto parabólico hacia el oponente
+    if(head.elapsed >= head.duration){
+      launchHydraDarkHeadAsParabola(head);
+      hydraDarkHeads.splice(i, 1);
+    }
+  }
+}
+
+function launchHydraDarkHeadAsParabola(head){
+  const target = head.ownerSide === 'L' ? p2 : p1;
+  if(!target) return;
+  
+  // Crear proyectil parabólico que busca al oponente
+  const projectile = {
+    x: head.x,
+    y: head.y,
+    vx: 0,
+    vy: 0,
+    targetX: target.x,
+    targetY: target.y,
+    elapsed: 0,
+    duration: 1.5,
+    ownerSide: head.ownerSide,
+    radius: head.radius * 1.2,
+    type: 'hydraDarkParabola',
+    touched: false
+  };
+  
+  // Calcular velocidad inicial para trayectoria parabólica
+  const dx = target.x - head.x;
+  const dy = target.y - head.y;
+  const dist = Math.hypot(dx, dy);
+  const time = projectile.duration;
+  
+  // Velocidad horizontal
+  projectile.vx = dx / time * 0.8;
+  // Velocidad vertical con arco parabólico
+  projectile.vy = (dy / time) - (CONFIG.GRAVITY * time * 0.5);
+  
+  if(!hydraDarkProjectiles) hydraDarkProjectiles = [];
+  hydraDarkProjectiles.push(projectile);
+}
+
+function updateHydraDarkProjectiles(dt){
+  if(!hydraDarkProjectiles) return;
+  
+  for(let i = hydraDarkProjectiles.length - 1; i >= 0; i--){
+    const proj = hydraDarkProjectiles[i];
+    proj.elapsed += dt;
+    
+    // Aplicar gravedad y movimiento
+    proj.vy += CONFIG.GRAVITY * dt;
+    proj.x += proj.vx * dt;
+    proj.y += proj.vy * dt;
+    
+    // Colisión con rival
+    const target = proj.ownerSide === 'L' ? p2 : p1;
+    if(target && !proj.touched){
+      const rx = proj.x - target.x;
+      const ry = proj.y - target.y;
+      const rad = proj.radius + target.r;
+      if(rx*rx + ry*ry <= rad*rad){
+        // Ralentización permanente acumulativa: multiplicar por 0.99 cada impacto
+        if(!target.hydraDarkSlow){ target.hydraDarkSlow = { mult: 1 }; }
+        target.hydraDarkSlow.mult *= 0.99;
+        proj.touched = true;
+      }
+    }
+    
+    // Remover si expira o sale de pantalla
+    if(proj.elapsed >= proj.duration || proj.y > CONFIG.GROUND_Y){
+      hydraDarkProjectiles.splice(i, 1);
+    }
+  }
+}
+
+// Nota: efecto de ralentización de Hydra Dark es permanente y acumulativo vía hydraDarkSlow.mult
+
+function drawHydraDarkTentacles(){
+  const headImg = IMAGES[HYDRA_HEAD_KEY];
+  const tentacleImg = IMAGES[HYDRA_TENTACLE_KEY];
+
+  for(const head of hydraDarkHeads){
+    const owner = head.owner;
+    if(!owner) continue;
+
+    const ox = owner.x;
+    const oy = owner.y - owner.r * 0.3;
+    const hx = head.x;
+    const hy = head.y;
+
+    // Dibujar tentáculo (línea o segmentos desde propietario a cabeza)
+    if(tentacleImg && tentacleImg.complete){
+      const dx = hx - ox;
+      const dy = hy - oy;
+      const dist = Math.hypot(dx, dy);
+      const angle = Math.atan2(dy, dx);
+      const segments = Math.ceil(dist / 60);
+      for(let seg = 0; seg < segments; seg++){
+        const t = segments > 0 ? seg / segments : 0;
+        const sx = ox + dx * t;
+        const sy = oy + dy * t;
+        ctx.save();
+        ctx.translate(sx, sy);
+        ctx.rotate(angle);
+        ctx.drawImage(tentacleImg, 0, -24, 60, 48);
+        ctx.restore();
+      }
+    } else {
+      // Fallback línea simple
+      ctx.strokeStyle = 'rgba(100, 255, 100, 0.8)';
+      ctx.lineWidth = 24;
+      ctx.beginPath();
+      ctx.moveTo(ox, oy);
+      ctx.lineTo(hx, hy);
+      ctx.stroke();
+    }
+
+  }
+}
+
+function drawHydraDarkHeads(){
+  const headImg = IMAGES[HYDRA_HEAD_KEY];
+  for(const head of hydraDarkHeads){
+    const owner = head.owner;
+    if(!owner) continue;
+    const hx = head.x;
+    const hy = head.y;
+    if(headImg && headImg.complete){
+      ctx.save();
+      ctx.translate(hx, hy);
+      const headSize = head.radius * 2;
+      ctx.drawImage(headImg, -headSize/2, -headSize/2, headSize, headSize);
+      ctx.restore();
+    } else {
+      ctx.fillStyle = 'rgba(100, 255, 100, 0.9)';
+      ctx.beginPath();
+      ctx.arc(hx, hy, head.radius, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+}
+
+function drawHydraDarkProjectiles(){
+  if(!hydraDarkProjectiles) return;
+  const headImg = IMAGES[HYDRA_HEAD_KEY];
+  
+  for(const proj of hydraDarkProjectiles){
+    if(headImg && headImg.complete){
+      ctx.save();
+      ctx.translate(proj.x, proj.y);
+      const angle = Math.atan2(proj.vy, proj.vx);
+      ctx.rotate(angle);
+      const size = proj.radius * 2;
+      ctx.drawImage(headImg, -size/2, -size/2, size, size);
+      ctx.restore();
+    } else {
+      // Fallback círculo verde brillante
+      ctx.fillStyle = 'rgba(120, 255, 120, 0.95)';
+      ctx.beginPath();
+      ctx.arc(proj.x, proj.y, proj.radius, 0, Math.PI * 2);
+      ctx.fill();
+    }
   }
 }
 
@@ -14533,6 +14948,14 @@ function handleSelection(){
     violinDarkRockets.length = 0;
     thereminSwordsOrbit.length = 0;
     thereminSwordProjectiles.length = 0;
+    hydraDarkHeads.length = 0;
+    hydraDarkProjectiles.length = 0;
+    if(Array.isArray(hydraCloneSpawnTimeouts)){
+      while(hydraCloneSpawnTimeouts.length){
+        const t = hydraCloneSpawnTimeouts.pop();
+        try{ clearTimeout(t); }catch(e){}
+      }
+    }
 
     score.p1=0;
     score.p2=0;
@@ -15233,6 +15656,7 @@ function stepPhysics(dt){
     }
     updateStatusEffects(p, dt);
     updatePlayerRuntime(p, dt);
+    // hydraDarkSlow is permanent cumulative: applied via multiplier below
     p.vy += CONFIG.GRAVITY * (p.gravityScale || 1.0) * dt;
     p.vx *= (1 - CONFIG.AIR_DRAG);
     p.vy *= (1 - CONFIG.AIR_DRAG*0.6);
@@ -15247,7 +15671,8 @@ function stepPhysics(dt){
     }
     const baseMaxVx = p.stats?.maxVx ?? CONFIG.PLAYER_MAX_VX;
     const kbBoost = (p.status?.knockbackTimer > 0) ? (p.status.knockbackBoost || 1) : 1;
-    const maxVx = baseMaxVx * dashCap * darkAccelCap * kbBoost;
+    const hydraSlow = p.hydraDarkSlow?.mult || 1;
+    const maxVx = baseMaxVx * dashCap * darkAccelCap * kbBoost * hydraSlow;
     p.x += clamp(p.vx, -maxVx, maxVx)*dt;
     p.y += p.vy*dt;
     const freeCourt = isArcadeMode() && arcadeContext.freeCourt;
@@ -15265,6 +15690,8 @@ function stepPhysics(dt){
     if(p.y < 60) { p.y = 60; p.vy = 20; }
   }
   updateHydraClones(dt);
+  updateHydraDarkHeads(dt);
+  updateHydraDarkProjectiles(dt);
   updateDirectorClones(dt);
   updateMiniDirectors(dt);
   updateThereminSwords(dt);
@@ -15741,11 +16168,15 @@ function drawGame(){
   ctx.stroke();
 
   // Jugadores
+  // Tentáculos detrás de los jugadores
+  drawHydraDarkTentacles();
   drawPlayer(p1);
   drawPlayer(p2);
   drawHydraClones();
   drawDirectorClones();
   drawMiniDirectors();
+  drawHydraDarkHeads();
+  drawHydraDarkProjectiles();
   drawThereminSwords();
   drawViolinDarkRockets();
 
@@ -15840,23 +16271,71 @@ function drawStoryOverlay(){
 
   if(storyContext.stage === 'slides' && step?.slides){
     const url = step.slides[storyContext.slideIndex] || step.slides[0];
-    const img = preloadStoryImage(url, 'slides');
-    ctx.fillStyle = '#050a15';
-    ctx.fillRect(0,0,W,H);
-    if(img && img.complete){
-      ctx.drawImage(img, 0,0,W,H);
-    }
-    // Only dim if the slide is still loading
-    if(!(img && img.complete)){
-      ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    const isVideo = isVideoUrl(url);
+    
+    if(isVideo){
+      // Video handling
+      if(!storyContext.videoElement || storyContext.videoElement.src !== url){
+        // Crear o reutilizar elemento video
+        if(!storyContext.videoElement){
+          storyContext.videoElement = document.createElement('video');
+          storyContext.videoElement.style.display = 'none';
+          document.body.appendChild(storyContext.videoElement);
+        }
+        storyContext.videoElement.src = url;
+        storyContext.videoElement.onended = ()=>{
+          // Auto-avance al siguiente slide cuando termina video
+          if(!storyContext.videoAutoadvanced){
+            storyContext.videoAutoadvanced = true;
+            if(storyContext.slideIndex < step.slides.length - 1){
+              storyContext.slideIndex++;
+            } else {
+              storyNextStep();
+            }
+          }
+        };
+        storyContext.videoElement.play();
+        storyContext.isPlayingVideo = true;
+      }
+      
+      // Dibujar pantalla negra de fondo
+      ctx.fillStyle = '#000';
       ctx.fillRect(0,0,W,H);
+      
+      // Dibujar video capturando frame actual (si está disponible)
+      try {
+        ctx.drawImage(storyContext.videoElement, 0, 0, W, H);
+      } catch(e) {
+        // Video aún no disponible, mostrar carga
+        ctx.fillStyle = 'rgba(255,255,255,0.1)';
+        ctx.fillRect(0,0,W,H);
+      }
+      
+      // Mensaje con instrucción de skip (si usuario puede saltar)
+      ctx.fillStyle = '#fff';
+      ctx.font = '700 16px system-ui';
+      ctx.textAlign = 'center';
+      ctx.fillText('(Toca/click para saltar video)', W/2, H - 32);
+    } else {
+      // Imagen handling (código anterior)
+      const img = preloadStoryImage(url, 'slides');
+      ctx.fillStyle = '#050a15';
+      ctx.fillRect(0,0,W,H);
+      if(img && img.complete){
+        ctx.drawImage(img, 0,0,W,H);
+      }
+      // Only dim if the slide is still loading
+      if(!(img && img.complete)){
+        ctx.fillStyle = 'rgba(0,0,0,0.35)';
+        ctx.fillRect(0,0,W,H);
+      }
+      ctx.fillStyle = '#fff';
+      ctx.font = '700 22px system-ui';
+      ctx.textAlign = 'center';
+      const ready = nowTs >= storyContext.cooldownUntil;
+      const msg = ready ? 'Toca/click para continuar' : 'Espera...';
+      ctx.fillText(msg, W/2, H - 48);
     }
-    ctx.fillStyle = '#fff';
-    ctx.font = '700 22px system-ui';
-    ctx.textAlign = 'center';
-    const ready = nowTs >= storyContext.cooldownUntil;
-    const msg = ready ? 'Toca/click para continuar' : 'Espera...';
-    ctx.fillText(msg, W/2, H - 48);
   }
 
   if(storyContext.stage === 'blackIn' || storyContext.stage === 'blackOut'){
