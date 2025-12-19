@@ -1943,6 +1943,12 @@ const SKIN_ASSETS = {
     spriteOffsetX: 0,
     spriteOffsetY: 0
   },
+  harpDarkProbe: {
+    spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Harp/HarpDrone.png',
+    spriteScale: 0.8,
+    spriteOffsetX: 0,
+    spriteOffsetY: 0
+  },
   director: {
     spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Director/DirectorSkinTilt.png', // Pon aquí la foto del director
     spriteScale: 1,
@@ -1986,7 +1992,8 @@ const SKIN_DARK_ASSETS = {
   hydra: { spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Hydra/HydraSkinDark.png', spriteScale: 1.1, spriteOffsetX: 0, spriteOffsetY: 0 },
   ghost: { spriteUrl: '', spriteScale: 1.0, spriteOffsetX: 0, spriteOffsetY: 0 },
   theremin: { spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Theremin/ThereminSkinDark.png', spriteScale: 1.1, spriteSpinSpeed: 1.2, spriteOffsetX: 0, spriteOffsetY: 0 },
-  harp: { spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Harp/HarpSkinDark.png', spriteScale: 1.5, spriteWidth: 0.73, spriteOffsetX: 0, spriteOffsetY: 8 },
+  harp: { spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Harp/HarpSkinDark.png', spriteScale: 1.5, spriteWidth: 1, spriteOffsetX: 0, spriteOffsetY: -5 },
+  harpDarkProbe: { spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Harp/HarpDrone.png', spriteScale: 0.8 },
   director: { spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Director/DirectorSkinDark.png', spriteScale: 1.4, spriteOffsetX: 1.8, spriteOffsetY: -1, hitboxScale: 1.2 },
   flor: { spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Flor/FlorSkinDark.png', spriteScale: 1.8, spriteOffsetX: 0, spriteOffsetY: -5 },
   mystery: { spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Mistery/MisterySkinDark.png', spriteScale: 1.1, spriteOffsetX: 0, spriteOffsetY: 0 },
@@ -3199,7 +3206,7 @@ const STORY_CHAPTERS = [
   {
     id:'cap1',
     title:'Capítulo 1 - La isla que despertó',
-    thumb:'https://placehold.co/320x200/0d2444/ffffff?text=Cap1',
+    thumb:'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/pr%C3%B3logo/Slide%201.3.png',
     steps:[
       {
         type:'slides',
@@ -3249,7 +3256,7 @@ const STORY_CHAPTERS = [
   {
     id:'cap2',
     title:'Capítulo 2 - Primeras resonancias',
-    thumb:'https://placehold.co/320x200/102f5a/ffffff?text=Cap2',
+    thumb:'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap2/Slide%202.3.png',
     steps:[
       {
         type:'slides',
@@ -3329,7 +3336,7 @@ const STORY_CHAPTERS = [
   {
     id:'cap3',
     title:'Capítulo 3 - Dominadas con los hermanos del ritmo',
-    thumb:'https://placehold.co/320x200/143452/ffffff?text=Cap3',
+    thumb:'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap3/Slide%203.4.png',
     steps:[
       {
         type:'slides',
@@ -3372,7 +3379,7 @@ const STORY_CHAPTERS = [
   {
     id:'cap4',
     title:'Capítulo 4 - Ghost y la puerta al caos',
-    thumb:'https://placehold.co/320x200/152338/ffffff?text=Cap4',
+    thumb:'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap4/Slide%204.5.png',
     steps:[
       {
         type:'slides',
@@ -3422,7 +3429,7 @@ const STORY_CHAPTERS = [
   {
     id:'cap5',
     title:'Capítulo 5 - Hydra, Queen y el trato inesperado',
-    thumb:'https://placehold.co/320x200/18314a/ffffff?text=Cap5',
+    thumb:'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap5/Slide%205.7.png',
     steps:[
       {
         type:'slides',
@@ -3436,7 +3443,7 @@ const STORY_CHAPTERS = [
         type:'combat',
         label:'Cello vs Hydra (guardia de la Reina)',
         mode:'1v1',
-        scoreTarget:1,
+        scoreTarget:8,
         p1Skin:'cello',
         botSkin:'hydra',
         bgUrl:'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap5/Slide%205.3.png',
@@ -3473,7 +3480,7 @@ const STORY_CHAPTERS = [
         mode:'1v1',
         scoreTarget:10,
         p1Skin:'violin',
-        botSkin:'queen',
+        botSkin:'queen_dark',
         bgUrl:'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap5/Slide%205.7.png',
         events:{
           botLife:[
@@ -3506,22 +3513,16 @@ const STORY_CHAPTERS = [
   {
     id:'cap6',
     title:'Capítulo 6 - Theremin y el error temporal',
-    thumb:'https://placehold.co/320x200/173454/ffffff?text=Cap6',
+    thumb:'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap6/Slide%206.6.png',
     steps:[
       {
         type:'slides',
         slides:[
-          'https://placehold.co/1200x675/07101a/ffffff?text=6-1+Laboratorio+en+el+acantilado',
-          'https://placehold.co/1200x675/091421/ffffff?text=6-2+Theremin+habla+con+el+Director',
-          'https://placehold.co/1200x675/0b1928/ffffff?text=6-3+Portal+temporal'
-        ],
-        minMs:2000
-      },
-      {
-        type:'slides',
-        slides:[
-          'https://placehold.co/1200x675/0c1c2c/ffffff?text=6-4+Llegada+de+Harp',
-          'https://placehold.co/1200x675/0e2032/ffffff?text=6-5+Harp+se+niega'
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap6/Slide%206.1.png',
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap6/Slide%206.2.png',
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap6/Slide%206.3.png',
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap6/Slide%206.4.png',
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap6/Slide%206.5.png'
         ],
         minMs:2000
       },
@@ -3529,21 +3530,26 @@ const STORY_CHAPTERS = [
         type:'combat',
         label:'Harp vs Theremin (futuro vs estabilización)',
         mode:'1v1',
-        scoreTarget:11,
+        scoreTarget:7,
         p1Skin:'harp',
         botSkin:'theremin',
-        bgUrl:'https://placehold.co/1200x675/11243a/ffffff?text=BG+Laboratorio+Theremin',
+        bgUrl:'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap6/Slide%206.6.png',
         events:{
           botLife:[
-            {at:8,text:'Theremin pierde el control del círculo de energía'},
-            {at:4,text:'La Onda Theremin se debilita'}
+            {at:7,text:'Theremin pierde el control del círculo de energía'},
+            {at:4,text:'Theremin pierde energía y se tambalea'},
+            {at:2,text:'El portal temporal empieza a cerrarse'}
+          ],
+          playerLife:[
+            {at:9,text:'Con doble salto, Harp evita las descargas'},
+            {at:8,text:'Arpegio celestial estabiliza a Harp'}
           ],
           ability:[
             {who:'p1',text:'Arpegio Celestial y doble salto entre máquinas'},
-            {who:'p2',text:'Onda Theremin intenta aturdir a Harp'}
+            {who:'p2',text:'Theremin electrocuta a Harp'}
           ],
           onBotDefeat:[
-            {text:'Harp rompe la maquinaria y abre una brecha de escape'}
+            {text:'Harp rompe la maquinaria y con gravedad abre una brecha de escape'}
           ],
           onPlayerDefeat:[
             {text:'La estabilización de Theremin te atrapa. Intenta romper el círculo de nuevo.'}
@@ -3553,8 +3559,8 @@ const STORY_CHAPTERS = [
       {
         type:'slides',
         slides:[
-          'https://placehold.co/1200x675/101e33/ffffff?text=6-6+Harp+escapa+del+laboratorio',
-          'https://placehold.co/1200x675/0b1727/ffffff?text=6-7+Caida+hacia+otra+playa'
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap6/Slide%206.7.png',
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap6/Slide%206.8.png'
         ],
         minMs:2000
       }
@@ -3636,9 +3642,9 @@ const STORY_CHAPTERS = [
         type:'combat',
         label:'Violin vs Theremin (estabilización)',
         mode:'1v1',
-        scoreTarget:11,
+        scoreTarget:5,
         p1Skin:'violin',
-        botSkin:'theremin',
+        botSkin:'theremin_dark',
         bgUrl:'https://placehold.co/1200x675/0f2134/ffffff?text=BG+Laboratorio+acantilado',
         events:{
           botLife:[
@@ -5172,11 +5178,9 @@ function startStoryCombatStep(step){
   badge.innerText = step.label || 'Historia - Combate';
   if(!musicMuted) playCurrentMusic();
   
-  // Capítulo 5: Violin vs Queen - spawnar 6 mini hydras del lado de Queen
+  // Capítulo 5: Violin vs Queen - spawnar 4 mini hydras del lado de Queen
   if(storyContext.chapterIndex === 4 && step.label && step.label.includes('Violin vs Queen')){
-    for(let i=0; i<6; i++){
       spawnHydraClone(p2, { count:1, skin:'hydra' });
-    }
   }
     if(storyContext.chapterIndex === 4 && step.label && step.label.includes('Cello vs Hydra')){
     for(let i=0; i<3; i++){
@@ -5214,7 +5218,7 @@ function storyHandlePoint(who){
         pushStoryBubble(ev.text || `Bot: ${botLives} vidas`, 'p2');
       }
     });
-    // Capítulo 5: Violin vs Queen - al llegar a 5 vidas, spawnar 6 mini hydras del lado de Queen
+    // Capítulo 5: Violin vs Queen - al llegar a 5 vidas, spawnar 4 mini hydras del lado de Queen
     if(storyContext.chapterIndex === 4 && step?.label && step.label.includes('Violin vs Queen') && botLives === 5){
       for(let i=0;i<4;i++){
         spawnHydraClone(p2, { count:1, skin:'hydra' });
@@ -8103,11 +8107,21 @@ function scoreToLifeGlobal(myScore, oppScore){
     return 1;
   }
   const diff = myScore - oppScore;
-  if(Math.abs(diff) === 1){
-    return (diff > 0) ? 2 : 1;
+  if(diff === 1){
+    // Estoy arriba por 1: tengo 2 vidas, rival 1
+    return 2;
   }
-  if(Math.abs(diff) >= 2){
-    return (diff > 0) ? 0 : 0;
+  if(diff === -1){
+    // Estoy abajo por 1: me queda 1 vida
+    return 1;
+  }
+  if(diff >= 2){
+    // Arriba por 2 o más: sigo mostrando 2
+    return 2;
+  }
+  if(diff <= -2){
+    // Abajo por 2 o más: estoy muerto
+    return 0;
   }
   return 1;
 }
@@ -8231,6 +8245,9 @@ const PLAYER_CONTROLS = {
   L: { left:'KeyA', right:'KeyD', up:'KeyW', ability:'KeyS' },
   R: { left:'ArrowLeft', right:'ArrowRight', up:'ArrowUp', ability:'ArrowDown' }
 };
+
+// Cache de imágenes para sprites
+const spriteImageCache = {};
 
 const STAMINA_REGEN_SCALE = 0.1; // 90% más lento
 const ghostBarriers = [];
@@ -8464,6 +8481,18 @@ const ABILITIES = {
     hitChargePercent: 30,
     doubleJumpCostPercent: 34
   }),
+  harpDarkProbe: defineAbility({
+    id: 'harpDarkProbe',
+    label: 'Sonda Oscura',
+    type: 'passive',
+    duration: 0,
+    cooldown: 0,
+    staminaCost: 0,
+    description: 'Pasivamente genera una sonda que se mueve hacia ti. Presiona el botón de habilidad para controlarla y hacerla retroceder.',
+    staminaProfile: { max: 100, regen: 120, start: 60 },
+    doubleJumpCostPercent: 34,
+    hitChargePercent: 30
+  }),
   queenMajesty: defineAbility({
     id: 'queenMajesty',
     label: 'Majestad Coral',
@@ -8540,9 +8569,12 @@ const ABILITIES = {
     cooldown: 3500,
     staminaCost: 50,
     description: 'Al perder un punto recarga media barra y aturde al rival al activarse.',
-    staminaProfile: { max: 100, regen: 8, start: 60 },
+    staminaProfile: { max: 100, regen: 25, start:30 },
     onConcede(player){
-      recoverStamina(player, (player.stamina?.max || 0) * 0.45);
+      //espera 2 segundos antes de recuperar stamina:
+      setTimeout(() => {
+        recoverStamina(player, (player.stamina?.max || 0) * 0.20);
+      }, 2700);
     },
     onActivate(player){
       applyThereminShock(player);
@@ -8553,11 +8585,11 @@ const ABILITIES = {
     label: 'Onda Theremin Dark',
     duration: 1400,
     cooldown: 200,
-    staminaCost: 50,
+    staminaCost: 100,
     description: 'Electrocuta como la versión normal y despliega una espada láser que orbita y luego se lanza como proyectil.',
-    staminaProfile: { max: 100, regen: 80, start: 70 },
+    staminaProfile: { max: 100, regen: 70, start: 70 },
     onConcede(player){
-      recoverStamina(player, (player.stamina?.max || 0) * 0.45);
+      recoverStamina(player, (player.stamina?.max || 0) * 0.4);
     },
     onActivate(player){
       applyThereminShock(player);
@@ -10086,10 +10118,12 @@ function createAbilityState(abilityId, settings = {}){
 }
 
 function applySkinProfile(player, skinId){
-  const profile = getSkinProfile(skinId);
+  const rawSkinId = skinId;
+  const baseSkinId = rawSkinId.endsWith('_dark') ? rawSkinId.slice(0, -5) : rawSkinId;
+  const profile = getSkinProfile(baseSkinId);
   const prevBottom = (typeof player.y === 'number' && typeof player.r === 'number') ? player.y + player.r : null;
   
-  player.charProgressStats = getCharStatsSnapshot(skinId);
+  player.charProgressStats = getCharStatsSnapshot(baseSkinId);
   player.charAchievementData = getCharAchievementData(player.charProgressStats);
   // En modo historia o arcade desde historia, ignorar upgrades DARK automáticos salvo que el step lo autorice
   const inStory = (matchMode === MATCH_MODE.STORY);
@@ -10102,72 +10136,104 @@ function applySkinProfile(player, skinId){
   // Si es Drum Dark, usar drumDarkDetonate
   // Si es Metal Dark, usar metalDarkSpike
   let effectiveAbilityId = profile.abilityId;
-  if(player.darkTierUnlocked && skinId === 'violin'){
+  const isExplicitDarkSkin = rawSkinId.endsWith('_dark');
+
+  if(player.darkTierUnlocked && baseSkinId === 'violin'){
     const isBot = botActive && player?.side === 'R';
     if(!isBot){
       effectiveAbilityId = 'violinDarkAccel';
     }
   }
-  if(player.darkTierUnlocked && skinId === 'director'){
+  if(player.darkTierUnlocked && baseSkinId === 'director'){
     const isBot = botActive && player?.side === 'R'; // bot es siempre p2
     if(!isBot){
       effectiveAbilityId = 'directorDarkDouble';
     }
   }
-  if(player.darkTierUnlocked && skinId === 'drum'){
+  if(player.darkTierUnlocked && baseSkinId === 'drum'){
     const isBot = botActive && player?.side === 'R';
     if(!isBot){
       effectiveAbilityId = 'drumDarkDetonate';
     }
   }
-  if(player.darkTierUnlocked && skinId === 'metal'){
+  if(player.darkTierUnlocked && baseSkinId === 'metal'){
     const isBot = botActive && player?.side === 'R';
     if(!isBot){
       effectiveAbilityId = 'metalDarkSpike';
     }
   }
-  if(player.darkTierUnlocked && skinId === 'flor'){
+  if(player.darkTierUnlocked && baseSkinId === 'flor'){
     const isBot = botActive && player?.side === 'R';
     if(!isBot){
       effectiveAbilityId = 'florDarkPulse';
     }
   }
-  if(player.darkTierUnlocked && skinId === 'queen'){
+  // Queen dark variant: se activa solo si la skin es explícitamente 'queen_dark'
+  if(rawSkinId === 'queen_dark'){
+    const isBot = botActive && player?.side === 'R';
+    // En modo historia, los bots pueden usar habilidades dark
+    const inStoryMode = matchMode === MATCH_MODE.STORY;
+    if(!isBot || inStoryMode){
+      effectiveAbilityId = 'queenDarkMajesty';
+    }
+  }
+  // Queen normal: solo el jugador (no bots) puede usar dark si darkTierUnlocked
+  if(player.darkTierUnlocked && baseSkinId === 'queen'){
     const isBot = botActive && player?.side === 'R';
     if(!isBot){
       effectiveAbilityId = 'queenDarkMajesty';
     }
   }
-  if(player.darkTierUnlocked && skinId === 'theremin'){
+  // Theremin dark variant: se activa solo si la skin es explícitamente 'theremin_dark'
+  if(rawSkinId === 'theremin_dark'){
+    const isBot = botActive && player?.side === 'R';
+    const inStoryMode = matchMode === MATCH_MODE.STORY;
+    if(!isBot || inStoryMode){
+      effectiveAbilityId = 'thereminDarkPulse';
+    }
+  } else if(player.darkTierUnlocked && baseSkinId === 'theremin'){
     const isBot = botActive && player?.side === 'R';
     if(!isBot){
       effectiveAbilityId = 'thereminDarkPulse';
     }
   }
-  if(player.darkTierUnlocked && skinId === 'hydra'){
+  if(player.darkTierUnlocked && baseSkinId === 'hydra'){
     const isBot = botActive && player?.side === 'R';
     if(!isBot){
       effectiveAbilityId = 'hydraDarkPulse';
+    }
+  }
+  // Harp dark: sólo versión dark o tier desbloqueado
+  if(rawSkinId === 'harp_dark'){
+    const isBot = botActive && player?.side === 'R';
+    const inStoryMode = matchMode === MATCH_MODE.STORY;
+    if(!isBot || inStoryMode){
+      effectiveAbilityId = 'harpDarkProbe';
+    }
+  } else if(player.darkTierUnlocked && baseSkinId === 'harp'){
+    const isBot = botActive && player?.side === 'R';
+    if(!isBot){
+      effectiveAbilityId = 'harpDarkProbe';
     }
   }
   
   const abilityState = createAbilityState(effectiveAbilityId, profile.abilitySettings);
   const abilityDef = abilityState.def;
 
-  player.skin = skinId;
+  player.skin = rawSkinId;
   player.profile = profile;
   player.baseRadius = profile.radius;
   
   // Aplicar hitbox desde dark asset si está desbloqueado y tiene hitboxScale definido
   let effectiveHitboxScale = profile.hitboxScale;
-  if(player.darkTierUnlocked){
+  if(player.darkTierUnlocked || isExplicitDarkSkin){
     // Primero revisar SKIN_DARK_ASSETS (para skins como ghost, etc)
-    const darkAsset = SKIN_DARK_ASSETS?.[skinId];
+    const darkAsset = SKIN_DARK_ASSETS?.[baseSkinId];
     if(darkAsset && typeof darkAsset.hitboxScale === 'number'){
       effectiveHitboxScale = darkAsset.hitboxScale;
     }
     // Para Fire, revisar darkHitboxScale dentro del mismo SKIN_ASSETS
-    else if(skinId === 'fire'){
+    else if(baseSkinId === 'fire'){
       const fireAsset = SKIN_ASSETS.fire;
       if(fireAsset && typeof fireAsset.darkHitboxScale === 'number'){
         effectiveHitboxScale = fireAsset.darkHitboxScale;
@@ -10196,7 +10262,7 @@ function applySkinProfile(player, skinId){
   };
   player.scale = { radius: 1, hitbox: 1, hitboxX: 1, hitboxY: 1, visualX: 1, visualY: 1 };
   // Aplicar escala visual por defecto del personaje
-  const defaultVisualScale = defaultSkinScales[skinId] ?? 1.0;
+  const defaultVisualScale = defaultSkinScales[skinId] ?? defaultSkinScales[baseSkinId] ?? 1.0;
   player.visualScale = { x: defaultVisualScale, y: defaultVisualScale };
   const baseStamina = { max: 100, regen: 24, start: 100 };
   const abilityStamina = abilityDef.staminaProfile || {};
@@ -10219,6 +10285,10 @@ function applySkinProfile(player, skinId){
   }
   if(skinId !== 'mystery' && mysteryBomb.owner === player.side){
     detachMysteryBomb(player.side);
+  }
+  // Inicializar probe de Harp Dark si es harp
+  if(baseSkinId === 'harp' && effectiveAbilityId === 'harpDarkProbe'){
+    spawnHarpDarkProbe(player);
   }
   player.y = (prevBottom !== null) ? (prevBottom - player.r) : (CONFIG.GROUND_Y - player.r);
 }
@@ -10589,8 +10659,8 @@ function updateHydraDarkHeads(dt){
       if(bdx*bdx + bdy*bdy <= ballRad*ballRad){
         const dirX = Math.cos(Math.atan2(bdy, bdx) + Math.PI);
         const dirY = Math.sin(Math.atan2(bdy, bdx) + Math.PI);
-        ball.vx = dirX * 1600;
-        ball.vy = dirY * 1600 * 0.4;
+        ball.vx = dirX * 2800;
+        ball.vy = dirY * 3000 * 0.4;
         head.hitBall = true;
       }
     }
@@ -11733,6 +11803,132 @@ function detachMysteryBomb(side){
   mysteryBomb.owner = null;
 }
 
+// ===== HARP DARK PROBE FUNCTIONS =====
+function spawnHarpDarkProbe(player){
+  const probeRadius = 72;  // Triplicado desde 24px
+  const probeY = CONFIG.GROUND_Y - 380;  // Más arriba
+  const probeVelSlow = -1.5;  // 1/3 de 1.2, lento hacia el jugador
+  const probeVelFast = -3.2;  // 1/3 de 4.5, lento cuando retrocede
+  
+  player.harpProbe = {
+    x: player.x,
+    y: probeY,
+    vx: 0,
+    maxVelSlow: probeVelSlow,
+    maxVelFast: probeVelFast,
+    radius: probeRadius,
+    controlActive: false,
+    accel: 0.03,
+    side: player.side
+  };
+}
+
+function updateHarpDarkProbe(player){
+  const probe = player?.harpProbe;
+  if(!probe) return;
+  
+  // Dirección hacia el jugador: si es L, va hacia la derecha (+); si es R, hacia la izquierda (-)
+  const direction = player.side === 'L' ? 1 : -1;
+  
+  // Si controlActive, la sonda retrocede (va hacia el lado opuesto)
+  // Si no, se mueve hacia el jugador
+  const targetVel = probe.controlActive 
+    ? (-probe.maxVelFast * direction)  // Retrocede, dirección opuesta
+    : (probe.maxVelSlow * direction);   // Hacia el jugador
+  
+  // Suavizar cambio de velocidad
+  probe.vx += (targetVel - probe.vx) * probe.accel;
+  probe.x += probe.vx;
+  
+  // Permitir que vaya hasta el borde de la pantalla (incluso del otro lado)
+  probe.x = clamp(probe.x, probe.radius, W - probe.radius);
+  
+  // Colisión con pelota - mejorada para asegurar que funciona
+  const dx = ball.x - probe.x;
+  const dy = ball.y - probe.y;
+  const dist = Math.sqrt(dx*dx + dy*dy);
+  const minDist = probe.radius + (ball.r || CONFIG.BALL_RADIUS);
+  
+  // Solo es sólida cuando el jugador mantiene el botón de habilidad
+  if(probe.controlActive && dist < minDist && dist > 0){
+    // Calcular ángulo de rebote
+    const angle = Math.atan2(dy, dx);
+    const incoming = Math.hypot(ball.vx, ball.vy);
+    const speed = Math.max(30, incoming * 0.9); // rebote fuerte estilo bot/clon
+    ball.vx = Math.cos(angle) * speed;
+    ball.vy = Math.sin(angle) * speed - 2;  // Agregar un poco de lift
+    
+    // Separar la pelota del probe para evitar que quede atrapada
+    const overlap = minDist - dist + 1;
+    ball.x += Math.cos(angle) * overlap;
+    ball.y += Math.sin(angle) * overlap;
+  }
+}
+
+function getSpriteImage(url, callback){
+  if(!url) return;
+  if(spriteImageCache[url]){
+    if(spriteImageCache[url].loaded){
+      callback(spriteImageCache[url].img);
+    }
+    return;
+  }
+  spriteImageCache[url] = { loaded: false, img: null };
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.onload = function(){
+    spriteImageCache[url].loaded = true;
+    spriteImageCache[url].img = img;
+    callback(img);
+  };
+  img.onerror = function(){
+    spriteImageCache[url].loaded = true;
+    spriteImageCache[url].img = null;
+  };
+  img.src = url;
+}
+
+function drawHarpDarkProbe(player){
+  const probe = player?.harpProbe;
+  if(!probe) return;
+  
+  ctx.save();
+  ctx.translate(probe.x, probe.y);
+  ctx.globalAlpha = 0.85;
+  
+  if(probe.controlActive){
+    ctx.shadowColor = 'rgba(180,120,255,0.7)';
+    ctx.shadowBlur = 12;
+  }
+  
+  const asset = SKIN_ASSETS.harpDarkProbe;
+  if(!asset || !asset.spriteUrl) {
+    // Fallback: dibujar un círculo si no hay sprite
+    ctx.fillStyle = 'rgba(100,50,200,0.7)';
+    ctx.beginPath();
+    ctx.arc(0, 0, probe.radius, 0, TAU);
+    ctx.fill();
+  } else {
+    // Dibujar sprite si está en cache
+    const cached = spriteImageCache[asset.spriteUrl];
+    if(cached && cached.loaded && cached.img){
+      const size = probe.radius * 2;
+      const spriteWidth = size * 2;  // Doble ancho para que no esté apretada
+      ctx.drawImage(cached.img, -spriteWidth/2, -size/2, spriteWidth, size);
+    } else if(!cached){
+      // Iniciar carga si no está en cache
+      getSpriteImage(asset.spriteUrl, ()=>{});
+      // Fallback mientras carga
+      ctx.fillStyle = 'rgba(100,50,200,0.7)';
+      ctx.beginPath();
+      ctx.arc(0, 0, probe.radius, 0, TAU);
+      ctx.fill();
+    }
+  }
+  
+  ctx.restore();
+}
+
 function triggerMysteryBombExplosion(player, options = {}){
   if(!player) return false;
   if(!mysteryBomb.attached || mysteryBomb.owner !== player.side){
@@ -12028,19 +12224,21 @@ function concludeAbility(player){
   ability.cooldownMs = (cooldownOverride !== null) ? cooldownOverride : ability.def.cooldown;
 }
 
-function resolveSkinPhotoCandidates(baseSkin, b){
+function resolveSkinPhotoCandidates(skinId, b){
   const player = b?.player;
+  const isExplicitDark = typeof skinId === 'string' && skinId.endsWith('_dark');
+  const baseSkin = isExplicitDark ? skinId.slice(0, -5) : skinId;
   
-  // Deshabilitar dark skins para bots, bosses y clones del bot
+  // Deshabilitar dark skins para bots, bosses y clones del bot, salvo que la skin venga marcada como dark explícitamente
   const isBot = (botActive && player === p2);
   const isBoss = (player === p2 && player?.isBoss === true);
   const isBotClone = (player?.isClone === true && player?.ownerSide === p2?.side && botActive);
   const isBotOwned = (player?.ownerSide === p2?.side && botActive && !player?.isClone);
-  const allowDark = !isBot && !isBoss && !isBotClone && !isBotOwned;
+  const allowDark = isExplicitDark ? true : (!isBot && !isBoss && !isBotClone && !isBotOwned);
   
   const stats = player?.charProgressStats || (baseSkin ? getCharStatsSnapshot(baseSkin) : null);
   const achData = player?.charAchievementData || (stats ? getCharAchievementData(stats) : null);
-  const darkUnlocked = allowDark && (player?.darkTierUnlocked ?? isDarkTierUnlocked(achData || stats));
+  const darkUnlocked = isExplicitDark || (allowDark && (player?.darkTierUnlocked ?? isDarkTierUnlocked(achData || stats)));
   const normalAsset = (typeof SKIN_ASSETS !== 'undefined' && SKIN_ASSETS[baseSkin]) ? SKIN_ASSETS[baseSkin] : {};
   const darkAssetRaw = darkUnlocked ? (SKIN_DARK_ASSETS?.[baseSkin] || null) : null;
   const darkAsset = (darkAssetRaw && darkAssetRaw.spriteUrl) ? darkAssetRaw : null;
@@ -12066,6 +12264,7 @@ function resolveSkinPhotoCandidates(baseSkin, b){
 }
 
 function drawSkin(ctx, skin, b){
+  const baseSkin = (typeof skin === 'string' && skin.endsWith('_dark')) ? skin.slice(0, -5) : skin;
   ctx.save();
   const TAU = Math.PI * 2;
   const R = b.r;
@@ -12188,11 +12387,11 @@ function drawSkin(ctx, skin, b){
         const w = R * 2 * scale * widthMul;
         const h = R * 2 * scale;
         // Si es la skin de metal, girar igual que la versión vectorial
-        if (skin === 'metal') {
+        if (baseSkin === 'metal') {
           ctx.rotate((t/1000) * 1.6);
         }
-        // Si es theremin con spriteSpinSpeed, agregar rotación y glow pulsante
-        if (skin === 'theremin' && typeof baseAsset.spriteSpinSpeed === 'number') {
+        // Si es theremin (incluye theremin_dark) con spriteSpinSpeed, agregar rotación y glow pulsante
+        if (baseSkin === 'theremin' && typeof baseAsset.spriteSpinSpeed === 'number') {
           // Glow radial pulsante celeste con tamaño dinámico
           const pulse = 0.65 + 0.25 * Math.sin(t / 600);
           const glowSize = 0.75 + 0.3 * Math.sin(t / 600); // Glow varía entre 0.45 y 1.05 (3/4 del máximo original)
@@ -14315,6 +14514,12 @@ if(appScene === APP_SCENE.MENU && arcadeOpen && e.code === 'Escape'){
     e.preventDefault();
     return;
   }
+    if(appScene === APP_SCENE.MENU && storyOpen && e.code === 'Escape'){
+      playUiBackSound();
+      closeStoryMenu();
+      e.preventDefault();
+      return;
+    }
     const isPrev = (e.code === 'ArrowLeft' || e.code === 'ArrowUp' || e.code === 'KeyA' || e.code === 'KeyW');
     const isNext = (e.code === 'ArrowRight' || e.code === 'ArrowDown' || e.code === 'KeyD' || e.code === 'KeyS');
     if(isPrev){
@@ -15558,7 +15763,7 @@ function handleInput(){
   const jumpFactorP = darkAccelP?.active ? (darkAccelP.jumpMult || 1.3) : 1;
   const jumpP = (p.stats?.jump ?? CONFIG.PLAYER_JUMP_V) * (stunnedP ? 0 : slowFactorP) * jumpFactorP;
   const abilityIdP = p.ability?.def?.id;
-  const harpP = abilityIdP === 'harpAria';
+  const harpP = abilityIdP === 'harpAria' || abilityIdP === 'harpDarkProbe';
   const harpCostRatioP = harpP ? ((p.ability?.def?.doubleJumpCostPercent ?? 50) / 100) : 0;
   const leftP = !!keys[ctrlP.left];
   const rightP = !!keys[ctrlP.right];
@@ -15684,7 +15889,7 @@ function handleInput(){
     const jumpFactorQ = darkAccelQ?.active ? (darkAccelQ.jumpMult || 1.3) : 1;
     const jumpQ = (q.stats?.jump ?? CONFIG.PLAYER_JUMP_V) * (stunnedQ ? 0 : slowFactorQ) * jumpFactorQ;
     const abilityIdQ = q.ability?.def?.id;
-    const harpQ = abilityIdQ === 'harpAria';
+    const harpQ = abilityIdQ === 'harpAria' || abilityIdQ === 'harpDarkProbe';
     const harpCostRatioQ = harpQ ? ((q.ability?.def?.doubleJumpCostPercent ?? 50) / 100) : 0;
     const leftQ = !!keys[ctrlQ.left];
     const rightQ = !!keys[ctrlQ.right];
@@ -15771,6 +15976,13 @@ function handleAbilityInput(player){
   }
   if(player.ability?.def?.id === 'mysteryCipher'){
     processMysteryAbilityInput(player);
+    return;
+  }
+  if(player.ability?.def?.id === 'harpDarkProbe'){
+    // Para harpDarkProbe, controla la dirección de la sonda mientras se mantiene presionado
+    if(player.harpProbe){
+      player.harpProbe.controlActive = !!keys[player.controls.ability];
+    }
     return;
   }
   if(consumePlayerKeyTap(player, player.controls.ability)){
@@ -16006,6 +16218,8 @@ function stepPhysics(dt){
   updateMiniDirectors(dt);
   updateThereminSwords(dt);
   updateViolinDarkRockets(dt);
+  if(p1 && p1.harpProbe) updateHarpDarkProbe(p1);
+  if(p2 && p2.harpProbe) updateHarpDarkProbe(p2);
 
   // Pelota (si está en espera de saque, dejamos la integración normal pero waitServe evita movimiento)
   const prevBallX = ball.x;
@@ -16489,6 +16703,8 @@ function drawGame(){
   drawHydraDarkProjectiles();
   drawThereminSwords();
   drawViolinDarkRockets();
+  if(p1 && p1.harpProbe) drawHarpDarkProbe(p1);
+  if(p2 && p2.harpProbe) drawHarpDarkProbe(p2);
 
   // Pelota
   drawBall();
@@ -16595,6 +16811,7 @@ function drawStoryOverlay(){
         storyContext.videoElement.src = url;
         storyContext.videoElement.onended = ()=>{
           // Auto-avance al siguiente slide cuando termina video
+          storyContext.isPlayingVideo = false; // Resetear flag
           if(!storyContext.videoAutoadvanced){
             storyContext.videoAutoadvanced = true;
             if(storyContext.slideIndex < step.slides.length - 1){
@@ -16628,6 +16845,7 @@ function drawStoryOverlay(){
       ctx.fillText('(Toca/click para saltar video)', W/2, H - 32);
     } else {
       // Imagen handling (código anterior)
+      storyContext.isPlayingVideo = false; // Resetear flag cuando no es video
       const img = preloadStoryImage(url, 'slides');
       ctx.fillStyle = '#050a15';
       ctx.fillRect(0,0,W,H);
@@ -17169,6 +17387,7 @@ function drawHUD(){
     : scoreToLife(p2Score, p1Score);
   const p1Life = Math.max(0, p1LifeRaw + bonusP1);
   const p2Life = Math.max(0, p2LifeRaw + bonusP2);
+  
   handleLifeBasedAbilities(p1, p1Life, MAX_SEGMENTS);
   handleLifeBasedAbilities(p2, p2Life, MAX_SEGMENTS);
 
@@ -17178,52 +17397,112 @@ const inSuddenDeath = suddenDeathActive;
   //     DIBUJAR BARRA SEGMENTADA
   // ===============================
   function drawLifeBar(x, y, w, h, myLife, myMaxLife, alignLeft){
-    // myMaxLife = segmentos base que se muestran (10 para jugador, scoreTarget para oponente)
-    // Si myLife > myMaxLife, dibujamos capas de dorados encima (apiladas)
-    const displaySegments = myMaxLife;
-    const segW = w / displaySegments;
-    
-    // Dibujar los segmentos rojos de base
-    for(let i=0;i<displaySegments;i++){
-      ctx.strokeStyle = '#550000';
-      ctx.lineWidth = 0.5;
-      const fill = (i < myLife);
-      ctx.fillStyle = fill ? '#b80606' : '#330000';
+    const radius = Math.min(h * 0.55, 8);
+    const extras = Math.max(0, myLife - myMaxLife);
+    const t = now();
 
-      const sx = alignLeft ? (x + i*segW) : (x + (displaySegments-1-i)*segW);
+    // helper: rounded rect
+    const roundedRect = (px, py, pw, ph, r)=>{
+      const rr = Math.min(r, pw/2, ph/2);
       ctx.beginPath();
-      ctx.rect(sx, y, segW - 1, h);
-      ctx.fill();
+      ctx.moveTo(px + rr, py);
+      ctx.lineTo(px + pw - rr, py);
+      ctx.quadraticCurveTo(px + pw, py, px + pw, py + rr);
+      ctx.lineTo(px + pw, py + ph - rr);
+      ctx.quadraticCurveTo(px + pw, py + ph, px + pw - rr, py + ph);
+      ctx.lineTo(px + rr, py + ph);
+      ctx.quadraticCurveTo(px, py + ph, px, py + ph - rr);
+      ctx.lineTo(px, py + rr);
+      ctx.quadraticCurveTo(px, py, px + rr, py);
+      ctx.closePath();
+    };
+
+    const ratio = clamp(myLife / myMaxLife, 0, 1);
+    const fillW = ratio * w;
+    const glowPulse = 0.35 + 0.25 * Math.sin(t / 220);
+    const lowLife = ratio < 0.3;
+
+    // Fondo
+    ctx.save();
+    roundedRect(x, y, w, h, radius);
+    const bgGrad = ctx.createLinearGradient(x, y, x, y + h);
+    bgGrad.addColorStop(0, 'rgba(12,16,24,0.82)');
+    bgGrad.addColorStop(1, 'rgba(6,8,12,0.92)');
+    ctx.fillStyle = bgGrad;
+    ctx.fill();
+
+    // Borde exterior
+    const borderGrad = ctx.createLinearGradient(x, y, x, y + h);
+    borderGrad.addColorStop(0, '#1d2330');
+    borderGrad.addColorStop(1, '#0b0f18');
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = borderGrad;
+    ctx.stroke();
+
+    // Relleno principal (gradiente simétrico hacia el centro)
+    ctx.save();
+    ctx.clip();
+    const fx = alignLeft ? x : (x + w - fillW);
+    const fillGrad = alignLeft 
+      ? ctx.createLinearGradient(fx, y, fx + fillW, y + h)
+      : ctx.createLinearGradient(fx + fillW, y, fx, y + h);
+    fillGrad.addColorStop(0, '#750303');
+    fillGrad.addColorStop(0.55, '#b00000');
+    fillGrad.addColorStop(1, '#c81a1a');
+    ctx.fillStyle = fillGrad;
+    if(lowLife){
+      ctx.shadowColor = 'rgba(255,58,58,0.55)';
+      ctx.shadowBlur = 12 * glowPulse;
+    }
+    ctx.fillRect(fx, y, fillW, h);
+
+    // Separadores sutiles por segmento
+    ctx.globalAlpha = 0.22;
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(255,255,255,0.45)';
+    for(let i=1;i<myMaxLife;i++){
+      const sx = alignLeft ? (x + i * (w / myMaxLife)) : (x + w - i * (w / myMaxLife));
+      ctx.beginPath();
+      ctx.moveTo(sx, y + 2);
+      ctx.lineTo(sx, y + h - 2);
       ctx.stroke();
     }
-    
-    // Dibujar capas de dorado encima (extras apiladas)
-    const extras = Math.max(0, myLife - myMaxLife);
+    ctx.globalAlpha = 1;
+
+    // Overlay de brillo
+    const gloss = ctx.createLinearGradient(x, y, x, y + h);
+    gloss.addColorStop(0, 'rgba(255,255,255,0.18)');
+    gloss.addColorStop(0.5, 'rgba(255,255,255,0.04)');
+    gloss.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = gloss;
+    ctx.fillRect(x, y, w, h);
+    ctx.restore();
+
+    // Extras dorados (capas superiores)
     if(extras > 0){
-      const extraLayers = Math.ceil(extras / displaySegments);
-      for(let layer=0; layer<extraLayers; layer++){
-        const layerStart = layer * displaySegments;
-        const layerEnd = Math.min(layerStart + displaySegments, extras);
-        const layerFill = layerEnd - layerStart;
-        
-        ctx.globalAlpha = 0.25;
-        ctx.strokeStyle = '#aa8800';
-        ctx.lineWidth = 0.5;
-        
-        for(let i=0; i<displaySegments; i++){
-          const globalIndex = layer * displaySegments + i;
-          const fill = (i < layerFill);
-          ctx.fillStyle = fill ? '#f0d050' : 'transparent';
-          
-          const sx = alignLeft ? (x + i*segW) : (x + (displaySegments-1-i)*segW);
-          ctx.beginPath();
-          ctx.rect(sx, y, segW - 1, h);
-          if(fill) ctx.fill();
-          ctx.stroke();
-        }
-      }
-      ctx.globalAlpha = 1;
+      const extraRatio = Math.min(extras / myMaxLife, 1);
+      const extraW = extraRatio * w;
+      const exX = alignLeft ? x : (x + w - extraW);
+      const exH = h * 0.55;
+      const exY = y - 2;
+      roundedRect(exX, exY, extraW, exH, radius * 0.75);
+      const gold = ctx.createLinearGradient(exX, exY, exX, exY + exH);
+      gold.addColorStop(0, 'rgba(255,230,140,0.95)');
+      gold.addColorStop(1, 'rgba(255,195,80,0.85)');
+      ctx.fillStyle = gold;
+      ctx.shadowColor = 'rgba(255,215,120,0.55)';
+      ctx.shadowBlur = 8;
+      ctx.fill();
+      ctx.shadowBlur = 0;
     }
+
+    // Línea interior para definición
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(255,255,255,0.10)';
+    roundedRect(x+1, y+1, w-2, h-2, radius-1);
+    ctx.stroke();
+
+    ctx.restore();
   }
 
 // Activar Sudden Death si ambos llegan por primera vez a 1 vida
@@ -17235,40 +17514,97 @@ if (!suddenDeathActive && p1Life === 1 && p2Life === 1) {
 }
 
   function drawSuddenDeathBar(x, y, w, h, life, alignLeft){
-  const MAX = 2; // sólo dos segmentos (1 y 2)
-  const segW = w / MAX;
+    const MAX = 2;
+    const radius = Math.min(h * 0.55, 8);
+    const t = now();
+    const pulse = 0.45 + 0.35 * Math.sin(t / 180);
 
-  // Glow dinámico
-  const glow = 6 + Math.sin(performance.now() / 200) * 4;
+    // Helper: rounded rect
+    const roundedRect = (px, py, pw, ph, r)=>{
+      const rr = Math.min(r, pw/2, ph/2);
+      ctx.beginPath();
+      ctx.moveTo(px + rr, py);
+      ctx.lineTo(px + pw - rr, py);
+      ctx.quadraticCurveTo(px + pw, py, px + pw, py + rr);
+      ctx.lineTo(px + pw, py + ph - rr);
+      ctx.quadraticCurveTo(px + pw, py + ph, px + pw - rr, py + ph);
+      ctx.lineTo(px + rr, py + ph);
+      ctx.quadraticCurveTo(px, py + ph, px, py + ph - rr);
+      ctx.lineTo(px, py + rr);
+      ctx.quadraticCurveTo(px, py, px + rr, py);
+      ctx.closePath();
+    };
 
-  for(let i=0; i<MAX; i++){
-    const filled = (i < life);
-
-    // posición del segmento
-    const sx = alignLeft ? (x + i*segW) : (x + (MAX-1-i)*segW);
+    const ratio = clamp(life / MAX, 0, 1);
+    const fillW = ratio * w;
 
     ctx.save();
-    ctx.lineWidth = 2;
 
-    if(filled){
-      ctx.fillStyle = '#5a0000'; // rojo oscuro
-      ctx.shadowColor = '#ff2a2a';
-      ctx.shadowBlur = glow;
-    } else {
-      ctx.fillStyle = '#220000';
-      ctx.shadowBlur = 0;
+    // Fondo
+    roundedRect(x, y, w, h, radius);
+    const bgGrad = ctx.createLinearGradient(x, y, x, y + h);
+    bgGrad.addColorStop(0, 'rgba(12,8,8,0.92)');
+    bgGrad.addColorStop(1, 'rgba(6,4,4,0.96)');
+    ctx.fillStyle = bgGrad;
+    ctx.fill();
+
+    // Borde
+    const borderGrad = ctx.createLinearGradient(x, y, x, y + h);
+    borderGrad.addColorStop(0, '#2a0000');
+    borderGrad.addColorStop(1, '#150000');
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = borderGrad;
+    ctx.stroke();
+
+    // Relleno principal con parpadeo
+    ctx.save();
+    ctx.clip();
+    const fx = alignLeft ? x : (x + w - fillW);
+    const fillGrad = alignLeft 
+      ? ctx.createLinearGradient(fx, y, fx + fillW, y + h)
+      : ctx.createLinearGradient(fx + fillW, y, fx, y + h);
+    const darkBase = `rgba(${80 + 40*pulse}, 0, 0, 1)`;
+    const midRed = `rgba(${120 + 60*pulse}, 0, 0, 1)`;
+    const brightRed = `rgba(${180 + 50*pulse}, ${10 + 15*pulse}, ${10 + 15*pulse}, 1)`;
+    fillGrad.addColorStop(0, darkBase);
+    fillGrad.addColorStop(0.55, midRed);
+    fillGrad.addColorStop(1, brightRed);
+    ctx.fillStyle = fillGrad;
+    ctx.shadowColor = `rgba(255, 40, 40, ${0.6 * pulse})`;
+    ctx.shadowBlur = 14 * pulse;
+    ctx.fillRect(fx, y, fillW, h);
+    ctx.shadowBlur = 0;
+
+    // Separador central
+    if(life > 0){
+      ctx.globalAlpha = 0.3;
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = 'rgba(255,100,100,0.5)';
+      const midX = x + w / 2;
+      ctx.beginPath();
+      ctx.moveTo(midX, y + 2);
+      ctx.lineTo(midX, y + h - 2);
+      ctx.stroke();
+      ctx.globalAlpha = 1;
     }
 
-    ctx.strokeStyle = '#770000';
+    // Brillo superior
+    const gloss = ctx.createLinearGradient(x, y, x, y + h);
+    gloss.addColorStop(0, 'rgba(255,255,255,0.12)');
+    gloss.addColorStop(0.5, 'rgba(255,255,255,0.02)');
+    gloss.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = gloss;
+    ctx.fillRect(x, y, w, h);
+    ctx.restore();
 
-    ctx.beginPath();
-    ctx.rect(sx, y, segW - 4, h);
-    ctx.fill();
-      ctx.stroke();
+    // Línea interior
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(255,80,80,0.15)';
+    roundedRect(x+1, y+1, w-2, h-2, radius-1);
+    ctx.stroke();
 
-      ctx.restore();
+    ctx.restore();
   }
-}
 
 function handleLifeBasedAbilities(playerRef, lifeSegments, maxSegments){
   // Feature removed: violin no longer gets permanent dash at low health
@@ -17278,49 +17614,143 @@ function handleLifeBasedAbilities(playerRef, lifeSegments, maxSegments){
     const stamina = playerRef && playerRef.stamina;
     const ratio = stamina ? clamp((stamina.value || 0) / (stamina.max || 1), 0, 1) : 0;
     const fillW = ratio * w;
+    const radius = Math.min(h * 0.55, 6);
+    const t = now();
 
-    ctx.save();
-    ctx.fillStyle = '#0b1d33';
-    ctx.globalAlpha = 0.85;
-    ctx.fillRect(x, y, w, h);
-    ctx.globalAlpha = 1;
+    // Helper: rounded rect
+    const roundedRect = (px, py, pw, ph, r)=>{
+      const rr = Math.min(r, pw/2, ph/2);
+      ctx.beginPath();
+      ctx.moveTo(px + rr, py);
+      ctx.lineTo(px + pw - rr, py);
+      ctx.quadraticCurveTo(px + pw, py, px + pw, py + rr);
+      ctx.lineTo(px + pw, py + ph - rr);
+      ctx.quadraticCurveTo(px + pw, py + ph, px + pw - rr, py + ph);
+      ctx.lineTo(px + rr, py + ph);
+      ctx.quadraticCurveTo(px, py + ph, px, py + ph - rr);
+      ctx.lineTo(px, py + rr);
+      ctx.quadraticCurveTo(px, py, px + rr, py);
+      ctx.closePath();
+    };
 
     const abilityState = playerRef?.ability;
-    let barColor = '#2ad1ff';
-    if(abilityState?.active){
-      barColor = '#00d18f';
-    } else if(abilityState && abilityState.cooldownMs > 0){
-      barColor = '#8da0b3';
-    }
-    ctx.fillStyle = barColor;
-    if(alignLeft){
-      ctx.fillRect(x, y, fillW, h);
+    const isDark = playerRef?.darkTierUnlocked || (playerRef?.skin && playerRef.skin.endsWith('_dark'));
+    const isActive = abilityState?.active;
+    const isOnCooldown = abilityState && abilityState.cooldownMs > 0;
+
+    ctx.save();
+
+    // Fondo
+    roundedRect(x, y, w, h, radius);
+    const bgGrad = ctx.createLinearGradient(x, y, x, y + h);
+    bgGrad.addColorStop(0, 'rgba(12,16,24,0.82)');
+    bgGrad.addColorStop(1, 'rgba(6,8,12,0.92)');
+    ctx.fillStyle = bgGrad;
+    ctx.fill();
+
+    // Borde
+    const borderGrad = ctx.createLinearGradient(x, y, x, y + h);
+    borderGrad.addColorStop(0, '#1d2330');
+    borderGrad.addColorStop(1, '#0b0f18');
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = borderGrad;
+    ctx.stroke();
+
+    // Relleno principal
+    ctx.save();
+    ctx.clip();
+    const fx = alignLeft ? x : (x + w - fillW);
+    const fillGrad = ctx.createLinearGradient(fx, y, fx, y + h);
+    
+    if(isActive){
+      if(isDark){
+        // Dark activo: luz morada brillante
+        fillGrad.addColorStop(0, '#e8d9ff');
+        fillGrad.addColorStop(1, '#c9a2ff');
+        ctx.shadowColor = 'rgba(180,120,255,0.55)';
+        ctx.shadowBlur = 10;
+      } else {
+        // Activo normal: blanco brillante con cyan
+        fillGrad.addColorStop(0, '#e0f7ff');
+        fillGrad.addColorStop(1, '#a0e7ff');
+        ctx.shadowColor = 'rgba(160,240,255,0.55)';
+        ctx.shadowBlur = 8;
+      }
+    } else if(isDark){
+      // Dark: color base del tier dark
+      fillGrad.addColorStop(0, '#8a3fd6');
+      fillGrad.addColorStop(1, '#5c2a99');
     } else {
-      ctx.fillRect(x + (w - fillW), y, fillW, h);
+      // Normal: celeste intenso
+      fillGrad.addColorStop(0, '#00d4ff');
+      fillGrad.addColorStop(1, '#0099cc');
+    }
+    ctx.fillStyle = fillGrad;
+    ctx.fillRect(fx, y, fillW, h);
+    ctx.shadowBlur = 0;
+
+    // Overlay de cooldown (capa gris semi-transparente)
+    if(isOnCooldown && !isActive){
+      ctx.globalAlpha = 0.55;
+      const coolGrad = ctx.createLinearGradient(x, y, x, y + h);
+      coolGrad.addColorStop(0, 'rgba(100,100,110,0.75)');
+      coolGrad.addColorStop(1, 'rgba(60,60,70,0.75)');
+      ctx.fillStyle = coolGrad;
+      ctx.fillRect(x, y, w, h);
+      ctx.globalAlpha = 1;
     }
 
-    ctx.strokeStyle = '#0c5c83';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(x, y, w, h);
+    // Marcadores de costo (chevron recortado)
     const ability = playerRef?.ability?.def;
     const staminaMax = stamina?.max || 0;
     const cost = ability?.staminaCost || 0;
     if(cost > 0 && staminaMax > 0){
       const markers = Math.floor(staminaMax / cost);
-      ctx.strokeStyle = '#11111188';
-      ctx.lineWidth = 2;
+      const notchW = 3;
+      const notchH = 2.5;
+      ctx.save();
+      // Chevrons opacos usando el color del fondo de la barra vacía
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.fillStyle = '#0b0f18';
+      ctx.globalAlpha = 0.9;
       for(let i=1; i<=markers; i++){
         const markerRatio = (cost * i) / staminaMax;
         if(markerRatio >= 1) break;
-        const markX = alignLeft
-          ? x + markerRatio * w
-          : x + w - markerRatio * w;
+        const markX = alignLeft ? (x + markerRatio * w) : (x + w - markerRatio * w);
+
+        // Chevron superior
         ctx.beginPath();
-        ctx.moveTo(markX, y);
-        ctx.lineTo(markX, y + h);
-        ctx.stroke();
+        ctx.moveTo(markX - notchW/2, y);
+        ctx.lineTo(markX, y + notchH);
+        ctx.lineTo(markX + notchW/2, y);
+        ctx.closePath();
+        ctx.fill();
+
+        // Chevron inferior
+        ctx.beginPath();
+        ctx.moveTo(markX - notchW/2, y + h);
+        ctx.lineTo(markX, y + h - notchH);
+        ctx.lineTo(markX + notchW/2, y + h);
+        ctx.closePath();
+        ctx.fill();
       }
+      ctx.restore();
     }
+
+    // Brillo superior
+    const gloss = ctx.createLinearGradient(x, y, x, y + h);
+    gloss.addColorStop(0, 'rgba(255,255,255,0.15)');
+    gloss.addColorStop(0.5, 'rgba(255,255,255,0.03)');
+    gloss.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = gloss;
+    ctx.fillRect(x, y, w, h);
+    ctx.restore();
+
+    // Línea interior para definición
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+    roundedRect(x+1, y+1, w-2, h-2, radius-1);
+    ctx.stroke();
 
     ctx.restore();
   }
@@ -17391,8 +17821,8 @@ if(botActive && matchMode === MATCH_MODE.BOT){
   ctx.fillText(p2Label, W - 40, 60);
   ctx.shadowBlur = 0;
 
-  // Timer de partida
-  if(matchTimerMs != null){
+  // Timer de partida (oculto durante sudden death)
+  if(matchTimerMs != null && !suddenDeathActive){
     const ms = Math.max(0, matchTimerMs);
     const totalSeconds = Math.floor(ms / 1000);
     const minutes = Math.floor(totalSeconds / 60);
@@ -17402,7 +17832,7 @@ if(botActive && matchMode === MATCH_MODE.BOT){
       : `${minutes}:${String(seconds).padStart(2,'0')}`;
     ctx.textAlign = 'center';
     ctx.font = '900 26px system-ui';
-    const warn = (matchTimerMode === 'countdown' && ms <= 30000 && !suddenDeathActive);
+    const warn = (matchTimerMode === 'countdown' && ms <= 30000);
     ctx.fillStyle = warn ? '#ffdf5c' : '#e9f4ff';
     ctx.shadowColor = warn ? '#ffb300' : '#000';
     ctx.shadowBlur = warn ? 10 : 0;
