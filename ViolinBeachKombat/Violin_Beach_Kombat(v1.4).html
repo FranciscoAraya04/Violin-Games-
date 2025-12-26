@@ -851,6 +851,123 @@
   .overlay-btn.hidden{display:none;}
   .overlay-btn:hover{filter:brightness(1.15);} 
   .overlay-btn:active{transform:translateY(1px);}
+  
+  /* Estilos para carrusel de selección de stages */
+  .stage-carousel {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 20px 0;
+    justify-content: center;
+  }
+  
+  .stage-nav-btn {
+    background: linear-gradient(135deg, #1f7aec, #10b2ff);
+    border: 1px solid #0fd6b1;
+    color: #fff;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font: 700 14px system-ui;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+  }
+  
+  .stage-nav-btn:hover {
+    filter: brightness(1.15);
+    box-shadow: 0 8px 20px rgba(31, 122, 236, 0.4);
+  }
+  
+  .stage-nav-btn:active {
+    transform: translateY(1px);
+  }
+  
+  .stage-preview-container {
+    position: relative;
+    flex: 1;
+    max-width: 800px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+  }
+  
+  .stage-preview-canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+    cursor: pointer;
+    border-radius: 12px;
+    border: 3px solid #1f7aec;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
+  }
+  
+  .stage-preview-container:hover .stage-preview-canvas {
+    border-color: #0fd6b1;
+  }
+  
+  .stage-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+    padding: 16px;
+    color: #fff;
+    border-radius: 0 0 12px 12px;
+  }
+  
+  .stage-name {
+    font: 700 20px 'Barlow', system-ui;
+    color: #e9f4ff;
+    margin-bottom: 4px;
+  }
+  
+  .stage-tier {
+    font: 600 12px 'Barlow', system-ui;
+    color: #9dc6ff;
+  }
+  
+  .stage-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin: 16px 0;
+    flex-wrap: wrap;
+  }
+  
+  .stage-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #2a3f63;
+    border: 1px solid #1f365a;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .stage-dot.active {
+    background: #1f7aec;
+    border-color: #0fd6b1;
+    box-shadow: 0 0 12px #1f7aec;
+  }
+  
+  .stage-dot:hover {
+    background: #3a5a85;
+    border-color: #5a8aff;
+  }
+  
+  .stage-dot.locked {
+    background: #1a1a1a;
+    border-color: #444;
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+  
+  .stage-dot.locked:hover {
+    background: #1a1a1a;
+    border-color: #444;
+  }
 </style>
 </head>
 <body>
@@ -1195,6 +1312,31 @@
     </div>
     <div class="story-grid" id="storyGrid"></div>
   </div>
+  <div class="panel hidden" id="stageSelectPanel">
+    <div class="tutorial-hero" style="margin-bottom:8px;">
+      <h1>Selecciona un Stage</h1>
+      <span class="pill">Supervivencia Bot</span>
+    </div>
+    <p class="menu-description" style="text-align:left; margin-bottom:12px;">
+      Elige el escenario donde quieres jugar. Usa A/D, Flechas o Espacio para navegar. Presiona W, Enter o toca la imagen para seleccionar.
+    </p>
+    <div class="stage-carousel">
+      <button class="stage-nav-btn stage-prev" id="btnStagePrev">‹ Anterior</button>
+      <div class="stage-preview-container">
+        <canvas id="stagePreviewCanvas" width="1280" height="720" class="stage-preview-canvas"></canvas>
+        <div class="stage-info" id="stageInfo">
+          <div class="stage-name" id="stageName">---</div>
+          <div class="stage-tier" id="stageTier">Sin juego aún</div>
+        </div>
+      </div>
+      <button class="stage-nav-btn stage-next" id="btnStageNext">Siguiente ›</button>
+    </div>
+    <div class="stage-dots" id="stageDots"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
+      <button class="ui-btn" id="btnSelectStage">Confirmar Stage</button>
+      <button class="ui-btn secondary" id="btnCancelStageSelect">Volver al menú</button>
+    </div>
+  </div>
   <div class="ency-panel hidden" id="encyPanel">
     <div class="ency-header">
       <div>
@@ -1378,22 +1520,44 @@ console.log('Ctrl+C para detener el lobby');
 <script>
 
 const SFX = {
-    woosh: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/mixkit-air-woosh-1489.wav'),
-    woosh2: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/mixkit-air-woosh-1489.wav'),
-    ballhit: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/mixkit-basketball-ball-hard-hit-2093.wav'),
-    sandhit: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/sand.wav'),
-    pito: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/mixkit-police-short-whistle-615.wav  '),
-    chelohit: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/tennis-ball-hit-386155.mp3'),
-    harpjump: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/audiomass-output.wav'),
-    pianonote: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/high-c-piano-c5-422108.mp3'),
-    mineexplode: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/medium-explosion-40472.mp3'),
-    fireburn: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/audiomass-output%20(1).wav'),
-    flowerpulse: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/pulso.wav'),
-    baloonpop: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/mixkit-click-balloon-small-burst-3070.wav'),
-    uiMove: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/sfx/UImoove.wav'),
-    uiSelect: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/sfx/selectUI.wav'),
-    uiBack: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/sfx/UIbackout.mp3'),
-    fatalStart: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/sfx/jagged-edge-189972.mp3'),
+    woosh: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/mixkit-air-woosh-1489.wav'),
+    woosh2: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/mixkit-air-woosh-1489.wav'),
+    ballhit: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/mixkit-basketball-ball-hard-hit-2093.wav'),
+    sandhit: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/sand.wav'),
+    pito: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/mixkit-police-short-whistle-615.wav  '),
+    chelohit: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/tennis-ball-hit-386155.mp3'),
+    harpjump: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/audiomass-output.wav'),
+    pianonote: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/high-c-piano-c5-422108.mp3'),
+    mineexplode: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/medium-explosion-40472.mp3'),
+    fireburn: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/audiomass-output%20(1).wav'),
+    flowerpulse: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/pulso.wav'),
+    baloonpop: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/mixkit-click-balloon-small-burst-3070.wav'),
+    spearGo: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/sfx/Spear.wav'),
+    spearBack: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/sfx/SpearBack.wav'),
+    spearYoink: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/sfx/SpearYoink.mp3'),
+    getOverHere: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/sfx/GetOverHere.mp3'),
+    wind: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/sfx/Wind.mp3'),
+    snowHit: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/sfx/SnowHit.mp3'),
+    ice: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/sfx/Ice.mp3'),
+    ballFreeze: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/sfx/BallFreeze.mp3'),
+    snowThrow: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/sfx/SnowThrow.mp3'),
+    uiMove: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/sfx/UImoove.wav'),
+    uiSelect: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/sfx/selectUI.wav'),
+    uiBack: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/sfx/UIbackout.mp3'),
+    fatalStart: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/sfx/jagged-edge-189972.mp3'),
+    celloDarkWaveMoving: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/sfx/WaveMooving.mp3'),
+    celloDarkTorpedoLaunch: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/sfx/SeagullTorpedo.mp3'),
+    celloDarkBoatHorn: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/sfx/BoatHorn.mp3'),
+    celloDarkTorpedoHit: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/sfx/TorpedoHit.mp3'),
+    ballSpawn: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/sfx/BallSpawn.mp3'),
+    ballSand: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/sfx/BallSand.mp3'),
+    florExplosionGuitar: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/sfx/FlorExplosionGuitar.mp3'),
+    vampireLaugh: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/sfx/VampireLaugh.mp3'),
+    horror: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/sfx/Horror.mp3'),
+    vampireDespawn: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/sfx/VampireDespawn.mp3'),
+    scream: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/sfx/Scream.mp3'),
+    batFlap: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/sfx/BatFlap.mp3'),
+    pianoVampireWing: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/sfx/PianoVampireWing.mp3',
 
 };
 
@@ -1408,6 +1572,28 @@ let mineexplodeTimeout = null;
 let fireburnTimeout = null;
 let flowerpulseTimeout = null;
 let baloonpopTimeout = null;
+let spearGoTimeout = null;
+let spearBackTimeout = null;
+let spearYoinkTimeout = null;
+let getOverHereTimeout = null;
+let windTimeout = null;
+let snowHitTimeout = null;
+let iceTimeout = null;
+let ballFreezeTimeout = null;
+let snowThrowTimeout = null;
+let celloDarkWaveTimeout = null;
+let celloDarkTorpedoTimeout = null;
+let celloDarkBoatHornTimeout = null;
+let celloDarkTorpedoHitTimeout = null;
+let ballSpawnTimeout = null;
+let ballSandTimeout = null;
+let florExplosionGuitarTimeout = null;
+let vampireLaughTimeout = null;
+let horrorTimeout = null;
+let vampireDespawnTimeout = null;
+let screamTimeout = null;
+let batFlapTimeout = null;
+
 SFX.woosh.volume = 0.8;
 SFX.woosh2.volume = 0.8;
 SFX.ballhit.volume = 0.4;
@@ -1420,29 +1606,50 @@ SFX.mineexplode.volume = 0.8;
 SFX.fireburn.volume = 0.7;
 SFX.flowerpulse.volume = 1;
 SFX.baloonpop.volume = 1;
+SFX.spearGo.volume = 0.8;
+SFX.spearBack.volume = 0.8;
+SFX.spearYoink.volume = 0.8;
+SFX.getOverHere.volume = 0.2;
+SFX.wind.volume = 0.2;
+SFX.snowHit.volume = 0.4;
+SFX.ice.volume = 0.8;
+SFX.ballFreeze.volume = 0.9;
+SFX.snowThrow.volume = 0.8;
 SFX.uiMove.volume = 0.25;   // ajuste de volumen
 SFX.uiSelect.volume = 0.5;  // ajuste de volumen
 SFX.uiBack.volume = 0.6;    // ajuste de volumen
 SFX.fatalStart.volume = 0.7; // ajuste de volumen
+SFX.celloDarkWaveMoving.volume = 0.6;
+SFX.celloDarkTorpedoLaunch.volume = 0.7;
+SFX.celloDarkBoatHorn.volume = 0.8;
+SFX.celloDarkTorpedoHit.volume = 0.65;
+SFX.ballSpawn.volume = 0.35;
+SFX.ballSand.volume = 0.15;
+SFX.florExplosionGuitar.volume = 0.4;
+SFX.vampireLaugh.volume = 0.5;
+SFX.horror.volume = 0.35;
+SFX.vampireDespawn.volume = 0.7;
+SFX.scream.volume = 0.25;
+SFX.batFlap.volume = 0.5;
 
 const MUSIC ={
-    beach: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/Relax%20%EF%BD%9C%205%20minutes%20of%20Sand%20and%20Sea%20%EF%BD%9C%20Sounds%20of%20Nature%20%EF%BD%9C%20Sleep%20Sounds%20(1).wav'),
-    mkmusic: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/Tarkatan%20War%20Kamp%20%EF%BD%9C%20Mortal%20Kombat%2011%20(2).wav'),
-    suddendeathmusic: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/War%20&%20Epic%20(Royalty%20Free%20Music%20For%20YouTube)%20-%20WAR%20by%20@Makai-symphony.mp3'),
-    menu1: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/music/Caprice%20No.%205.mp3'),
-    menu2: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/music/Paganini%EF%BC%9A%20Caprice%20No.1%20for%20Violin%20(Augustin%20Hadelich).wav'),
-    menu3: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/music/MovimientoPerpetuo.mp3'),
-    survival: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/music/Shadow-Fight-2-Act-1-Survival-Th.mp3'),
-    survival2: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/music/Shadow-Fight-2-Act-2-Survival-Th.mp3'),
-    survival3: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/music/Shadow-Fight-2-Act-3-Challenge-A.mp3'),
-    arcade: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/music/Ready-Set-Slice-Fruit-Ninja-Musi.mp3'),
-    arcade2: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/music/Tribes-Tribulations.mp3'),
-    arcade3: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/music/Age-of-War-Theme-Soundtrack.mp3'),
-    bossfight: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/music/Onslaught%20%EF%BC%9A%20Bloons%20Tower%20Defense%206%20(Video%20Game%20Soundtrack).mp3'),
-    fatalityPractice: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/music/The-Training-Room.mp3'),
-    versus2: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/music/Lin-Kuei-Temple-Mortal-Kombat-X.mp3'),
-    versus3: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/music/Outworld-Marketplace-Mortal-Komb.mp3'),
-    matchEnd: new Audio('https://github.com/FranciscoAraya04/Violin-Games-/raw/refs/heads/main/music/MatchEnd.wav'),
+    beach: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Relax%20%EF%BD%9C%205%20minutes%20of%20Sand%20and%20Sea%20%EF%BD%9C%20Sounds%20of%20Nature%20%EF%BD%9C%20Sleep%20Sounds%20(1).wav'),
+    mkmusic: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Tarkatan%20War%20Kamp%20%EF%BD%9C%20Mortal%20Kombat%2011%20(2).wav'),
+    suddendeathmusic: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/War%20&%20Epic%20(Royalty%20Free%20Music%20For%20YouTube)%20-%20WAR%20by%20@Makai-symphony.mp3'),
+    menu1: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/music/Caprice%20No.%205.mp3'),
+    menu2: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/music/Paganini%EF%BC%9A%20Caprice%20No.1%20for%20Violin%20(Augustin%20Hadelich).wav'),
+    menu3: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/music/MovimientoPerpetuo.mp3'),
+    survival: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/music/Shadow-Fight-2-Act-1-Survival-Th.mp3'),
+    survival2: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/music/Shadow-Fight-2-Act-2-Survival-Th.mp3'),
+    survival3: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/music/Shadow-Fight-2-Act-3-Challenge-A.mp3'),
+    arcade: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/music/Ready-Set-Slice-Fruit-Ninja-Musi.mp3'),
+    arcade2: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/music/Tribes-Tribulations.mp3'),
+    arcade3: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/music/Age-of-War-Theme-Soundtrack.mp3'),
+    bossfight: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/music/Onslaught%20%EF%BC%9A%20Bloons%20Tower%20Defense%206%20(Video%20Game%20Soundtrack).mp3'),
+    fatalityPractice: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/music/The-Training-Room.mp3'),
+    versus2: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/music/Lin-Kuei-Temple-Mortal-Kombat-X.mp3'),
+    versus3: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/music/Outworld-Marketplace-Mortal-Komb.mp3'),
+    matchEnd: new Audio('https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/music/MatchEnd.wav'),
 }
 
 MUSIC.beach.volume = 0.3;
@@ -1517,9 +1724,7 @@ function playSong(audioNode, { restart = true, onEnded = null } = {}) {
     if(typeof endHook === 'function'){
       try{
         endHook();
-      }catch(e){
-        console.warn('music end hook failed', e);
-      }
+      }catch(e){}
     }
   };
 
@@ -1770,6 +1975,8 @@ const HYDRA_TENTACLE_URL = 'https://raw.githubusercontent.com/FranciscoAraya04/V
 
 function loadBackgroundImage(name, url) {
   const img = new Image();
+  img.onload = ()=>{};
+  img.onerror = ()=>{};
   img.src = url;
   bgImages[name] = img;
   IMAGES[name] = img;
@@ -1904,6 +2111,13 @@ const SKIN_ASSETS = {
       spriteOffsetX: 0,
       spriteOffsetY: 0
   },
+  florFlowerBall: {
+    spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Flor/FlorDarkBall.png', // ⚠️ COLOCA AQUÍ EL LINK DEL SPRITE DEL BALÓN DE FLORES (raw.githubusercontent.com) ⚠️
+    spriteScale: 1.3,
+    spriteWidthScale: 0.95, // Ajusta el ancho del sprite (0.7 = 70% del ancho normal, 1.0 = ancho normal)
+    spriteOffsetX: 0,
+    spriteOffsetY: 0
+  },
   hydra: {
     spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Hydra/HydraSkin.png', // Pon aquí la foto de la hidra
     spriteScale: 1.1,
@@ -1982,10 +2196,10 @@ const SKIN_ASSETS = {
 const SKIN_DARK_ASSETS = {
   //Nuevos links funcionales para skins dark 
   violin: { spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Violin/ViolinSkinDark.png', spriteScale: 1.8, spriteOffsetX: 0, spriteOffsetY: -20, hitboxScale: 1.35 },
-  cello: { spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Cello/CelloSkinDark.png', spriteScale: 1.5, spriteOffsetX: 5, spriteOffsetY: 0 },
-  piano: { spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Piano/PianoSkinDark.png', spriteScale: 1.25, spriteOffsetX: 0, spriteOffsetY: 0, stretchedSpriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Piano/PianoLongSkinDark.png', stretchedSpriteScale: 2.5, stretchedSpriteOffsetX: 0, stretchedSpriteOffsetY: 0 },
+  cello: { spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Cello/CelloSkinDark.png', spriteScale: 1.9, spriteOffsetX: 5, spriteOffsetY: 0, hitboxScale: 1.5 },
+  piano: { spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Piano/PianoSkinDark.png', spriteScale: 1.25, spriteOffsetX: 0, spriteOffsetY: 0, stretchedSpriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Piano/PianoLongSkinDark.png', stretchedSpriteScale: 2.5, stretchedSpriteOffsetX: 0, stretchedSpriteOffsetY: 0, batSpriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Piano/PianoDarkBatOpen.png', batSpriteOpenScale: 1.2, batSpriteOpenWidth: 1.55, batSpriteClosedUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Piano/PianoDarkBat.png', batSpriteClosedScale: 1.0 },
   metal: { spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Metal/MetalSkinDark.png', spriteScale: 1.5, spriteOffsetX: 0, spriteOffsetY: 0, hitboxScale: 1.2 },
-  dj: { spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Dj/DjSkinDark.png', spriteScale: 1.0, spriteOffsetX: 0, spriteOffsetY: 0 },
+  dj: { spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Dj/DjSkinDark.png', spriteScale: 1.1, spriteOffsetX: 0, spriteOffsetY: 0 },
   queen: { spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Queen/QueenSkinDark.png', spriteScale: 0.95, spriteOffsetX: 0, spriteOffsetY: 0, hitboxScale: 0.9 },
   fire: { spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Fire/FireSkinDark.png', spriteScale: 1.0, spriteOffsetX: 0, spriteOffsetY: 0 },
   drum: { spriteUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Drumm/DrummSkinDark.png', spriteScale: 1.3, spriteOffsetX: 0, spriteOffsetY: 0 },
@@ -2074,6 +2288,12 @@ for(const [skinName, asset] of Object.entries(SKIN_DARK_ASSETS)){
   }
   if(asset?.stretchedSpriteUrl){
     loadSkinPhoto(`${skinName}_dark_stretched`, asset.stretchedSpriteUrl);
+  }
+  if(asset?.batSpriteUrl){
+    loadSkinPhoto(`${skinName}_dark_bat`, asset.batSpriteUrl);
+  }
+  if(asset?.batSpriteClosedUrl){
+    loadSkinPhoto(`${skinName}_dark_bat_closed`, asset.batSpriteClosedUrl);
   }
 }
 loadBackgroundImage('beachPhoto', 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/beach.avif');
@@ -2193,6 +2413,226 @@ const BALL_TYPES = [ //tipos de pelotas disponibles
   { name:'tenis', stops:[[0,'#fff8'],[1,'#f2f2f2']], seam:'#ffffff', rMul:0.4 , weight: 0.3 },
 ];
 
+// Array de stages reales del modo historia (capítulos 1 a 8)
+// Cada item representa el background usado en los combates de historia.
+// requiredChapter: ID del capítulo en el que aparece el background.
+const STAGES = [
+  {
+    // playas normales
+    name: 'Playa soleada',
+    imageUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/beach.avif',
+    fallbackColor: '#87CEEB',
+    weight: 1.0,
+    requiredChapter: null 
+  },
+  {
+    name: 'Playa nocturna',
+    imageUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/beach_nighted.png',
+    fallbackColor: '#1a1a2e',
+    weight: 1.0,
+    requiredChapter: null 
+  },
+  {
+    name: 'Playa nublada',
+    imageUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/beach_weather.jpg',
+    fallbackColor: '#a6c2d1',
+    weight: 1.0,
+    requiredChapter: null 
+  },
+  // Capítulo 1
+  {
+    name: 'La isla que despertó',
+    imageUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/pr%C3%B3logo/Slide%201.3.png',
+    fallbackColor: '#87CEEB',
+    weight: 1.0,
+    requiredChapter: 'cap1'
+  },
+  // Capítulo 2
+  {
+    name: 'Primeras resonancias',
+    imageUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap2/Slide%202.3.png',
+    fallbackColor: '#1a1a2e',
+    weight: 1.0,
+    requiredChapter: 'cap2'
+  },
+  // Capítulo 4
+  {
+    name: 'Puerta al caos',
+    imageUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap4/Slide%204.5.png',
+    fallbackColor: '#5a1a1a',
+    weight: 1.0,
+    requiredChapter: 'cap4'
+  },
+  // Capítulo 5 (dos backgrounds distintos)
+  {
+    name: 'Hydra guardia',
+    imageUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap5/Slide%205.3.png',
+    fallbackColor: '#2e3b4e',
+    weight: 1.0,
+    requiredChapter: 'cap5'
+  },
+  {
+    name: 'Queen tiara',
+    imageUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap5/Slide%205.7.png',
+    fallbackColor: '#3b1f3b',
+    weight: 1.0,
+    requiredChapter: 'cap5'
+  },
+  // Capítulo 6
+  {
+    name: 'Error temporal',
+    imageUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap6/Slide%206.6.png',
+    fallbackColor: '#224466',
+    weight: 1.0,
+    requiredChapter: 'cap6'
+  },
+  // Capítulo 7
+  {
+    name: 'Beach Scraps',
+    imageUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap7/Slide%207.4.png',
+    fallbackColor: '#334455',
+    weight: 1.0,
+    requiredChapter: 'cap7'
+  },
+  // Capítulo 8
+  {
+    name: 'Puerta de Laboratorio',
+    imageUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap8/Slide%208.7.png',
+    fallbackColor: '#1f2a3a',
+    weight: 1.0,
+    requiredChapter: 'cap8'
+  },
+  {
+    name: 'Zona industrial',
+    imageUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Stages/MetalDrumm.png',
+    fallbackColor: '#2a2a2a',
+    weight: 1.0,
+    requiredChapter: 'cap3'
+  },
+  {
+    name: 'Templo Lin Kuei',
+    imageUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Stages/LinKueiTemple.png',
+    fallbackColor: '#4a3b2a',
+    weight: 1.0,
+    requiredChapter: 'cap3'
+  },
+  {
+    name: 'Templo Violin Kuei',
+    imageUrl: 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Stages/ViolinKueiTemple.png',
+    fallbackColor: '#2a2a2a',
+    weight: 1.0,
+    requiredChapter: 'cap3'
+  },
+];
+
+function getStageTierColor(stageIndex){
+  // Sistema de tier: colores según progreso (bots derrotados) alineado con ACH_COLORS
+  const progress = window.progress || {};
+  const stageKey = `stage_${stageIndex}`;
+  // FIXED: Read from progress.stats.perStage, not progress[stageKey]
+  const stageStats = progress?.stats?.perStage?.[stageKey] || { botsDefeated: 0 };
+  const botsDefeated = stageStats.botsDefeated || 0;
+  
+  
+  // Umbrales de bots para 10 tiers (1-10: BRONCE a DARK)
+  // 1: 5, 2: 10, 3: 25, 4: 50, 5: 100, 6: 200, 7: 350, 8: 500, 9: 750, 10: 1000
+  let tierLevel = 0; // Sin tier
+  if(botsDefeated >= 1000) tierLevel = 10; // DARK
+  else if(botsDefeated >= 750) tierLevel = 9;  // SAFIRO
+  else if(botsDefeated >= 500) tierLevel = 8;  // LAPIZ
+  else if(botsDefeated >= 350) tierLevel = 7;  // RUBI
+  else if(botsDefeated >= 200) tierLevel = 6;  // ESMERALDA
+  else if(botsDefeated >= 100) tierLevel = 5;  // DIAMANTE
+  else if(botsDefeated >= 50) tierLevel = 4;   // PLATINO
+  else if(botsDefeated >= 25) tierLevel = 3;   // ORO
+  else if(botsDefeated >= 10) tierLevel = 2;   // PLATA
+  else if(botsDefeated >= 5) tierLevel = 1;    // BRONCE
+  
+  // Usar ACH_COLORS si existe el tier, sino usar gris default
+  const achColor = ACH_COLORS[tierLevel];
+  if(achColor){
+    // Crear versión muy atenuada del color para dots sin seleccionar (10% saturación)
+    const desaturated = desaturateColor(achColor.glow, 0.1);
+    return {
+      border: achColor.glow,
+      bg: achColor.tint,
+      borderMuted: desaturated,
+      bgMuted: 'rgba(122, 143, 163, 0.2)'  // Gris muy tenue para no seleccionado
+    };
+  }
+  // Sin tier: gris muy apagado cuando no está seleccionado
+  const defaultBorderSelected = '#5a7fa3';
+  const defaultBgSelected = 'rgba(90, 127, 163, 0.4)';
+  const defaultBorderMuted = '#3a4f63';
+  const defaultBgMuted = 'rgba(58, 79, 99, 0.1)';
+  return {
+    border: defaultBorderSelected,
+    bg: defaultBgSelected,
+    borderMuted: defaultBorderMuted,
+    bgMuted: defaultBgMuted
+  };
+}
+
+// Helper para desaturar colores hex
+function desaturateColor(hexColor, saturation = 0.3){
+  // Convertir hex a RGB
+  let hex = hexColor.replace('#', '');
+  if(hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+  const r = parseInt(hex.substring(0, 2), 16);
+  const g = parseInt(hex.substring(2, 4), 16);
+  const b = parseInt(hex.substring(4, 6), 16);
+  
+  // Convertir RGB a HSL
+  const rn = r / 255, gn = g / 255, bn = b / 255;
+  const max = Math.max(rn, gn, bn), min = Math.min(rn, gn, bn);
+  let h, s, l = (max + min) / 2;
+  
+  if(max === min){
+    h = s = 0;
+  } else {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch(max){
+      case rn: h = ((gn - bn) / d + (gn < bn ? 6 : 0)) / 6; break;
+      case gn: h = ((bn - rn) / d + 2) / 6; break;
+      case bn: h = ((rn - gn) / d + 4) / 6; break;
+    }
+  }
+  
+  // Aplicar desaturación
+  s = s * saturation;
+  
+  // Convertir HSL a RGB
+  let r2, g2, b2;
+  if(s === 0){
+    r2 = g2 = b2 = l;
+  } else {
+    const hue2rgb = (p, q, t) => {
+      if(t < 0) t += 1;
+      if(t > 1) t -= 1;
+      if(t < 1/6) return p + (q - p) * 6 * t;
+      if(t < 1/2) return q;
+      if(t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+      return p;
+    };
+    const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    const p = 2 * l - q;
+    r2 = hue2rgb(p, q, h + 1/3);
+    g2 = hue2rgb(p, q, h);
+    b2 = hue2rgb(p, q, h - 1/3);
+  }
+  
+  const toHex = (v) => {
+    const hex = Math.round(v * 255).toString(16);
+    return hex.length === 1 ? '0' + hex : hex;
+  };
+  
+  return '#' + toHex(r2) + toHex(g2) + toHex(b2);
+}
+
+
+
+
 // Config de bosses y assets (rellena las URLs con las fotos del repo)
 const BOSS_ASSETS = {
   rock: {
@@ -2302,6 +2742,12 @@ function createBaseProgress(){
     totalHits: 0,
     hitsByChar: {},
     perChar: {},
+    perStage: {
+      'stage_0': { botsDefeated: 0 },
+      'stage_1': { botsDefeated: 0 },
+      'stage_2': { botsDefeated: 0 },
+      'stage_3': { botsDefeated: 0 }
+    },
     timePlayedMs: 0,
     botKillsTotal: 0,
     lanKd: { wins:0, losses:0 },
@@ -2324,7 +2770,8 @@ function createBaseProgress(){
   skins: [],
   unlocks: {},
   loadout: {},
-  achievements: []
+  achievements: [],
+  completedChapters: [] // IDs de capítulos de historia completados
   };
 }
 
@@ -2343,6 +2790,10 @@ function normalizeProgress(data, base = createBaseProgress()){
   };
   if(!merged.stats.hitsByChar) merged.stats.hitsByChar = {};
   if(!merged.stats.perChar || typeof merged.stats.perChar !== 'object') merged.stats.perChar = {};
+  
+  // CRITICAL: Preserve perStage data from input before normalizing
+  const inputPerStage = stats.perStage || {};
+  
   if(!merged.stats.timePlayedMs) merged.stats.timePlayedMs = 0;
   if(!merged.stats.botKillsTotal) merged.stats.botKillsTotal = 0;
   if(!merged.stats.lanKd || typeof merged.stats.lanKd !== 'object') merged.stats.lanKd = { wins:0, losses:0 };
@@ -2369,6 +2820,30 @@ function normalizeProgress(data, base = createBaseProgress()){
     }
   }
   merged.stats.arcade = arcadeStats;
+  
+  // Normalize perStage data - preserve existing values from input
+  // Dynamically generate stageDefaults based on current STAGES array length
+  const stageDefaults = {};
+  for(let i = 0; i < STAGES.length; i++){
+    stageDefaults[`stage_${i}`] = { botsDefeated: 0 };
+  }
+  
+  if(!merged.stats.perStage || typeof merged.stats.perStage !== 'object'){
+    merged.stats.perStage = {};
+  }
+  // Merge existing data with defaults
+  for(const [stageKey, defaultData] of Object.entries(stageDefaults)){
+    const existingData = inputPerStage[stageKey] || merged.stats.perStage[stageKey];
+    if(!merged.stats.perStage[stageKey]){
+      merged.stats.perStage[stageKey] = existingData ? { ...existingData } : { ...defaultData };
+    }
+    // Only reset to 0 if the value is invalid, not if it's just undefined
+    if(typeof merged.stats.perStage[stageKey].botsDefeated !== 'number' || Number.isNaN(merged.stats.perStage[stageKey].botsDefeated)){
+      // Preserve existing value from input if available
+      merged.stats.perStage[stageKey].botsDefeated = (existingData?.botsDefeated && typeof existingData.botsDefeated === 'number') ? existingData.botsDefeated : 0;
+    }
+  }
+  
   for(const [skin, data] of Object.entries(merged.stats.perChar)){
     merged.stats.perChar[skin] = { ...CHAR_DEFAULT_STATS, ...(data || {}) };
     for(const key of Object.keys(CHAR_DEFAULT_STATS)){
@@ -2385,6 +2860,7 @@ function normalizeProgress(data, base = createBaseProgress()){
   merged.unlocks = { ...(base.unlocks || {}), ...(data?.unlocks || {}) };
   merged.loadout = { ...base.loadout, ...(data?.loadout || {}) };
   merged.achievements = Array.isArray(data?.achievements) ? data.achievements : [];
+  merged.completedChapters = Array.isArray(data?.completedChapters) ? data.completedChapters : [];
   return merged;
 }
 
@@ -2401,9 +2877,11 @@ function loadProgress(){
 }
 
 let progress = loadProgress();
+window.progress = progress; // Expose to window for global access
 
 function saveProgress(next = progress){
   progress = normalizeProgress(next);
+  window.progress = progress; // Keep window.progress in sync
   try{
     localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress));
   }catch(err){
@@ -2455,6 +2933,61 @@ function addCharStat(skin, key, delta=1){
   const entry = ensureCharStats(skin);
   if(!entry) return;
   entry[key] = (entry[key] || 0) + (delta || 0);
+}
+
+function incrementStageBotsDefeated(stageIndex){
+  if(stageIndex == null || !progress?.stats?.perStage) return;
+  const stageKey = `stage_${stageIndex}`;
+  const stageStats = progress.stats.perStage[stageKey];
+  if(stageStats){
+    stageStats.botsDefeated = (stageStats.botsDefeated || 0) + 1;
+  }
+}
+
+function isStageUnlocked(stageIndex){
+  const stage = STAGES[stageIndex];
+  if(!stage) return false;
+  // Stage sin requisitos siempre está disponible
+  if(stage.requiredChapter == null) return true;
+  // Verificar si el capítulo requerido está completado
+  const completed = progress?.completedChapters || [];
+  return completed.includes(stage.requiredChapter);
+}
+
+function getUnlockedStages(){
+  return STAGES.filter((stage, idx) => isStageUnlocked(idx));
+}
+
+function markChapterCompleted(chapterId){
+  if(!chapterId) return;
+  if(!progress.completedChapters) progress.completedChapters = [];
+  if(!progress.completedChapters.includes(chapterId)){
+    progress.completedChapters.push(chapterId);
+    saveProgress(progress);
+  }
+}
+
+function isStageUnlocked(stageIndex){
+  const stage = STAGES[stageIndex];
+  if(!stage) return false;
+  // Stage sin requisitos siempre está disponible
+  if(stage.requiredChapter == null) return true;
+  // Verificar si el capítulo requerido está completado
+  const completed = progress?.completedChapters || [];
+  return completed.includes(stage.requiredChapter);
+}
+
+function getUnlockedStages(){
+  return STAGES.filter((stage, idx) => isStageUnlocked(idx));
+}
+
+function markChapterCompleted(chapterId){
+  if(!chapterId) return;
+  if(!progress.completedChapters) progress.completedChapters = [];
+  if(!progress.completedChapters.includes(chapterId)){
+    progress.completedChapters.push(chapterId);
+    saveProgress(progress);
+  }
 }
 
 function updateBotKillStats(skin, elapsedMs=0){
@@ -3085,10 +3618,20 @@ const uiRefs = {
   offerOut: document.getElementById('offerOut'),
   answerIn: document.getElementById('answerIn'),
   offerIn: document.getElementById('offerIn'),
-  answerOut: document.getElementById('answerOut')
+  answerOut: document.getElementById('answerOut'),
+  // Referencias para selección de stages
+  stageSelectPanel: document.getElementById('stageSelectPanel'),
+  stagePreviewCanvas: document.getElementById('stagePreviewCanvas'),
+  stageName: document.getElementById('stageName'),
+  stageTier: document.getElementById('stageTier'),
+  stageDots: document.getElementById('stageDots'),
+  btnStagePrev: document.getElementById('btnStagePrev'),
+  btnStageNext: document.getElementById('btnStageNext'),
+  btnSelectStage: document.getElementById('btnSelectStage'),
+  btnCancelStageSelect: document.getElementById('btnCancelStageSelect')
 };
 
-const APP_SCENE = { MENU:'menu', NET:'net', SELECT:'select', GAME:'game' };
+const APP_SCENE = { MENU:'menu', NET:'net', SELECT:'select', GAME:'game', STAGE:'stage' };
 const MATCH_MODE = { LOCAL:'local', BOT:'bot', LAN:'lan', ARCADE:'arcade', STORY:'story' };
 let appScene = APP_SCENE.MENU;
 let lastMenuLike = true; // track last ui/game state to avoid restarting menu music when switching UI panels
@@ -3104,6 +3647,11 @@ let encyReturnTarget = 'menu';
 let storyPage = 0; // paginación de capítulos (6 por página)
 let selectionUsedTouch = false;
 let modernSkinsEnabled = true; // Toggle para skins modernas con imágenes vs dibujos
+let stageSelectionActive = false; // Flag para saber si estamos en selección de stages
+let selectedStageIndex = 0; // Índice del stage actualmente seleccionado en UI
+let gameSelectedStageIndex = 0; // Índice del stage seleccionado para este juego
+let currentSelectedStage = null; // Stage seleccionado para usar en el combate
+let stageSelectionCanvas = null; // Canvas para renderizar preview de stage
 let lobbySocket = null;
 let lobbyId = null;
 let lobbyPeers = [];
@@ -3569,15 +4117,14 @@ const STORY_CHAPTERS = [
   {
     id:'cap7',
     title:'Capítulo 7 - Harp vs los buenos',
-    thumb:'https://placehold.co/320x200/14314a/ffffff?text=Cap7',
+    thumb:'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap7/Slide%207.4.png',
     steps:[
       {
         type:'slides',
         slides:[
-          'https://placehold.co/1200x675/050914/ffffff?text=7-1+Playa+desgastada',
-          'https://placehold.co/1200x675/07101a/ffffff?text=7-2+Harp+caida',
-          'https://placehold.co/1200x675/091323/ffffff?text=7-3+Primer+contacto',
-          'https://placehold.co/1200x675/0b1728/ffffff?text=7-4+Acusaciones+y+desconfianza'
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap7/Slide%207.1.png',
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap7/Slide%207.3.png',
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap7/Slide%207.2.png',
         ],
         minMs:2000
       },
@@ -3585,21 +4132,27 @@ const STORY_CHAPTERS = [
         type:'combat',
         label:'Harp vs Violin (mal menor)',
         mode:'1v1',
-        scoreTarget:10,
+        scoreTarget:5,
         p1Skin:'harp',
         botSkin:'violin',
-        bgUrl:'https://placehold.co/1200x675/0c1b2a/ffffff?text=BG+Playa+restos+laboratorio',
+        bgUrl:'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap7/Slide%207.4.png',
         events:{
           botLife:[
-            {at:7,text:'Violín resiste sin contraatacar con odio'},
-            {at:4,text:'Harp percibe que hay contención en sus golpes'}
+            {at:4,text:'Violín resiste sin contraatacar con odio'},
+            {at:3,text:'Harp no puede confiar en los héroes'},
+            {at:2,text:'Violín siente la rabia de Harp'},
+            {at:1,text:'Se avecina algo muy muy malo...'}
+          ],
+          playerLife:[
+            {at:9,text:'Malditos modificados...'},
+            {at:8,text:'Mi resentimiento hará que paguen...'}
           ],
           ability:[
             {who:'p1',text:'Arpegio Celestial y doble salto sobre la red'},
             {who:'p2',text:'Dash de turbinas para seguir el ritmo'}
           ],
           onBotDefeat:[
-            {text:'Harp comprende que Violín no lucha como sirviente del Director'}
+            {text:'Harp en su rabia se transforma en algo oscuro'}
           ],
           onPlayerDefeat:[
             {text:'El futuro roto pesa demasiado. Vuelve a intentarlo para convencerla.'}
@@ -3609,8 +4162,43 @@ const STORY_CHAPTERS = [
       {
         type:'slides',
         slides:[
-          'https://placehold.co/1200x675/0e2033/ffffff?text=7-6+Harp+comprende',
-          'https://placehold.co/1200x675/101f35/ffffff?text=7-7+Decision+de+colaborar'
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap7/Slide%207.4%20vid.mp4',
+        ],
+        minMs:2000
+      },
+      {
+        type:'combat',
+        label:'Harp vs Violín, Cello y Piano',
+        mode:'1v1',
+        scoreTarget:10,
+        p1Skin:'harp_dark',
+        botSkin:'violin',
+        bgUrl:'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap7/Slide%207.4.png',
+        events:{
+          botLife:[
+            {at:8,text:'El trío se coordina: Violin adelante, apoyan Cello y Piano'},
+            {at:5,text:'Las coberturas de los aliados empiezan a fallar'},
+            {at:3,text:'Harp se está dando cuenta que no queremos dañarlo'},
+            {at:1,text:'Harp comprende que no somos sus enemigos'}
+          ],
+          ability:[
+            {who:'p2',text:'Violin activa Legato Veloz para esquivar'},
+            {who:'p1',text:'Harp Dark controla la sonda para abrir espacios'}
+          ],
+          onBotDefeat:[
+            {text:'El trío baja las armas; Harp entiende su intención'}
+          ],
+          onPlayerDefeat:[
+            {text:'La presión del trío te supera. Vuelve a intentarlo.'}
+          ]
+        }
+      },
+      {
+        type:'slides',
+        slides:[
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap7/Slide%207.5.png',
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap7/Slide%207.6.png',
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap7/Slide%207.7.png'
         ],
         minMs:2000
       }
@@ -3619,41 +4207,37 @@ const STORY_CHAPTERS = [
   {
     id:'cap8',
     title:'Capítulo 8 - Laboratorio y camino al Director',
-    thumb:'https://placehold.co/320x200/163754/ffffff?text=Cap8',
+    thumb:'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap8/Slide%208.7.png',
     steps:[
       {
         type:'slides',
         slides:[
-          'https://placehold.co/1200x675/050a13/ffffff?text=8-1+Laboratorio+herido',
-          'https://placehold.co/1200x675/07101b/ffffff?text=8-2+Theremin+revisa+datos',
-          'https://placehold.co/1200x675/091322/ffffff?text=8-3+Enfrentamiento+verbal'
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap8/Slide%208.1.png',
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap8/Slide%208.2.png',
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap8/Slide%208.3.png',
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap8/Slide%208.4.png',
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap8/Slide%208.5.png',
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap8/Slide%208.5vid.mp4',
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap8/Slide%208.6.png'
         ],
-        minMs:2000
-      },
-      {
-        type:'slides',
-        slides:[
-          'https://placehold.co/1200x675/0b1827/ffffff?text=8-4+Theremin+se+niega',
-          'https://placehold.co/1200x675/0d1b2b/ffffff?text=8-5+Post+combate+revelacion'
-        ],
-        minMs:2000
+        minMs:1000
       },
       {
         type:'combat',
         label:'Violin vs Theremin (estabilización)',
         mode:'1v1',
-        scoreTarget:5,
+        scoreTarget:15,
         p1Skin:'violin',
         botSkin:'theremin_dark',
-        bgUrl:'https://placehold.co/1200x675/0f2134/ffffff?text=BG+Laboratorio+acantilado',
+        bgUrl:'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap8/Slide%208.7.png',
         events:{
           botLife:[
             {at:8,text:'Los modelos de Theremin empiezan a fallar'},
             {at:4,text:'El círculo de energía pierde estabilidad'}
           ],
           ability:[
-            {who:'p1',text:'Contraritmo de turbinas rompe patrones'},
-            {who:'p2',text:'Onda Theremin intenta predecir cada golpe'}
+            {who:'p1',text:'Afinación Perfecta para romper patrones'},
+            {who:'p2',text:'Theremin tene la fuerza consigo'}
           ],
           onBotDefeat:[
             {text:'Theremin acepta compartir el mapa hacia Metal y Drumm'}
@@ -3666,24 +4250,27 @@ const STORY_CHAPTERS = [
       {
         type:'slides',
         slides:[
-          'https://placehold.co/1200x675/111f32/ffffff?text=8-6+Mapa+fortaleza+Director',
-          'https://placehold.co/1200x675/0d1827/ffffff?text=8-7+Marcha+a+zona+industrial'
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap8/Slide%208.8.png',
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap8/Slide%208.9.png',
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap8/Sllide%208.10.png',
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap8/Slide%208.11.png',
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap8/Slide%208.12.png'
         ],
-        minMs:2000
+        minMs:1000
       }
     ]
   },
   {
     id:'cap9',
     title:'Capítulo 9 - Metal y Drumm, muro de choque',
-    thumb:'https://placehold.co/320x200/183b58/ffffff?text=Cap9',
+    thumb:'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap9/Slide%209.7.png',
     steps:[
       {
         type:'slides',
         slides:[
-          'https://placehold.co/1200x675/060a12/ffffff?text=9-1+Zona+industrial',
-          'https://placehold.co/1200x675/080e18/ffffff?text=9-2+Presentacion+Metal+Drumm',
-          'https://placehold.co/1200x675/0a121f/ffffff?text=9-3+Cello+vs+Metal+Preparacion'
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap9/Slide%209.1.png',
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap9/Slide%209.2.png',
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap9/Slide%209.3.png'
         ],
         minMs:2000
       },
@@ -3694,7 +4281,7 @@ const STORY_CHAPTERS = [
         scoreTarget:12,
         p1Skin:'cello',
         botSkin:'metal',
-        bgUrl:'https://placehold.co/1200x675/0c1525/ffffff?text=BG+Hornos+y+chispas',
+        bgUrl:'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap9/Slide%209.4.png',
         events:{
           botLife:[
             {at:9,text:'La sierra de Metal pierde filo'},
@@ -3715,8 +4302,8 @@ const STORY_CHAPTERS = [
       {
         type:'slides',
         slides:[
-          'https://placehold.co/1200x675/0e1828/ffffff?text=9-4+Metal+derrotado',
-          'https://placehold.co/1200x675/101b2d/ffffff?text=9-5+Piano+vs+Drumm+Preparacion'
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap9/Slide%209.5.png',
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap9/Slide%209.6.png'
         ],
         minMs:2000
       },
@@ -3727,7 +4314,7 @@ const STORY_CHAPTERS = [
         scoreTarget:12,
         p1Skin:'piano',
         botSkin:'drum',
-        bgUrl:'https://placehold.co/1200x675/111f33/ffffff?text=BG+Plataformas+explosivas',
+        bgUrl:'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap9/Slide%209.7.png',
         events:{
           botLife:[
             {at:9,text:'Las bombas de Drumm empiezan a fallar en timing'},
@@ -3748,8 +4335,10 @@ const STORY_CHAPTERS = [
       {
         type:'slides',
         slides:[
-          'https://placehold.co/1200x675/111d30/ffffff?text=9-6+Maquinaria+se+detiene',
-          'https://placehold.co/1200x675/0d1726/ffffff?text=9-7+Camino+nucleo+y+desvio+Flor'
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap9/Slide%209.8.png',
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap9/Slide%209.9.png',
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap9/Slide%209.10.png',
+          'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/historia/Cap9/Slide%209.11.png'
         ],
         minMs:2000
       }
@@ -4311,6 +4900,10 @@ function resetPlayerNames(){
 
 function setScene(scene){
   appScene = scene;
+  if(scene !== APP_SCENE.GAME){
+    djFrozenClones.length = 0; // ensure DJ clones are cleared when leaving gameplay
+    storyAllies.length = 0; // ensure story allies are cleared when leaving gameplay
+  }
   if(lobbyLayer) lobbyLayer.classList.add('hidden');
   const showArcade = arcadeOpen && scene === APP_SCENE.MENU;
   const showStory = storyOpen && scene === APP_SCENE.MENU;
@@ -4349,9 +4942,17 @@ function setScene(scene){
     uiLayer.classList.remove('hidden');
     menuPanel.classList.toggle('hidden', tutorialOpen || encyOpen || arcadeOpen || storyOpen);
     lanPanel.classList.add('hidden');
+    if(uiRefs.stageSelectPanel) uiRefs.stageSelectPanel.classList.add('hidden');
     menuFocusIndex = 0;
     syncMenuFocus();
     syncProfileUi();
+  } else if(scene === APP_SCENE.STAGE){
+    // Mostrar panel de selección de stages
+    if(uiRefs.statsLayer) uiRefs.statsLayer.classList.add('hidden');
+    uiLayer.classList.remove('hidden');
+    menuPanel.classList.add('hidden');
+    lanPanel.classList.add('hidden');
+    if(uiRefs.stageSelectPanel) uiRefs.stageSelectPanel.classList.remove('hidden');
   } else if(scene === APP_SCENE.NET){
     tutorialOpen = false;
     encyOpen = false;
@@ -4995,6 +5596,7 @@ if(uiRefs.storyExitBtn){
     // Desactivar contexto de historia si está activo
     if(window.storyContext){
       storyContext.active = false;
+      storyAllies.length = 0; // limpiar aliados al salir
     }
     // Volver al menú de historia
     openStoryMenu();
@@ -5065,6 +5667,12 @@ function storyNextStep(){
   const next = storyContext.steps[storyContext.stepIndex];
   storyContext.currentStep = next || null;
   if(!next){
+    // CHAPTER COMPLETED - Mark as completed and unlock rewards (stages)
+    const completedChapter = STORY_CHAPTERS[storyContext.chapterIndex];
+    if(completedChapter?.id){
+      markChapterCompleted(completedChapter.id);
+    }
+    
     const nextChapterIndex = storyContext.chapterIndex + 1;
     const hasMore = nextChapterIndex < STORY_CHAPTERS.length;
     if(hasMore){
@@ -5097,6 +5705,8 @@ function startStoryCombatStep(step){
   storyContext.pendingWinner = null;
   storyContext.lastBotLives = step.scoreTarget || CONFIG.BASE_POINTS_TO_WIN;
   storyContext.lastPlayerLives = step.scoreTarget || CONFIG.BASE_POINTS_TO_WIN;
+  storyContext.chapter8TransitionDone = false; // Reset mid-combat transition flag for Chapter 8
+  storyContext.harpDarkTriggered = false; // Reset Harp dark transformation flag
   // Actualizar UI (pausa visible, menú historia oculto)
   syncUiState();
   // En modo historia, por defecto ignorar upgrades DARK automáticos.
@@ -5106,6 +5716,8 @@ function startStoryCombatStep(step){
   thereminSwordsOrbit.length = 0;
   thereminSwordProjectiles.length = 0;
   hydraDarkHeads.length = 0;
+  celloDarkWaves.length = 0;
+  celloDarkTorpedos.length = 0;
   // Cancelar spawns programados de clones de Hydra
   if(Array.isArray(hydraCloneSpawnTimeouts)){
     while(hydraCloneSpawnTimeouts.length){
@@ -5150,6 +5762,7 @@ function startStoryCombatStep(step){
   p2 = makePlayer(W*0.75,'R', p2Skin);
   hydraClones.length = 0;
   directorClones.length = 0;
+  storyAllies.length = 0;
   miniDirectors.length = 0;
   ghostBarriers.length = 0;
   florBursts.length = 0;
@@ -5157,7 +5770,13 @@ function startStoryCombatStep(step){
   thereminSwordsOrbit.length = 0;
   thereminSwordProjectiles.length = 0;
   hydraDarkHeads.length = 0;
+  djFrozenClones.length = 0;
   hydraDarkProjectiles.length = 0;
+  fireColumns.length = 0;
+  fireFlames.length = 0;
+  fireSpears.length = 0;
+  celloDarkWaves.length = 0;
+  celloDarkTorpedos.length = 0;
   if(Array.isArray(hydraCloneSpawnTimeouts)){
     while(hydraCloneSpawnTimeouts.length){
       const t = hydraCloneSpawnTimeouts.pop();
@@ -5186,6 +5805,12 @@ function startStoryCombatStep(step){
     for(let i=0; i<3; i++){
       spawnHydraClone(p2, { count:1, skin:'hydra' });
     }
+  }
+  // Capítulo 7: Harp vs Violín, Cello y Piano — sumar aliados persistentes a escala normal
+  if(step.label && step.label.includes('Harp vs Violín, Cello y Piano')){
+    const spacing = (p2?.r || CONFIG.PLAYER_RADIUS) * 2.5;  // Mayor separación inicial
+    spawnStoryAlly(p2, 'cello', -spacing, 1.15);      // Cello: tamaño normal (scale=1)
+    spawnStoryAlly(p2, 'piano', spacing, 0.9);    // Piano: más pequeño (scale=0.65)
   }
 }
 
@@ -5224,13 +5849,39 @@ function storyHandlePoint(who){
         spawnHydraClone(p2, { count:1, skin:'hydra' });
       }
     }
+    // Capítulo 8: Violin vs Theremin - transición mid-combat a Harp con aliado Violín
+    if(storyContext.chapterIndex === 7 && step?.label && step.label.includes('Violin vs Theremin') && !storyContext.chapter8TransitionDone){
+      if(botLives === 9){
+        // Primer evento: Violín pide ayuda a Harp
+        pushStoryBubble('Harp, ¿un poco de ayuda?', 'p1');
+      } else if(botLives === 8){
+        // Segundo evento: cambiar skin a Harp (aplicará ability automáticamente) y spawnar Violín como aliado
+        // Primero desactivar Legato Veloz para que Harp no herede la velocidad de Violín
+        if(p1.status?.violinDash){
+          p1.status.violinDash = null;
+        }
+        applySkinProfile(p1, 'harp');  // Esto automáticamente asigna la habilidad de Harp (harpDarkProbe)
+        // Spawnar Violín como aliado con IA
+        const spacing = (p1?.r || CONFIG.PLAYER_RADIUS) * 2.5;
+        spawnStoryAlly(p1, 'violin', -spacing, 0.95);
+        // Marcar transición como completada
+        storyContext.chapter8TransitionDone = true;
+        pushStoryBubble('¡Ahora somos dos!', 'center');
+      }
+    }
   }
-  if(playerLives < (storyContext.lastPlayerLives ?? target)){
+  if(playerLives < (storyContext.lastPlayerLives ?? target)){ 
     playerEvents.forEach(ev=>{
       if(typeof ev.at === 'number' && ev.at === playerLives){
         pushStoryBubble(ev.text || `Jugador: ${playerLives} vidas`, 'p1');
       }
     });
+    // Capítulo 8: Si Harp ha aparecido y la vida cae por debajo de 4, Harp se vuelve dark
+    if(storyContext.chapterIndex === 7 && storyContext.chapter8TransitionDone && !storyContext.harpDarkTriggered && playerLives < 4 && playerLives > 0){
+      applySkinProfile(p1, 'harp_dark');
+      storyContext.harpDarkTriggered = true;
+      pushStoryBubble('¡La ira despierta en Harp!', 'center');
+    }
   }
   storyContext.lastBotLives = botLives;
   storyContext.lastPlayerLives = playerLives;
@@ -6896,6 +7547,7 @@ function resetNetState(options = {}){
 
 function startLocalMode(mode){
   storyContext.active = false;
+  storyAllies.length = 0; // limpiar aliados del modo historia
   matchMode = mode === 'bot' ? MATCH_MODE.BOT : MATCH_MODE.LOCAL;
   useBot = matchMode === MATCH_MODE.BOT;
   botActive = useBot;
@@ -6903,8 +7555,29 @@ function startLocalMode(mode){
   refreshRosterFromProgress();
   resetPlayerNames();
   resetSelectionState();
-  setScene(APP_SCENE.SELECT);
-  gameState = STATE.SELECT;
+  
+  // Para ambos modos (bot y 1v1), mostrar selección de stages primero
+  // Filter to only show unlocked stages
+  const unlockedStages = getUnlockedStages();
+  
+  if(unlockedStages.length === 0){
+    badge.innerText = 'No hay stages disponibles. Completa capítulos de historia.';
+    return;
+  }
+  
+  stageSelectionActive = true;
+  selectedStageIndex = 0;
+  // Ensure first selected stage is unlocked
+  if(!isStageUnlocked(selectedStageIndex)){
+    selectedStageIndex = STAGES.findIndex((s, idx) => isStageUnlocked(idx));
+    if(selectedStageIndex === -1) selectedStageIndex = 0;
+  }
+  gameSelectedStageIndex = selectedStageIndex;
+  currentSelectedStage = STAGES[selectedStageIndex];
+  setScene(APP_SCENE.STAGE);
+  renderStageCarousel();
+  updateStageInfo();
+  
   badge.innerText = getModeLabel();
 }
 
@@ -6945,6 +7618,8 @@ function returnToArcadeSelection(){
   ballGroundTimeout = null;
   if(net.worldTimer){ clearInterval(net.worldTimer); net.worldTimer = null; }
   stopAllMusic();
+  // Clear any lingering Piano Dark decoys on exit
+  if(typeof pianoBatDecoys !== 'undefined') pianoBatDecoys.length = 0;
 }
 
 function returnToArcadeModeMenu(){
@@ -6965,6 +7640,8 @@ function returnToArcadeModeMenu(){
   arcadeOpen = true;
   gameState = STATE.SELECT;
   stopAllMusic();
+  // Clear any lingering Piano Dark decoys on exit to arcade menu
+  if(typeof pianoBatDecoys !== 'undefined') pianoBatDecoys.length = 0;
   setScene(APP_SCENE.MENU);
   badge.innerText = 'Arcade';
   ensureMenuMusic();
@@ -6973,6 +7650,9 @@ function returnToArcadeModeMenu(){
 function startArcadeMode(mode, options = {}){
   // Contexto: si viene desde historia, mantener activo; si no, desactivar
   storyContext.active = !!options.fromStory;
+  if(!options.fromStory){
+    storyAllies.length = 0; // limpiar aliados si no venimos del modo historia
+  }
   resetArcadeState();
   arcadeContext.mode = mode || ARCADE_MODES.DOMINADAS;
   arcadeContext.singlePlayer = arcadeContext.mode !== ARCADE_MODES.BOSS;
@@ -7031,6 +7711,220 @@ function openLanMenu(){
   updateLobbyUi();
 }
 
+// Funciones para selección de stages en modo supervivencia
+function renderStageCarousel(){
+  const canvas = document.getElementById('stagePreviewCanvas');
+  if(!canvas) return;
+  stageSelectionCanvas = canvas;
+  const ctx = canvas.getContext('2d');
+  if(!ctx) return;
+  
+  const stage = STAGES[selectedStageIndex];
+  if(!stage) return;
+  
+  // Check if stage is unlocked
+  if(!isStageUnlocked(selectedStageIndex)){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#1a1a1a';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#666';
+    ctx.font = 'bold 18px system-ui';
+    ctx.textAlign = 'center';
+    ctx.fillText('🔒 BLOQUEADO', canvas.width / 2, canvas.height / 2 - 20);
+    ctx.font = '14px system-ui';
+    const reqChapter = stage.requiredChapter;
+    const chapterName = STORY_CHAPTERS.find(c => c.id === reqChapter)?.title || reqChapter;
+    ctx.fillText('Completa ' + chapterName, canvas.width / 2, canvas.height / 2 + 20);
+    return;
+  }
+  
+  const tierColor = getStageTierColor(selectedStageIndex);
+  
+  // Cargar y dibujar la imagen del stage
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  let loadTimeout;
+  
+  const renderWithFallback = ()=>{
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = tierColor.bg;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = stage.fallbackColor || '#888888';
+    ctx.fillRect(8, 8, canvas.width - 16, canvas.height - 16);
+    ctx.fillStyle = tierColor.border;
+    ctx.font = 'bold 16px system-ui';
+    ctx.textAlign = 'center';
+    ctx.fillText(stage.name.split(' ')[0], canvas.width / 2, canvas.height / 2 - 20);
+    ctx.font = '14px system-ui';
+    ctx.fillText('(Local)', canvas.width / 2, canvas.height / 2 + 20);
+    // Dibujar borde
+    ctx.strokeStyle = tierColor.border;
+    ctx.lineWidth = 8;
+    ctx.strokeRect(4, 4, canvas.width - 8, canvas.height - 8);
+  };
+  
+  img.onload = ()=>{
+    clearTimeout(loadTimeout);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = tierColor.bg;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // Dibujar imagen manteniendo aspect ratio 16:9
+    const imgAspect = img.width / img.height;
+    const canvasAspect = canvas.width / canvas.height;
+    let drawWidth, drawHeight, drawX, drawY;
+    if(imgAspect > canvasAspect){
+      drawHeight = canvas.height;
+      drawWidth = drawHeight * imgAspect;
+      drawX = (canvas.width - drawWidth) / 2;
+      drawY = 0;
+    } else {
+      drawWidth = canvas.width;
+      drawHeight = drawWidth / imgAspect;
+      drawX = 0;
+      drawY = (canvas.height - drawHeight) / 2;
+    }
+    ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
+    // Dibujar borde
+    ctx.strokeStyle = tierColor.border;
+    ctx.lineWidth = 8;
+    ctx.strokeRect(4, 4, canvas.width - 8, canvas.height - 8);
+  };
+  
+  img.onerror = ()=>{
+    clearTimeout(loadTimeout);
+    renderWithFallback();
+  };
+  
+  // Set timeout for image loading (3 seconds max)
+  loadTimeout = setTimeout(()=>{
+    renderWithFallback();
+  }, 3000);
+  
+  img.src = stage.imageUrl;
+}
+
+function updateStageInfo(){
+  const stage = STAGES[selectedStageIndex];
+  if(!stage) return;
+  const nameEl = document.getElementById('stageName');
+  const tierEl = document.getElementById('stageTier');
+  if(nameEl) nameEl.textContent = stage.name;
+  if(tierEl){
+    const tierColor = getStageTierColor(selectedStageIndex);
+    const progress = window.progress || {};
+    const stageKey = `stage_${selectedStageIndex}`;
+    // FIXED: Read from progress.stats.perStage instead of progress[stageKey]
+    const stageData = progress?.stats?.perStage?.[stageKey] || { botsDefeated: 0 };
+    tierEl.textContent = `Bots: ${stageData.botsDefeated}`;
+  }
+}
+
+function updateStageDots(){
+  const dotsContainer = document.getElementById('stageDots');
+  if(!dotsContainer) return;
+  dotsContainer.innerHTML = '';
+  STAGES.forEach((stage, idx)=>{
+    const dot = document.createElement('div');
+    const isLocked = !isStageUnlocked(idx);
+    const isSelected = idx === selectedStageIndex;
+    
+    let className = 'stage-dot';
+    if(isSelected) className += ' active';
+    if(isLocked) className += ' locked';
+    dot.className = className;
+    
+    // For unlocked stages, apply tier color
+    if(!isLocked){
+      const tierColor = getStageTierColor(idx);
+      // Desaturate color for unselected dots
+      if(isSelected){
+        // Saturated color with glow for selected
+        dot.style.background = tierColor.bg;
+        dot.style.borderColor = tierColor.border;
+        dot.style.boxShadow = `0 0 12px ${tierColor.bg}`;
+      } else {
+        // Desaturated/attenuated color for unselected
+        dot.style.background = tierColor.bgMuted;
+        dot.style.borderColor = tierColor.borderMuted;
+        dot.style.boxShadow = 'none';
+      }
+    }
+    
+    // Add lock icon for locked stages
+    if(isLocked){
+      dot.innerHTML = '🔒';
+      dot.style.fontSize = '10px';
+      dot.style.display = 'flex';
+      dot.style.alignItems = 'center';
+      dot.style.justifyContent = 'center';
+    }
+    
+    dot.addEventListener('click', ()=>{
+      if(!isLocked){
+        selectedStageIndex = idx;
+        renderStageCarousel();
+        updateStageInfo();
+        updateStageDots();
+      }
+    });
+    dotsContainer.appendChild(dot);
+  });
+}
+
+function moveStageSelection(delta){
+  const oldIndex = selectedStageIndex;
+  let attempts = 0;
+  const maxAttempts = STAGES.length;
+  
+  do {
+    selectedStageIndex = (selectedStageIndex + STAGES.length + delta) % STAGES.length;
+    attempts++;
+    // Stop if we found an unlocked stage or tried all stages
+    if(isStageUnlocked(selectedStageIndex) || attempts >= maxAttempts) break;
+  } while(attempts < maxAttempts);
+  
+  // If no unlocked stage found, reset to first unlocked
+  if(!isStageUnlocked(selectedStageIndex)){
+    selectedStageIndex = STAGES.findIndex((s, idx) => isStageUnlocked(idx));
+    if(selectedStageIndex === -1) selectedStageIndex = 0;
+  }
+  
+  renderStageCarousel();
+  updateStageInfo();
+  updateStageDots();
+  playUiMoveSound();
+}
+
+function confirmStageSelection(){
+  console.log('[confirmStageSelection] Confirmando stage, selectedStageIndex:', selectedStageIndex);
+  currentSelectedStage = STAGES[selectedStageIndex];
+  console.log('[confirmStageSelection] currentSelectedStage:', currentSelectedStage?.name);
+  playUiSelectSound();
+  // Stage progress is automatically tracked through incrementStageBotsDefeated()
+  // Ir a selección de personajes
+  stageSelectionActive = false;
+  // Store the selected stage index for later use (don't reset until after game starts)
+  gameSelectedStageIndex = selectedStageIndex;
+  console.log('[confirmStageSelection] gameSelectedStageIndex seteado a:', gameSelectedStageIndex, 'stageSelectionActive:', stageSelectionActive);
+  // Reset character selection state to prevent cursor pollution
+  sel = createDefaultSelectionState();
+  console.log('[confirmStageSelection] Estado de selección reseteado:', sel);
+  setScene(APP_SCENE.SELECT);
+  gameState = STATE.SELECT;
+  console.log('[confirmStageSelection] Scene:', APP_SCENE.SELECT, 'gameState:', STATE.SELECT);
+}
+
+function cancelStageSelection(){
+  stageSelectionActive = false;
+  selectedStageIndex = 0;
+  currentSelectedStage = null;
+  matchMode = MATCH_MODE.LOCAL;
+  useBot = false;
+  botActive = false;
+  setScene(APP_SCENE.MENU);
+  badge.innerText = 'Selecciona modo';
+}
+
 function getModeLabel(){
   if(matchMode === MATCH_MODE.LAN){
     const side = (netRole === 'host') ? 'Host (P1 azul)' : (netRole === 'client' ? 'Invitado (P2 rojo)' : 'LAN');
@@ -7050,6 +7944,16 @@ if(uiRefs.btnStory) uiRefs.btnStory.addEventListener('click', ()=>openStoryMenu(
 if(uiRefs.btnStoryPrev) uiRefs.btnStoryPrev.addEventListener('click', ()=>{ storyPage = Math.max(0, storyPage - 1); renderStoryGrid(); });
 if(uiRefs.btnStoryNext) uiRefs.btnStoryNext.addEventListener('click', ()=>{ const perPage = 6; const maxPage = Math.floor((STORY_CHAPTERS.length - 1) / perPage); storyPage = Math.min(maxPage, storyPage + 1); renderStoryGrid(); });
 if(uiRefs.btnStoryBackMenu) uiRefs.btnStoryBackMenu.addEventListener('click', ()=>{ playUiBackSound(); closeStoryMenu(); });
+// Event listeners para selección de stages
+if(uiRefs.btnStagePrev) uiRefs.btnStagePrev.addEventListener('click', ()=>moveStageSelection(-1));
+if(uiRefs.btnStageNext) uiRefs.btnStageNext.addEventListener('click', ()=>moveStageSelection(1));
+if(uiRefs.btnSelectStage) uiRefs.btnSelectStage.addEventListener('click', ()=>confirmStageSelection());
+if(uiRefs.btnCancelStageSelect) uiRefs.btnCancelStageSelect.addEventListener('click', ()=>{ playUiBackSound(); cancelStageSelection(); });
+if(uiRefs.stagePreviewCanvas){
+  uiRefs.stagePreviewCanvas.addEventListener('click', ()=>confirmStageSelection());
+  uiRefs.stagePreviewCanvas.addEventListener('touchend', ()=>confirmStageSelection());
+}
+if(uiRefs.stageDots) document.addEventListener('DOMContentLoaded', ()=>updateStageDots());
 if(uiRefs.btnArcadeBack) uiRefs.btnArcadeBack.addEventListener('click', ()=>{ playUiBackSound(); closeArcadeMenu(); });
 if(uiRefs.btnArcadeDominadas) uiRefs.btnArcadeDominadas.addEventListener('click', ()=>startArcadeMode(ARCADE_MODES.DOMINADAS));
 if(uiRefs.btnArcadeTarget) uiRefs.btnArcadeTarget.addEventListener('click', ()=>startArcadeMode(ARCADE_MODES.TARGET));
@@ -7441,6 +8345,8 @@ function exitSelectionToMenu(){
   useBot = false;
   botActive = false;
   netRole = null;
+  // Safety: clear Piano Dark decoys when exiting selection
+  if(typeof pianoBatDecoys !== 'undefined') pianoBatDecoys.length = 0;
   setScene(APP_SCENE.MENU);
   badge.innerText = 'Selecciona modo';
 }
@@ -7450,6 +8356,15 @@ function returnToSelectLocal(){
     returnToArcadeSelection();
     return;
   }
+  
+  // CRITICAL FIX: Save bot progress before exiting (when pressing ESC)
+  if(matchMode === MATCH_MODE.BOT && botKills > 0 && gameState === STATE.PLAY){
+    for(let i = 0; i < botKills; i++){
+      incrementStageBotsDefeated(gameSelectedStageIndex);
+    }
+    saveProgress(progress);
+  }
+  
   resetMusicSelection();
   gameState = STATE.SELECT;
   setScene(APP_SCENE.SELECT);
@@ -7464,6 +8379,8 @@ function returnToSelectLocal(){
   serveTimeout = null;
   ballGroundTimeout = null;
   if(net.worldTimer){ clearInterval(net.worldTimer); net.worldTimer = null; }
+  // Clear any lingering Piano Dark decoys when returning to local selection
+  if(typeof pianoBatDecoys !== 'undefined') pianoBatDecoys.length = 0;
   syncUiState();
 }
 
@@ -7812,15 +8729,23 @@ function startMatchLocalFromConfig(cfg = {}){
   p1 = makePlayer(W*0.25,'L', p1Skin);
   p2 = makePlayer(W*0.75,'R', p2Skin);
   hydraClones.length = 0;
+  storyAllies.length = 0;
   directorClones.length = 0;
   miniDirectors.length = 0;
   ghostBarriers.length = 0;
+  pianoBatDecoys.length = 0;
   florBursts.length = 0;
   violinDarkRockets.length = 0;
   thereminSwordsOrbit.length = 0;
   thereminSwordProjectiles.length = 0;
   hydraDarkHeads.length = 0;
+  djFrozenClones.length = 0;
   hydraDarkProjectiles.length = 0;
+  fireColumns.length = 0;
+  fireFlames.length = 0;
+  fireSpears.length = 0;
+  celloDarkWaves.length = 0;
+  celloDarkTorpedos.length = 0;
   if(Array.isArray(hydraCloneSpawnTimeouts)){
     while(hydraCloneSpawnTimeouts.length){
       const t = hydraCloneSpawnTimeouts.pop();
@@ -8008,6 +8933,7 @@ function applyRemoteWorld(data){
 
   hydraClones.length = 0;
   (data.hydraClones || []).forEach(c=>hydraClones.push({ ...c }));
+  storyAllies.length = 0;
   directorClones.length = 0;
   (data.directorClones || []).forEach(c=>directorClones.push({ ...c }));
   miniDirectors.length = 0;
@@ -8016,6 +8942,9 @@ function applyRemoteWorld(data){
   (data.ghostBarriers || []).forEach(b=>ghostBarriers.push({ ...b }));
   florBursts.length = 0;
   (data.florBursts || []).forEach(f=>florBursts.push({ ...f }));
+  fireColumns.length = 0;
+  fireFlames.length = 0;
+  fireSpears.length = 0;
 
   Object.assign(drumMineL, data.drumMineL || { attached:false, pulse:0 });
   Object.assign(drumMineR, data.drumMineR || { attached:false, pulse:0 });
@@ -8252,16 +9181,28 @@ const spriteImageCache = {};
 const STAMINA_REGEN_SCALE = 0.1; // 90% más lento
 const ghostBarriers = [];
 const hydraClones = [];
+const storyAllies = [];
 const hydraDarkHeads = [];
 const hydraCloneSpawnTimeouts = [];
+let storyAllyCounter = 0;
 const hydraDarkProjectiles = [];
 const directorClones = [];
+const djFrozenClones = [];
 const miniDirectors = [];
 const florBursts = [];
+const florFlowerBalls = []; // Balones de flores de Flor Dark
 const hazardProjectiles = [];
 const violinDarkRockets = [];
 const thereminSwordsOrbit = [];
 const thereminSwordProjectiles = [];
+const fireColumns = [];
+const fireFlames = [];
+const fireSpears = [];
+const celloDarkWaves = [];
+const celloDarkTorpedos = [];
+const celloDarkTorpedoImg = new Image();
+// Sprite torpedo desde raw.githubusercontent
+celloDarkTorpedoImg.src = 'https://raw.githubusercontent.com/FranciscoAraya04/Violin-Games-/main/Skins/Cello/Torpedo.png';
 const drumMineL = { attached:false, pulse:0 };
 const drumMineR = { attached:false, pulse:0 };
 const mysteryBomb = { attached:false, owner:null, pulse:0 };
@@ -8368,22 +9309,23 @@ const ABILITIES = {
   pianoStretch: defineAbility({
     id: 'pianoStretch',
     label: 'Extensión Armónica',
-    duration: 3000,
+    duration: 4000,
     cooldown: 25,
     staminaCost: 34,
-    description: 'El piano se ensancha y amplía su hitbox durante 3s.',
-    staminaProfile: { max: 100, regen: 50, start: 50 },
+    description: 'Estira el teclado por 4 segundos aumentando el alcance.',
+    staminaProfile: { max: 100, regen: 40, start: 50 },
 
-    onActivate(player){
+    onActivate(player, ability){
+      // SFX
       clearTimeout(pianonoteTimeout);
       pianonoteTimeout = setTimeout(()=>{
-      try{ SFX.pianonote.currentTime = 0; SFX.pianonote.play(); }catch(e){}
+        try{ SFX.pianonote.currentTime = 0; SFX.pianonote.play(); }catch(e){}
       }, 10);
+      
       player.skinState = 'stretched';
       
-      // Si tiene dark tier, la extensión de hitbox es 1.5x mayor
-      const isDark = player.darkTierUnlocked;
-      const hitboxMultiplier = isDark ? 3.2 : 2.8;
+      // Piano normal tiene extensión de 2.8x
+      const hitboxMultiplier = 2.8;
       
       applyScaleModifier(player, {
         radius: 1,
@@ -8393,7 +9335,10 @@ const ABILITIES = {
         visualY: 0.85
       });
     },
-    onDeactivate(player){
+    onUpdate(player, dt, ability){
+      // Piano normal no tiene fase 2
+    },
+    onDeactivate(player, ability){
       player.skinState = 'normal';
       applyScaleModifier(player, {
         radius: 1,
@@ -8402,6 +9347,99 @@ const ABILITIES = {
         visualX: 1,
         visualY: 1
       });
+    }
+  }),
+  pianoDarkBat: defineAbility({
+    id: 'pianoDarkBat',
+    label: 'Murciélago Oscuro',
+    duration: 4000,
+    cooldown: 25,
+    staminaCost: 34,
+    hitChargePercent: 2,
+    description: 'Fase 1: estira 4s. Re-cast durante la fase: fase murciélago con vuelo libre 5s.',
+    staminaProfile: { max: 100, regen: 40, start: 100 },
+    phase2Duration: 8000,
+
+    onActivate(player, ability){
+      ability.runtime = ability.runtime || {};
+      ability.runtime.phase2Active = false;
+      ability.runtime.spawnX = player.spawnX || player.x;
+      ability.runtime.spawnY = player.spawnY || (CONFIG.GROUND_Y - player.r);
+      
+      // SFX para fase 1: solo pianonote
+      clearTimeout(pianonoteTimeout);
+      pianonoteTimeout = setTimeout(()=>{
+        try{ SFX.pianonote.currentTime = 0; SFX.pianonote.play(); }catch(e){}
+      }, 10);
+      
+      player.skinState = 'stretched';
+      
+      // Piano Dark siempre tiene extensión mayor (3.2x)
+      const hitboxMultiplier = 3.2;
+      
+      applyScaleModifier(player, {
+        radius: 1,
+        hitboxX: hitboxMultiplier,
+        hitboxY: hitboxMultiplier/2.1,
+        visualX: 1.8,
+        visualY: 0.85
+      });
+    },
+    onUpdate(player, dt, ability){
+      const rt = ability.runtime || (ability.runtime = {});
+      // Mantener banderas activas durante fase murciélago
+      if(rt.phase2Active){
+        player.status = player.status || {};
+        player.status.pianoBat = { speedMult: 1.2, infiniteJumps: true };
+        player.status.pianoGhostNet = true;
+      }
+      // Auto-activar fase 2 después de 4 segundos de fase 1
+      if(!rt.phase2Active && ability.remainingMs <= ability.duration - 4000 && !rt.phase2Activated){
+        rt.phase2Activated = true;
+        attemptPianoBatPhase2(player);
+      }
+    },
+    onDeactivate(player, ability){
+      const rt = ability.runtime || {};
+      const wasPhase2 = !!rt.phase2Active;
+      const prevX = player.x;
+      const prevY = player.y;
+      player.skinState = 'normal';
+      applyScaleModifier(player, {
+        radius: 1,
+        hitboxX: 1,
+        hitboxY: 1,
+        visualX: 1,
+        visualY: 1
+      });
+      if(player.status){
+        delete player.status.pianoBat;
+        delete player.status.pianoGhostNet;
+      }
+
+      if(wasPhase2){
+        // Eliminar piano decoy
+        clearPianoBatDecoys(player);
+        
+        // SFX obligatorio al terminar fase murciélago
+        clearTimeout(vampireDespawnTimeout);
+        vampireDespawnTimeout = setTimeout(()=>{
+          try{ SFX.vampireDespawn.currentTime = 0; SFX.vampireDespawn.play(); }catch(e){}
+        }, 10);
+        
+        const onOwnSide = (player.side === 'L') ? (player.x <= CONFIG.NET_X) : (player.x >= CONFIG.NET_X);
+        const targetX = onOwnSide ? player.x : (rt.spawnX ?? player.x);
+        const groundY = CONFIG.GROUND_Y - player.r;
+        spawnFinishExplosion(prevX, prevY, { maxRadius: 80, color: 'rgba(132, 62, 196, 0.65)', duration: 520 });
+        player.x = onOwnSide ? targetX : targetX;
+        player.y = onOwnSide ? groundY : groundY;
+        player.vy = 0;
+        player.onGround = true;
+        spawnFinishExplosion(player.x, player.y, { maxRadius: 95, color: 'rgba(210, 22, 45, 0.72)', duration: 560 });
+      }
+
+      rt.phase2Active = false;
+      rt.phase2Started = false;
     }
   }),
   violinDash: defineAbility({
@@ -8435,16 +9473,55 @@ const ABILITIES = {
     duration: 12000,
     cooldown: 12,
     staminaCost: 100,
-    description: 'Carga pasivamente y con golpes. Al activarla, crea un campo índigo en el lado rival que empuja la pelota hacia su muro e impide su regeneración de stamina.',
+    description: 'Carga pasivamente y con golpes. Al activarla, crea un campo frío en todo el campo que empuja la pelota hacia el muro rival e impide su regeneración de stamina.',
     staminaProfile: { max: 100, regen: 30, start: 50 },
     hitChargePercent: 5,
     fieldForce: 380,
+    fullField: true,
     onActivate(player, ability){
       activateDjField(player, ability);
       //esperamos 12 segundos y luego desactivamos DjField:
       setTimeout(()=>{
         deactivateDjField(player, ability);
       }, 12000);
+    },
+    onUpdate(player, dt, ability){
+      updateDjField(player, dt, ability);
+    },
+  }),
+  djDarkFreeze: defineAbility({
+    id: 'djDarkFreeze',
+    label: 'Freeze Combo',
+    duration: 1000,
+    cooldown: 14,
+    staminaCost: 30,
+    description: 'Campo frío global. Combos: [↑↑↓] campo frío; [→→↓] iceball congela 0.4s; [←←↓] clon helado congela pelota 0.5s.',
+    staminaProfile: { max: 100, regen: 35, start: 60 },
+    hitChargePercent: 5,
+    fieldForce: 420,
+    fullField: true,
+    onActivate(player, ability){
+      const category = ability.runtime?.pendingCategory;
+      if(category === 'attack'){
+        // Forward forward down: ice projectile (instant)
+        shootDjIceball(player);
+        ability.runtime.pendingCategory = null;
+        // Mark as instant-use so it doesn't stay active
+        ability.remainingMs = 0;
+      } else if(category === 'defense'){
+        // Back back down: frozen clone (instant)
+        spawnDjFrozenClone(player);
+        ability.runtime.pendingCategory = null;
+        // Mark as instant-use
+        ability.remainingMs = 0;
+      } else if(category === 'strategy'){
+        // Up up down: normal field (duration-based)
+        activateDjField(player, ability);
+        setTimeout(()=>{
+          deactivateDjField(player, ability);
+        }, 14000);
+        ability.runtime.pendingCategory = null;
+      }
     },
     onUpdate(player, dt, ability){
       updateDjField(player, dt, ability);
@@ -8457,7 +9534,7 @@ const ABILITIES = {
     cooldown: 0,
     staminaCost: 100,
     description: 'Cada golpe carga 10% y al activarla se hace 1.5x y golpea el doble de fuerte por 5s.',
-    staminaProfile: { max: 100, regen: 4, start: 10 },
+    staminaProfile: { max: 100, regen: 4, start: 80 },
     hitChargePercent: 10,
     powerMultiplier: 5.5,
     scaleMultiplier: 1.75,
@@ -8569,7 +9646,7 @@ const ABILITIES = {
     cooldown: 3500,
     staminaCost: 50,
     description: 'Al perder un punto recarga media barra y aturde al rival al activarse.',
-    staminaProfile: { max: 100, regen: 25, start:30 },
+    staminaProfile: { max: 100, regen: 25, start: 45 },
     onConcede(player){
       //espera 2 segundos antes de recuperar stamina:
       setTimeout(() => {
@@ -8599,13 +9676,42 @@ const ABILITIES = {
   fireIgnition: defineAbility({
     id: 'fireIgnition',
     label: 'Ignición RGB',
-    duration: 4500,
-    cooldown: 420,
-    staminaCost: 100,
-    description: 'Enciende la pelota y castiga al rival si la toca dos veces seguidas.',
-    staminaProfile: { max: 100, regen: 45, start: 50 },
+    duration: 500,
+    cooldown: 20,
+    staminaCost: 50,
+    description: 'Enciende la pelota con columna de fuego y llamita que prende la pelota.',
+    staminaProfile: { max: 100, regen: 85, start: 100 },
     onActivate(player, ability){
-      igniteBall(player, ability);
+      fireIgnitionActivate(player, ability);
+    }
+  }),
+  fireDarkSpear: defineAbility({
+    id: 'fireDarkSpear',
+    label: 'Spear Cable Dark',
+    duration: 100,
+    cooldown: 10,
+    staminaCost: 40,
+    hitChargePercent: 5,
+    description: 'Combos: [←←↓] Get Over Here; [→→↓] Ola de columnas; [↑↑↓] Ignición.',
+    staminaProfile: { max: 100, regen: 40, start: 60 },
+    hitChargePercent: 3,
+    onActivate(player, ability){
+      // Combos handled in processFireDarkAbilityInput
+    }
+  }),
+  celloDarkFortissimo: defineAbility({
+    id: 'celloDarkFortissimo',
+    label: 'Fortissimo Oscuro',
+    duration: 6000,
+    cooldown: 14,
+    staminaCost: 55,
+    description: 'Combos: [↑↑↓] ola empuja arriba; [←←↓] crecer 6s; [→→↓] torpedo bloquea salto 10s.',
+    staminaProfile: { max: 100, regen: 25, start: 100 },
+    hitChargePercent: 8,
+    scaleMultiplier: 1.75,
+    powerMultiplier: 7.5,
+    onActivate(player, ability){
+      // Combos handled in processCelloDarkAbilityInput
     }
   }),
   hydraEcho: defineAbility({
@@ -8700,8 +9806,9 @@ const ABILITIES = {
     duration: 600,
     cooldown: 160,
     staminaCost: 100,
+    hitChargePercent: 5,
     description: 'Carga una bomba en la pelota y la detona hacia el suelo.',
-    staminaProfile: { max: 100, regen: 50, start: 50 },
+    staminaProfile: { max: 100, regen: 50, start: 75 },
     canActivate(player){
       const mine = player.side === 'L' ? drumMineL : drumMineR;
       return player.ability.runtime.bombReady && mine.attached;
@@ -8723,6 +9830,7 @@ const ABILITIES = {
     duration: 600,
     cooldown: 160,
     staminaCost: 100,
+    hitChargePercent: 5,
     description: 'Carga una bomba en la pelota y la detona hacia el suelo, empujando al oponente radialmente.',
     staminaProfile: { max: 100, regen: 85, start: 100 },
     canActivate(player){
@@ -8829,6 +9937,76 @@ const ABILITIES = {
     }
   })
 };
+
+function attemptPianoBatPhase2(player){
+  console.log('[attemptPianoBatPhase2] Intentando activar fase 2');
+  if(!player?.ability) {
+    console.log('[attemptPianoBatPhase2] Sin ability');
+    return false;
+  }
+  const ability = player.ability;
+  const def = ability.def;
+  if(!def || (def.id !== 'pianoStretch' && def.id !== 'pianoDarkBat')) {
+    console.log('[attemptPianoBatPhase2] Habilidad incorrecta:', def?.id);
+    return false;
+  }
+  if(!ability.active || ability.runtime?.phase2Active) {
+    console.log('[attemptPianoBatPhase2] Ability inactiva o ya en fase 2');
+    return false;
+  }
+  const stamina = player.stamina;
+  if(!stamina || stamina.value < def.staminaCost) {
+    console.log('[attemptPianoBatPhase2] Sin stamina suficiente:', stamina?.value);
+    return false;
+  }
+
+  console.log('[attemptPianoBatPhase2] ¡¡¡ACTIVANDO FASE 2!!!');
+  stamina.value = Math.max(0, stamina.value - def.staminaCost);
+  ability.runtime = ability.runtime || {};
+  ability.runtime.phase2Active = true;
+  ability.runtime.phase2Started = true;
+  ability.remainingMs = def.phase2Duration || 5000;
+
+  // SFX vampíricos al convertirse en murciélago: Horror (obligatorio) + uno aleatorio
+  const isDark = player.darkTierUnlocked;
+  if(isDark){
+    clearTimeout(horrorTimeout);
+    horrorTimeout = setTimeout(()=>{
+      try{ SFX.horror.currentTime = 0; SFX.horror.play(); }catch(e){}
+    }, 10);
+    
+    const randomSfx = [SFX.vampireLaugh, SFX.scream, SFX.batFlap];
+    const chosen = randomSfx[Math.floor(Math.random() * randomSfx.length)];
+    const timeoutVar = chosen === SFX.vampireLaugh ? vampireLaughTimeout : (chosen === SFX.scream ? screamTimeout : batFlapTimeout);
+    clearTimeout(timeoutVar);
+    setTimeout(()=>{
+      try{ chosen.currentTime = 0; chosen.play(); }catch(e){}
+    }, 50);
+  }
+
+  // Cambiar a forma murciélago: hitbox normal, velocidad extra, ghost-net e infinitos saltos
+  player.skinState = 'bat';
+  player.status = player.status || {};
+  player.status.pianoBat = { speedMult: 1.2, infiniteJumps: true };
+  player.status.pianoGhostNet = true;
+
+  // Spawn Piano decoy bot
+  console.log('[attemptPianoBatPhase2] Spawning decoy para:', player.side);
+  spawnPianoBatDecoy(player);
+  
+  // Explosión de transformación
+  spawnTransformationExplosion(player.x, player.y);
+
+  applyScaleModifier(player, {
+    radius: 1,
+    hitboxX: 1,
+    hitboxY: 1,
+    visualX: 1,
+    visualY: 1
+  });
+
+  return true;
+}
 
 const SKIN_LIBRARY = buildSkinLibrary();
 const FATALITIES = buildFatalityLibrary();
@@ -8937,6 +10115,11 @@ function buildSkinLibrary(){
     abilityId: 'fireIgnition'
   });
   if(hitboxScales.fire) library.fire.hitboxScale = (library.fire.hitboxScale || CONFIG.PLAYER_HITBOX_SCALE) * hitboxScales.fire;
+
+  library['fire dark'] = createSkinProfile('fire', {
+    abilityId: 'fireDarkSpear',
+    darkTier: true
+  });
 
   library.metal = createSkinProfile('metal', {
     abilityId: 'metalSpike'
@@ -10168,6 +11351,52 @@ function applySkinProfile(player, skinId){
       effectiveAbilityId = 'florDarkPulse';
     }
   }
+  // Piano dark variant
+  if(player.darkTierUnlocked && baseSkinId === 'piano'){
+    const isBot = botActive && player?.side === 'R';
+    if(!isBot){
+      effectiveAbilityId = 'pianoDarkBat';
+    }
+  }
+  // Fire dark variant
+  if(rawSkinId === 'fire_dark'){
+    const isBot = botActive && player?.side === 'R';
+    const inStoryMode = matchMode === MATCH_MODE.STORY;
+    if(!isBot || inStoryMode){
+      effectiveAbilityId = 'fireDarkSpear';
+    }
+  } else if(player.darkTierUnlocked && baseSkinId === 'fire'){
+    const isBot = botActive && player?.side === 'R';
+    if(!isBot){
+      effectiveAbilityId = 'fireDarkSpear';
+    }
+  }
+  // Cello dark variant
+  if(rawSkinId === 'cello_dark'){
+    const isBot = botActive && player?.side === 'R';
+    const inStoryMode = matchMode === MATCH_MODE.STORY;
+    if(!isBot || inStoryMode){
+      effectiveAbilityId = 'celloDarkFortissimo';
+    }
+  } else if(player.darkTierUnlocked && baseSkinId === 'cello'){
+    const isBot = botActive && player?.side === 'R';
+    if(!isBot){
+      effectiveAbilityId = 'celloDarkFortissimo';
+    }
+  }
+  // DJ dark variant
+  if(rawSkinId === 'dj_dark'){
+    const isBot = botActive && player?.side === 'R';
+    const inStoryMode = matchMode === MATCH_MODE.STORY;
+    if(!isBot || inStoryMode){
+      effectiveAbilityId = 'djDarkFreeze';
+    }
+  } else if(player.darkTierUnlocked && baseSkinId === 'dj'){
+    const isBot = botActive && player?.side === 'R';
+    if(!isBot){
+      effectiveAbilityId = 'djDarkFreeze';
+    }
+  }
   // Queen dark variant: se activa solo si la skin es explícitamente 'queen_dark'
   if(rawSkinId === 'queen_dark'){
     const isBot = botActive && player?.side === 'R';
@@ -11034,10 +12263,12 @@ function activateDjField(player, ability){
   if(!player) return;
   const opponent = getOpponentPlayer(player);
   const targetSide = opponent?.side || (player.side === 'L' ? 'R' : 'L');
+  const fullField = ability?.def?.fullField || false;
   player.status = player.status || {};
   player.status.djField = {
     targetSide,
     force: ability?.def?.fieldForce || 80,
+    fullField,
     phase: 0
   };
   ability.runtime = ability.runtime || {};
@@ -11046,6 +12277,10 @@ function activateDjField(player, ability){
     opponent.status = opponent.status || {};
     opponent.status.djNoRegen = (opponent.status.djNoRegen || 0) + 1;
   }
+  clearTimeout(windTimeout);
+  windTimeout = setTimeout(()=>{
+    try{ SFX.wind.currentTime = 0; SFX.wind.play(); }catch(e){}
+  }, 10);
 }
 
 function updateDjField(player, dt){
@@ -11077,8 +12312,11 @@ function applyDjFieldBallForce(player, dt){
   const isRight = targetSide === 'R';
   const netX = CONFIG.NET_X;
   const ballCenter = ball.x;
-  if((isRight && ballCenter <= netX) || (!isRight && ballCenter >= netX)){
-    return;
+  // If fullField, apply everywhere; otherwise only on target side
+  if(!field.fullField){
+    if((isRight && ballCenter <= netX) || (!isRight && ballCenter >= netX)){
+      return;
+    }
   }
   const dir = isRight ? 1 : -1;
   const baseForce = field.force || 300;
@@ -11094,6 +12332,326 @@ function applyDjFieldsToBall(dt){
   if(p2?.status?.djField){
     applyDjFieldBallForce(p2, dt);
   }
+}
+
+function shootDjIceball(owner){
+  if(!owner) return;
+  const dir = owner.side === 'L' ? 1 : -1;
+  const iceballSpeed = 1200;
+  clearTimeout(snowThrowTimeout);
+  snowThrowTimeout = setTimeout(()=>{
+    try{ SFX.snowThrow.currentTime = 0; SFX.snowThrow.play(); }catch(e){}
+  }, 10);
+  const iceball = spawnHazardProjectile({
+    type: 'iceball',
+    owner: 'ability',
+    ownerSide: owner.side,
+    x: owner.x + (dir * owner.r * 1.5),
+    y: owner.y,
+    vx: dir * iceballSpeed,
+    vy: 0,
+    r: 32,
+    gravity: 0,
+    knockback: 400,
+    persistOnHit: false,
+    onPlayerHit: (proj, target) => {
+      // Freeze the target rigidly for 0.8s (no gravity, locked in air)
+      clearTimeout(snowHitTimeout);
+      snowHitTimeout = setTimeout(()=>{
+        try{ SFX.snowHit.currentTime = 0; SFX.snowHit.play(); }catch(e){}
+      }, 10);
+      target.status = target.status || {};
+      target.status.djFreeze = { timer: 0.8, tint: true, rigid: true };
+      target.vx = 0;
+      target.vy = 0;
+    }
+  });
+  // Visual marker for iceball
+  iceball.color = 'cyan';
+  iceball.isIceball = true;
+}
+
+function spawnDjFrozenClone(owner){
+  if(!owner) return;
+  clearTimeout(iceTimeout);
+  iceTimeout = setTimeout(()=>{
+    try{ SFX.ice.currentTime = 0; SFX.ice.play(); }catch(e){}
+  }, 10);
+  
+  // Count existing clones for this owner
+  const ownerClones = djFrozenClones.filter(c => c.ownerSide === owner.side);
+  if(ownerClones.length >= 4){
+    // Remove oldest clone
+    const oldestIndex = djFrozenClones.indexOf(ownerClones[0]);
+    if(oldestIndex !== -1){
+      djFrozenClones.splice(oldestIndex, 1);
+    }
+  }
+  
+  const clone = {
+    x: owner.x,
+    y: owner.y,
+    r: owner.r,
+    side: owner.side,
+    ownerSide: owner.side,
+    skin: owner.skin,
+    expires: performance.now() + 120000, // 2 minutes
+    frozen: true
+  };
+  djFrozenClones.push(clone);
+}
+
+function spawnCelloDarkWave(owner){
+  if(!owner) return;
+  const wave = {
+    x: owner.x,
+    baseY: CONFIG.GROUND_Y,
+    peakY: owner.y,
+    initialPeakY: owner.y+(CONFIG.GROUND_Y-owner.y)*0.2,
+    //initialPeakY: owner.y*1.1,
+    spawnTime: performance.now(),
+    vx: (owner.side === 'L' ? 130 : -130),
+    r: owner.r * 0.7,
+    ownerSide: owner.side,
+    expires: performance.now() + 60000
+  };
+  celloDarkWaves.push(wave);
+  
+  // Reproducir sonido de ola (permite múltiples reproducciones simultáneas)
+  try{
+    const waveAudio = new Audio(SFX.celloDarkWaveMoving.src);
+    waveAudio.volume = SFX.celloDarkWaveMoving.volume;
+    waveAudio.currentTime = 0;
+    waveAudio.play().catch(e => {});
+  }catch(e){}
+}
+
+function spawnCelloDarkTorpedo(owner){
+  if(!owner) return;
+  const torpedo = {
+    x: owner.x,
+    y: owner.y - owner.r * 0.5,
+    vx: (owner.side === 'L' ? 840 : -840),
+    vy: 0,
+    r: owner.r * 1.0,
+    ownerSide: owner.side,
+    expires: performance.now() + 5000
+  };
+  celloDarkTorpedos.push(torpedo);
+  
+  // Reproducir sonido de lanzamiento del torpedo
+  clearTimeout(celloDarkTorpedoTimeout);
+  celloDarkTorpedoTimeout = setTimeout(()=>{
+    try{ SFX.celloDarkTorpedoLaunch.currentTime = 0; SFX.celloDarkTorpedoLaunch.play(); }catch(e){}
+  }, 5);
+}
+
+function updateCelloDarkWaves(dt){
+  const now = performance.now();
+  for(let i = celloDarkWaves.length - 1; i >= 0; i--){
+    const wave = celloDarkWaves[i];
+    if(now > wave.expires){
+      celloDarkWaves.splice(i, 1);
+      continue;
+    }
+    wave.x += wave.vx * dt;
+    if(wave.x < -60 || wave.x > W + 60){
+      celloDarkWaves.splice(i, 1);
+      continue;
+    }
+    
+    // Calcular peak descendente: baja desde initialPeakY hasta baseY en ~10 segundos
+    const elapsedMs = now - wave.spawnTime;
+    const descensoProgress = Math.min(1, elapsedMs / 8000); // 0 a 1 en 10 segundos
+    const peakY = wave.initialPeakY + (wave.baseY - wave.initialPeakY) * descensoProgress;
+    wave.peakY = peakY; // Actualizar para que se refleje en la visualización y en la física
+    
+    const opponent = (wave.ownerSide === 'L' ? p2 : p1);
+    if(opponent){
+      // Campo de fuerza vertical siguiendo la curva
+      const baseY = wave.baseY ?? CONFIG.GROUND_Y;
+      const amp = Math.max(20, baseY - peakY);
+      const width = wave.r * 2.1 * 7.5; // doble de ancho
+      const dx = opponent.x - wave.x;
+      if(Math.abs(dx) <= width * 0.5){
+        const t = (dx / (width * 0.5)) * 3.5; // map to curve domain
+        const curveY = baseY - (amp * Math.exp(-Math.pow(t*0.55,2)));
+        const targetY = curveY - opponent.r;
+        if(opponent.y > targetY - 4){
+          opponent.status = opponent.status || {};
+          if(!opponent.status.celloDarkWaveEffect){
+            opponent.status.celloDarkWaveEffect = { timer: 10, heightReduction: 0.45 };
+          }
+          // Aplicar mojado índigo mientras esté tocando la ola (se renueva frame a frame)
+          opponent.status.celloDarkWetIndigo = { timer: 0.2, jumpReduction: 0.3, tint: true };
+          opponent.y = Math.min(opponent.y, targetY);
+          opponent.vy = Math.min(opponent.vy, -90);
+          opponent.vx += wave.vx * 0.06;
+        }
+      }
+    }
+  }
+}
+
+
+function updateCelloDarkTorpedos(dt){
+  const now = performance.now();
+  for(let i = celloDarkTorpedos.length - 1; i >= 0; i--){
+    const torpedo = celloDarkTorpedos[i];
+    if(now > torpedo.expires){
+      celloDarkTorpedos.splice(i, 1);
+      continue;
+    }
+    torpedo.x += torpedo.vx * dt;
+    torpedo.y += torpedo.vy * dt;
+    if(torpedo.x < -80 || torpedo.x > W + 80 || torpedo.y < -80 || torpedo.y > H + 80){
+      celloDarkTorpedos.splice(i, 1);
+      continue;
+    }
+    const opponent = (torpedo.ownerSide === 'L' ? p2 : p1);
+    if(opponent){
+      const dx = opponent.x - torpedo.x;
+      const dy = opponent.y - torpedo.y;
+      const dist = Math.hypot(dx, dy);
+      if(dist < opponent.r + torpedo.r){
+        // Empuje vertical al impactar
+        opponent.vy = Math.min(opponent.vy, -1440);
+        opponent.y = Math.min(opponent.y, torpedo.y - opponent.r);
+        
+        // Reproducir sonido de impacto del torpedo
+        clearTimeout(celloDarkTorpedoHitTimeout);
+        celloDarkTorpedoHitTimeout = setTimeout(()=>{
+          try{ SFX.celloDarkTorpedoHit.currentTime = 0; SFX.celloDarkTorpedoHit.play(); }catch(e){}
+        }, 5);
+        
+        celloDarkTorpedos.splice(i, 1);
+      }
+    }
+  }
+}
+
+// Campo de fuerza de la ola base bajo el cello (afecta solo al oponente)
+function applyCelloBaseWaveField(dt){
+  const baseY = CONFIG.GROUND_Y;
+  const players = [p1, p2];
+  for(const player of players){
+    if(!player || player.ability?.def?.id !== 'celloDarkFortissimo') continue;
+    const target = (player.side === 'L') ? p2 : p1;
+    if(!target) continue;
+    const peakY = player.y;
+    const amp = Math.max(20, baseY - peakY);
+    const width = player.r * 2.1 * 6; // igual que la visual base
+    const dx = target.x - player.x;
+    if(Math.abs(dx) <= width * 0.5){
+      const t = (dx / (width * 0.5)) * 3.5; // dominio de curva
+      const curveY = baseY - (amp * Math.exp(-Math.pow(t*0.55,2)));
+      const targetY = curveY - target.r;
+      if(target.y >= targetY - 4 && target.vy >= 0){
+        // Actúa como plataforma sólida: detiene la caída y permite onGround
+        target.y = targetY;
+        target.vy = 0;
+        target.onGround = true;
+        target.jumpCount = 0;
+        target.hasDoubleJumped = false;
+        target.status = target.status || {};
+        // Mojado índigo mientras toque la ola (no afecta al cello)
+        target.status.celloDarkWetIndigo = { timer: 0.2, jumpReduction: 0.3, tint: true };
+      }
+    }
+  }
+}
+
+function drawCelloDarkWaves(){
+  drawCelloWaveArray(celloDarkWaves, { color:'rgba(40,100,220,0.9)', glow:'#2864dc' });
+}
+
+function drawCelloWaveArray(list, style){
+  ctx.save();
+  for(const w of list){
+    ctx.save();
+    const baseY = w.baseY ?? CONFIG.GROUND_Y;
+    const peakY = w.peakY ?? (w.y || (baseY - w.r*0.8));
+    ctx.translate(w.x, baseY);
+    ctx.strokeStyle = 'rgba(60,120,240,0.20)';  
+    ctx.fillStyle = 'rgba(40,100,220,0.15)';
+    ctx.lineWidth = 4;
+    ctx.shadowColor = '#2864dc';
+    ctx.shadowBlur = 18;
+    const amp = Math.max(20, baseY - peakY);
+    const width = w.r * 2.1 * 8; // doble de ancho para la ola proyectil
+    ctx.beginPath();
+    ctx.moveTo(-width/2, 0);
+    for(let i=-3.5;i<=3.5;i+=0.25){
+      const x = i * (width/7);
+      const y = -amp * Math.exp(-Math.pow(i*0.55,2)) + Math.sin(performance.now()*0.0035 + i)*3;
+      ctx.lineTo(x,y);
+    }
+    ctx.lineTo(width/2, 0);
+    // Relleno bajo la curva igual a la ola base
+    ctx.lineTo(-width/2, 4);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+    ctx.restore();
+  }
+  ctx.restore();
+}
+
+function drawCelloDarkTorpedos(){
+  ctx.save();
+  for(const t of celloDarkTorpedos){
+    ctx.save();
+    ctx.translate(t.x, t.y);
+    // Torpedo recto, sin inclinación
+    // No rotamos: se dibuja horizontal
+    if(celloDarkTorpedoImg.complete){
+      const scale = (t.r * 2) / Math.max(1, celloDarkTorpedoImg.height);
+      const facing = t.vx >= 0 ? -1 : 1; // invertimos para corregir flip
+      ctx.scale(facing, 1);
+      ctx.drawImage(celloDarkTorpedoImg, -celloDarkTorpedoImg.width*scale*0.5, -t.r, celloDarkTorpedoImg.width*scale, celloDarkTorpedoImg.height*scale);
+    } else {
+      ctx.fillStyle = '#ff6b35';
+      ctx.beginPath();
+      ctx.moveTo(t.r * 1.5, 0);
+      ctx.lineTo(-t.r, t.r * 0.5);
+      ctx.lineTo(-t.r * 0.5, 0);
+      ctx.lineTo(-t.r, -t.r * 0.5);
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+  ctx.restore();
+}
+
+function drawCelloBaseWave(player){
+  if(!player || player.ability?.def?.id !== 'celloDarkFortissimo') return;
+  const yBase = CONFIG.GROUND_Y;
+  const peakY = player.y+(yBase-player.y)*0.2;
+  //const peakY = player.y;
+  const amp = Math.max(20, yBase - peakY);
+  ctx.save();
+  ctx.translate(player.x, yBase);
+  ctx.strokeStyle = 'rgba(110,130,250,0.20)';
+  ctx.lineWidth = 4;
+  ctx.shadowColor = '#2864dc';
+  ctx.shadowBlur = 18;
+  ctx.fillStyle = 'rgba(80,100,220,0.15)';
+  ctx.beginPath();
+  const width = player.r * 2.1 * 6; // 6x más ancha
+  for(let i=-3.5;i<=3.5;i+=0.25){
+    const x = i * (width/7);
+    const y = -amp * Math.exp(-Math.pow(i*0.55,2)) + Math.sin(performance.now()*0.0035 + i)*3;
+    if(i===-3.5) ctx.moveTo(x,y);
+    else ctx.lineTo(x,y);
+  }
+  ctx.lineTo(width/2, 4);
+  ctx.lineTo(-width/2, 4);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+  ctx.restore();
 }
 
 function activateCelloPower(player, ability){
@@ -11115,6 +12673,14 @@ function activateCelloPower(player, ability){
     visualX: scale,
     visualY: scale
   });
+  
+  // Reproducir sonido de bocina (solo cuando es dark)
+  if(player.skin && (player.skin === 'cello_dark' || (player.skinState === 'fortissimo' && player.darkTierUnlocked))){
+    clearTimeout(celloDarkBoatHornTimeout);
+    celloDarkBoatHornTimeout = setTimeout(()=>{
+      try{ SFX.celloDarkBoatHorn.currentTime = 0; SFX.celloDarkBoatHorn.play(); }catch(e){}
+    }, 5);
+  }
 }
 
 function deactivateCelloPower(player){
@@ -11151,9 +12717,55 @@ function grantAbilityChargeFromHit(player, percentOverride){
   player.stamina.value = clamp(player.stamina.value + gain, 0, player.stamina.max);
 }
 
+function fireIgnitionActivate(player, ability){
+  fireLaunchBallColumn(player);
+  spawnFireFlame(player);
+  spawnFireColumn(player);
+}
+
+function fireLaunchBallColumn(player){
+  if(!player || !ball) return;
+  // Launch ball upward vertically, preserve horizontal momentum
+  ball.vy = -1100;
+}
+
+function spawnFireFlame(player){
+  if(!player) return;
+  fireFlames.push({
+    x: player.x,
+    y: player.y,
+    r: 40,
+    createdAt: performance.now(),
+    duration: 10000, // 10 seconds
+    owner: player.side
+  });
+}
+
+function spawnFireColumn(player){
+  if(!player || !ball) return;
+  // Column spawns from ground, under the ball's X
+  fireColumns.push({
+    x: ball.x,
+    y: CONFIG.GROUND_Y,
+    startY: CONFIG.GROUND_Y,
+    endY: CONFIG.GROUND_Y - 400,
+    width: 60,
+    createdAt: performance.now(),
+    duration: 600,
+    owner: player.side
+  });
+  setTimeout(() => {
+    try{ 
+      const clonedSound = SFX.fireburn.cloneNode();
+      clonedSound.volume = SFX.fireburn.volume;
+      clonedSound.play(); 
+    }catch(e){}
+  }, 10);
+}
+
 function igniteBall(player, ability){
   const def = ability?.def || {};
-  const durationMs = def.duration || 3000;
+  const durationMs = def.duration || 30000;
   ball.fireEffect = {
     owner: player.side,
     dangerSide: player.side === 'L' ? 'R' : 'L',
@@ -11213,6 +12825,314 @@ function applyFireBurnPenalty(side){
   resetRally(opponent === 'p1' ? 'L' : 'R');
 }
 
+function updateFireFlames(dt){
+  const now = performance.now();
+  for(let i = fireFlames.length - 1; i >= 0; i--){
+    const flame = fireFlames[i];
+    if(now - flame.createdAt > flame.duration){
+      fireFlames.splice(i, 1);
+      continue;
+    }
+    // Check collision with ball
+    if(ball){
+      const dx = ball.x - flame.x;
+      const dy = ball.y - flame.y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if(dist < flame.r + ball.r){
+        // Ignite ball for 10 seconds
+        igniteBall({ side: flame.owner }, { def: { duration: 10000 } });
+      }
+    }
+  }
+}
+
+function updateFireColumns(dt){
+  const now = performance.now();
+  for(let i = fireColumns.length - 1; i >= 0; i--){
+    const col = fireColumns[i];
+    if(now - col.createdAt > col.duration){
+      fireColumns.splice(i, 1);
+      continue;
+    }
+    
+    // Check collision with opponent
+    if(col.pushOpponent){
+      const opponent = col.owner === 'L' ? p2 : p1;
+      if(opponent && Math.abs(opponent.x - col.x) < 80){
+        // Only push if opponent is in the area (from ground up to column height)
+        if(opponent.y < col.startY){
+          opponent.vy = -750;
+          col.pushOpponent = false; // only once per column
+        }
+      }
+    }
+  }
+}
+
+function drawFireFlames(){
+  if(!fireFlames.length) return;
+  const now = performance.now();
+  ctx.save();
+  for(const flame of fireFlames){
+    const elapsed = now - flame.createdAt;
+    if(elapsed > flame.duration) continue;
+    const progress = elapsed / flame.duration;
+    const alpha = 1 - progress;
+    const pulse = 0.8 + 0.2 * Math.sin(now / 100);
+    const grad = ctx.createRadialGradient(flame.x, flame.y, 0, flame.x, flame.y, flame.r * pulse);
+    grad.addColorStop(0, `rgba(255, 180, 80, ${0.9 * alpha})`);
+    grad.addColorStop(0.5, `rgba(255, 110, 20, ${0.7 * alpha})`);
+    grad.addColorStop(1, `rgba(255, 60, 10, 0)`);
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(flame.x, flame.y, flame.r * pulse, 0, Math.PI*2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+function drawFireColumns(){
+  if(!fireColumns.length) return;
+  const now = performance.now();
+  ctx.save();
+  for(const col of fireColumns){
+    const elapsed = now - col.createdAt;
+    if(elapsed > col.duration) continue;
+    const progress = elapsed / col.duration;
+    const alpha = 1 - progress;
+    const currentHeight = (col.startY - col.endY) * Math.min(progress * 2.5, 1);
+    const topY = col.startY - currentHeight;
+    const grad = ctx.createLinearGradient(col.x, col.startY, col.x, topY);
+    grad.addColorStop(0, `rgba(255, 140, 0, ${0.8*alpha})`);
+    grad.addColorStop(0.5, `rgba(255, 80, 20, ${0.6*alpha})`);
+    grad.addColorStop(1, `rgba(255, 200, 100, ${0.3*alpha})`);
+    ctx.fillStyle = grad;
+    const wobble = Math.sin(elapsed / 60) * 8;
+    ctx.fillRect(col.x - col.width/2 + wobble, topY, col.width, currentHeight);
+  }
+  ctx.restore();
+}
+
+// Fire Dark functions
+function fireLaunchSpearPull(player){
+  if(!player) return;
+  const opponent = player.side === 'L' ? p2 : p1;
+  const direction = opponent.x > player.x ? 1 : -1;
+  // Freeze player in air
+  player.vy = 0;
+  player.gravityScale = 0;
+  player.frozenTimer = 300;
+  clearTimeout(spearGoTimeout);
+  spearGoTimeout = setTimeout(()=>{
+    try{ SFX.spearGo.currentTime = 0; SFX.spearGo.play(); }catch(e){}
+  }, 10);
+  fireSpears.push({
+    x: player.x,
+    y: player.y,
+    vx: direction * 1800,
+    vy: 0,
+    r: 14,
+    owner: player.side,
+    mode: 'pull',
+    targetPlayer: null,
+    pullForce: 25000,
+    maxDistance: 900,
+    createdAt: performance.now()
+  });
+}
+
+function fireLaunchFireWave(player){
+  if(!player) return;
+  const startX = player.x;
+  const direction = player.side === 'L' ? 1 : -1;
+  const spacing = 120;
+  
+  for(let i = 0; i < 5; i++){
+    setTimeout(() => {
+      const colX = startX + (direction * spacing * i);
+      fireColumns.push({
+        x: colX,
+        y: CONFIG.GROUND_Y,
+        startY: CONFIG.GROUND_Y,
+        endY: CONFIG.GROUND_Y - 350,
+        width: 60,
+        createdAt: performance.now(),
+        duration: 600,
+        owner: player.side,
+        pushOpponent: true
+      });
+      setTimeout(() => {
+        try{ 
+          const clonedSound = SFX.fireburn.cloneNode();
+          clonedSound.volume = SFX.fireburn.volume;
+          clonedSound.play(); 
+        }catch(e){}
+      }, 10);
+    }, i * 200);
+  }
+}
+
+function updateFireSpears(dt){
+  const now = performance.now();
+  const players = [p1, p2];
+  for(let i = fireSpears.length - 1; i >= 0; i--){
+    const spear = fireSpears[i];
+    const owner = spear.owner === 'L' ? p1 : p2;
+    const opponent = spear.owner === 'L' ? p2 : p1;
+    
+    if(spear.mode === 'pull'){
+      if(!spear.targetPlayer){
+        // Check collision with opponent
+        const dx = opponent.x - spear.x;
+        const dy = opponent.y - spear.y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if(dist < spear.r + opponent.r + 20){
+          spear.targetPlayer = opponent.side;
+          spear.hitTime = now;
+          clearTimeout(spearYoinkTimeout);
+          spearYoinkTimeout = setTimeout(()=>{
+            try{ SFX.spearYoink.currentTime = 0; SFX.spearYoink.play(); }catch(e){}
+          }, 10);
+          clearTimeout(getOverHereTimeout);
+          getOverHereTimeout = setTimeout(()=>{
+            try{ SFX.getOverHere.currentTime = 0; SFX.getOverHere.play(); }catch(e){}
+          }, 10);
+        }
+      }
+      
+      if(spear.targetPlayer){
+        const timeSinceHit = now - spear.hitTime;
+        const pullDuration = 400; // 0.4 seconds of pull effect
+        
+        if(timeSinceHit < pullDuration){
+          // Block opponent from moving with inputs
+          opponent.pullStunned = true;
+          opponent.pullStunTimer = 400 - timeSinceHit;
+          
+          // Move opponent directly toward owner (ignore vx/vy completely)
+          const dirToOwner = owner.x > opponent.x ? 1 : -1;
+          const pullSpeed = 1800; // pixels per second
+          opponent.x += dirToOwner * pullSpeed * dt;
+          opponent.y = owner.y; // Stay at owner height
+          
+          // Spear follows opponent
+          spear.x += (owner.x - spear.x) * 12 * dt;
+          spear.y = opponent.y;
+        } else {
+          // Pull duration expired, spear disappears
+          fireSpears.splice(i, 1);
+          continue;
+        }
+      } else {
+        // Moving forward at constant speed
+        spear.x += spear.vx * dt;
+        const distFromOwner = Math.abs(spear.x - owner.x);
+        const timeSinceCreation = now - spear.createdAt;
+        
+        // Return if went too far or timeout
+        if(distFromOwner > spear.maxDistance || timeSinceCreation > 2000){
+          spear.mode = 'return';
+          spear.vx *= -1;
+          clearTimeout(spearBackTimeout);
+          spearBackTimeout = setTimeout(()=>{
+            try{ SFX.spearBack.currentTime = 0; SFX.spearBack.play(); }catch(e){}
+          }, 10);
+        }
+      }
+    } else if(spear.mode === 'return'){
+      const distToOwner = Math.abs(spear.x - owner.x);
+      const returnSpeed = distToOwner / 0.2; // return in 0.2 seconds
+      spear.x += (owner.x > spear.x ? returnSpeed : -returnSpeed) * dt;
+      if(Math.abs(spear.x - owner.x) < 30){
+        fireSpears.splice(i, 1);
+      }
+    }
+  }
+}
+
+function drawFireSpears(){
+  if(!fireSpears.length) return;
+  ctx.save();
+  for(const spear of fireSpears){
+    const owner = spear.owner === 'L' ? p1 : p2;
+    const dx = spear.x - owner.x;
+    const dy = spear.y - owner.y;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    const dirX = dist > 0 ? dx / dist : 1;
+    const dirY = dist > 0 ? dy / dist : 0;
+    const perpX = -dirY;
+    const perpY = dirX;
+    
+    // Cable (black)
+    ctx.strokeStyle = `rgba(0, 0, 0, 0.8)`;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(owner.x, owner.y);
+    ctx.lineTo(spear.x, spear.y);
+    ctx.stroke();
+    
+    // Electric pulses
+    const numNodes = 5;
+    for(let j = 0; j <= numNodes; j++){
+      const t = j / numNodes;
+      const nx = owner.x + (spear.x - owner.x) * t;
+      const ny = owner.y + (spear.y - owner.y) * t;
+      const intensity = 0.5 + 0.5 * Math.sin(performance.now() / 80 + j);
+      ctx.fillStyle = `rgba(100, 150, 255, ${intensity * 0.6})`;
+      ctx.beginPath();
+      ctx.arc(nx, ny, 2.5, 0, Math.PI*2);
+      ctx.fill();
+    }
+    
+    // Plug body (black)
+    ctx.fillStyle = `rgba(20, 20, 20, 0.95)`;
+    ctx.beginPath();
+    ctx.arc(spear.x, spear.y, spear.r - 2, 0, Math.PI*2);
+    ctx.fill();
+    
+    // Metallic prongs
+    const prongLen = 8;
+    const prongWidth = 2.5;
+    const spacing = 5;
+    
+    // Left prong
+    const leftX = spear.x + perpX * spacing/2;
+    const leftY = spear.y + perpY * spacing/2;
+    const leftEndX = leftX + dirX * prongLen;
+    const leftEndY = leftY + dirY * prongLen;
+    ctx.strokeStyle = `rgba(200, 200, 220, 0.9)`;
+    ctx.lineWidth = prongWidth;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(leftX, leftY);
+    ctx.lineTo(leftEndX, leftEndY);
+    ctx.stroke();
+    
+    // Right prong
+    const rightX = spear.x - perpX * spacing/2;
+    const rightY = spear.y - perpY * spacing/2;
+    const rightEndX = rightX + dirX * prongLen;
+    const rightEndY = rightY + dirY * prongLen;
+    ctx.strokeStyle = `rgba(200, 200, 220, 0.9)`;
+    ctx.lineWidth = prongWidth;
+    ctx.beginPath();
+    ctx.moveTo(rightX, rightY);
+    ctx.lineTo(rightEndX, rightEndY);
+    ctx.stroke();
+    
+    // Glow
+    const glowIntensity = 0.4 + 0.3 * Math.sin(performance.now() / 200);
+    ctx.strokeStyle = `rgba(100, 150, 255, ${glowIntensity * 0.4})`;
+    ctx.lineWidth = 8;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(spear.x, spear.y);
+    ctx.lineTo(spear.x + dirX * 3, spear.y + dirY * 3);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
 function attemptMetalSpike(player){
   if(!player) return false;
   const ability = player.ability;
@@ -11270,6 +13190,223 @@ function triggerFlorPulseDark(player){
   });
 }
 
+// ===== FLOR DARK: BALÓN DE FLORES =====
+function spawnFlowerBall(player, ballVx, ballVy){
+  if(!player) return;
+  
+  // Reproducir sonido de spawn
+  try{
+    SFX.ballSpawn.currentTime = 0;
+    SFX.ballSpawn.play();
+  }catch(e){}
+  
+  // Generar valores aleatorios para cada balón (variabilidad)
+  const vxMult = 0.9 + Math.random() * 0.3;      // 0.9 a 1.2x
+  const vyMult = 1.05 + Math.random() * 0.2;      // 1.05 a 1.25x (más rápido verticalmente)
+  const sizeMult = 0.95 + Math.random() * 0.35;  // 0.95 a 1.3x tamaño
+  const maxSpeedMult = 0.9 + Math.random() * 0.35; // 0.9 a 1.25x velocidad máxima
+  const gravityMult = 0.7 + Math.random() * 0.25;   // 0.7 a 0.95x gravedad
+  
+  const flowerBall = {
+    x: ball.x,
+    y: ball.y,
+    vx: ballVx * vxMult,
+    vy: ballVy * vyMult,
+    r: CONFIG.BALL_RADIUS * sizeMult,
+    ownerSide: player.side,
+    maxSpeed: CONFIG.BALL_MAX_SPEED * maxSpeedMult,
+    gravity: CONFIG.GRAVITY * gravityMult,
+    spawnTime: performance.now()
+  };
+  florFlowerBalls.push(flowerBall);
+}
+
+function updateFlowerBalls(dt){
+  for(let i = florFlowerBalls.length - 1; i >= 0; i--){
+    const fb = florFlowerBalls[i];
+
+    // Handle freeze status
+    if(fb.frozen){
+      fb.frozen.timer -= dt;
+      if(fb.frozen.timer <= 0){
+        delete fb.frozen;
+      } else {
+        fb.x = fb.frozen.x;
+        fb.y = fb.frozen.y;
+        fb.vx = 0;
+        fb.vy = 0;
+        continue;
+      }
+    }
+    
+    // Aplicar gravedad custom
+    fb.vy += fb.gravity * dt;
+    
+    // Aplicar movimiento
+    fb.x += fb.vx * dt;
+    fb.y += fb.vy * dt;
+    
+    // Limitar velocidad máxima
+    const speed = Math.hypot(fb.vx, fb.vy);
+    if(speed > fb.maxSpeed){
+      const scale = fb.maxSpeed / speed;
+      fb.vx *= scale;
+      fb.vy *= scale;
+    }
+    
+    // Colisión con paredes laterales
+    if(fb.x < fb.r){ fb.x = fb.r; fb.vx = Math.abs(fb.vx) * 0.9; }
+    if(fb.x > W - fb.r){ fb.x = W - fb.r; fb.vx = -Math.abs(fb.vx) * 0.9; }
+    
+    // Colisión con suelo: cuenta punto si toca el suelo rival
+    const gyBall = CONFIG.GROUND_Y - fb.r;
+    if(fb.y >= gyBall){
+      fb.y = gyBall;
+      const leftSide = (fb.x < CONFIG.NET_X);
+      const scoringKey = leftSide ? 'p2' : 'p1';
+      
+      // Reproducir sonido de caída en arena
+      try{
+        SFX.ballSand.currentTime = 0;
+        SFX.ballSand.play();
+      }catch(e){}
+      
+      // Solo cuenta punto si NO es el lado de Flor (el dueño del balón)
+      // Flor nunca gana puntos con su propio balón de flores
+      const florSide = fb.ownerSide;
+      if((florSide === 'L' && scoringKey === 'p1') || (florSide === 'R' && scoringKey === 'p2')){
+        // El balón de Flor tocó suelo del rival → Flor anota
+        addPoint(scoringKey);
+        resetRally(scoringKey === 'p1' ? 'L' : 'R');
+      }
+      // Si toca suelo de Flor, no pasa nada (no cuenta punto contra Flor)
+      
+      // Remover el balón de flores
+      florFlowerBalls.splice(i, 1);
+      continue;
+    }
+    
+    // Colisión con red (simplificado)
+    const netLeft = CONFIG.NET_X - CONFIG.NET_THICKNESS/2;
+    const netRight = CONFIG.NET_X + CONFIG.NET_THICKNESS/2;
+    const netTop = CONFIG.GROUND_Y - CONFIG.NET_HEIGHT;
+    if(fb.x > netLeft && fb.x < netRight && fb.y > netTop){
+      // Rebote simple en la red
+      if(fb.vx > 0) fb.x = netLeft - fb.r;
+      else fb.x = netRight + fb.r;
+      fb.vx *= -0.9;
+    }
+    
+    // Colisión con jugadores (el rival puede golpear el balón)
+    const players = [p1, p2];
+    for(const p of players){
+      if(!p) continue;
+      const dx = fb.x - p.x;
+      const dy = fb.y - p.y;
+      const dist = Math.hypot(dx, dy);
+      const minDist = fb.r + p.r;
+      
+      if(dist < minDist){
+        // El rival golpeó el balón de flores → explota
+        if(p.side !== fb.ownerSide){
+          // Reproducir sonido de explosión
+          try{
+            SFX.florExplosionGuitar.currentTime = 0;
+            SFX.florExplosionGuitar.play();
+          }catch(e){}
+          
+          // Crear explosión amarilla-fucsia (múltiples capas para efecto de color)
+          spawnFinishExplosion(fb.x, fb.y, { maxRadius: 100, color: 'rgba(255,235,59,0.75)', duration: 600 }); // Amarillo
+          spawnFinishExplosion(fb.x, fb.y, { maxRadius: 85, color: 'rgba(255,20,147,0.65)', duration: 550 }); // Fucsia
+          spawnFinishExplosion(fb.x, fb.y, { maxRadius: 70, color: 'rgba(255,215,0,0.85)', duration: 500 }); // Oro
+          
+          // Remover el balón de flores
+          florFlowerBalls.splice(i, 1);
+          break;
+        }
+      }
+    }
+  }
+}
+
+function drawFlowerBalls(){
+  for(const fb of florFlowerBalls){
+    ctx.save();
+    ctx.translate(fb.x, fb.y);
+    
+    // Sombra
+    const gy = CONFIG.GROUND_Y;
+    const d = clamp((gy - fb.y) / (gy - 80), 0, 1);
+    const shR = 22 * (1 - d) + 6;
+    ctx.globalAlpha = 0.25 * (1 - d) + 0.05;
+    ctx.fillStyle = '#000';
+    ctx.beginPath();
+    ctx.ellipse(0, gy - fb.y + 2, shR, shR * 0.35, 0, 0, TAU);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+    
+    // Intentar dibujar sprite del balón de flores
+    const asset = SKIN_ASSETS.florFlowerBall;
+    if(asset && asset.spriteUrl){
+      const img = spriteImageCache[asset.spriteUrl] || (spriteImageCache[asset.spriteUrl] = new Image());
+      img.src = asset.spriteUrl;
+      if(img.complete && img.naturalWidth > 0){
+        const scale = asset.spriteScale || 1.0;
+        const widthScale = asset.spriteWidthScale || 1.0; // Factor de ancho independiente
+        const w = fb.r * 2 * scale * widthScale; // Ancho ajustado
+        const h = fb.r * 2 * scale;               // Alto normal
+        const offsetX = asset.spriteOffsetX || 0;
+        const offsetY = asset.spriteOffsetY || 0;
+        ctx.drawImage(img, -w/2 + offsetX, -h/2 + offsetY, w, h);
+      } else {
+        // Fallback: dibujar balón floral con gradiente
+        const g = ctx.createRadialGradient(-4, -4, 3, 0, 0, fb.r);
+        g.addColorStop(0, '#ffeb3b');
+        g.addColorStop(0.5, '#ff1493');
+        g.addColorStop(1, '#c2185b');
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(0, 0, fb.r, 0, TAU);
+        ctx.fill();
+        
+        // Patrón de flores simple
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 1.5;
+        for(let i = 0; i < 5; i++){
+          const angle = (i / 5) * TAU;
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(Math.cos(angle) * fb.r * 0.6, Math.sin(angle) * fb.r * 0.6);
+          ctx.stroke();
+        }
+      }
+    } else {
+      // Fallback si no hay sprite configurado
+      const g = ctx.createRadialGradient(-4, -4, 3, 0, 0, fb.r);
+      g.addColorStop(0, '#ffeb3b');
+      g.addColorStop(0.5, '#ff1493');
+      g.addColorStop(1, '#c2185b');
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(0, 0, fb.r, 0, TAU);
+      ctx.fill();
+      
+      // Patrón de flores
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 1.5;
+      for(let i = 0; i < 5; i++){
+        const angle = (i / 5) * TAU;
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(Math.cos(angle) * fb.r * 0.6, Math.sin(angle) * fb.r * 0.6);
+        ctx.stroke();
+      }
+    }
+    
+    ctx.restore();
+  }
+}
+
 function spawnGhostBarrier(player){
   if(!player) return;
   const margin = 3;
@@ -11316,13 +13453,15 @@ function drawDjFieldOverlays(){
   if(p2?.status?.djField) fields.push(p2.status.djField);
   for(const field of fields){
     const isRight = field.targetSide === 'R';
-    const x = isRight ? CONFIG.NET_X : 0;
-    const width = isRight ? (W - CONFIG.NET_X) : CONFIG.NET_X;
+    const fullField = field.fullField || false;
+    const x = fullField ? 0 : (isRight ? CONFIG.NET_X : 0);
+    const width = fullField ? W : (isRight ? (W - CONFIG.NET_X) : CONFIG.NET_X);
     const phase = field.phase || 0;
-    const alpha = 0.12 + 0.04*Math.sin(phase * 4);
-    const gradient = ctx.createLinearGradient(x, 0, isRight ? W : CONFIG.NET_X, 0);
-    gradient.addColorStop(0, `rgba(20,0,40,${alpha})`);
-    gradient.addColorStop(1, `rgba(80,0,120,${alpha + 0.03})`);
+    const alpha = 0.14 + 0.05*Math.sin(phase * 4);
+    const gradient = ctx.createLinearGradient(x, 0, x + width, 0);
+    // Much colder cyan/ice tint
+    gradient.addColorStop(0, `rgba(0,60,90,${alpha})`);
+    gradient.addColorStop(1, `rgba(40,140,200,${alpha + 0.04})`);
     ctx.fillStyle = gradient;
     ctx.fillRect(x, 0, width, H);
   }
@@ -11389,6 +13528,51 @@ function spawnHydraClone(player, options = {}){
       wanderPhase: Math.random() * TAU
     };
     hydraClones.push(clone);
+  }
+}
+
+function spawnPianoBatDecoy(player){
+  if(!player) return;
+  // Eliminar cualquier decoy anterior de este jugador (solo su lado)
+  clearPianoBatDecoys(player);
+  // Crear bot aliado usando makePlayer para integración completa de física/colisiones/dibujo
+  const decoy = makePlayer(player.x, player.side, 'piano');
+  decoy.isPianoDecoy = true;
+  decoy.isClone = true; // Evitar fouls
+  decoy.ownerSide = player.side;
+  // Asegurar stats básicos
+  decoy.stats = decoy.stats || {};
+  decoy.stats.speed = decoy.stats.speed || CONFIG.PLAYER_SPEED;
+  decoy.stats.jump = decoy.stats.jump || CONFIG.PLAYER_JUMP_V;
+  decoy.stats.maxVx = decoy.stats.maxVx || CONFIG.PLAYER_MAX_VX;
+  pianoBatDecoys.push(decoy);
+}
+
+function clearPianoBatDecoys(player){
+  // Si no se pasa jugador, limpiar todos
+  if(!player){
+    pianoBatDecoys.length = 0;
+    return;
+  }
+  // Eliminar decoys SOLO del lado del jugador
+  for(let i = pianoBatDecoys.length - 1; i >= 0; i--){
+    if(pianoBatDecoys[i].ownerSide === player.side){
+      pianoBatDecoys.splice(i, 1);
+    }
+  }
+}
+
+// (Definición única) ya implementado arriba
+
+// (Definición única) ya implementado arriba
+
+function updatePianoBatDecoys(dt){
+  // Física básica ya se integra vía stepPhysics al añadirlos al arreglo de players
+}
+
+function drawPianoBatDecoys(){
+  for(const d of pianoBatDecoys){
+    drawPlayer(d);
   }
 }
 
@@ -11463,6 +13647,116 @@ function drawHydraClones(){
     const vs = clone.visualScale || {x:1,y:1};
     ctx.scale(vs.x, vs.y);
     drawSkin(ctx, clone.skin, { r: clone.r, player: clone });
+    ctx.restore();
+  }
+  ctx.restore();
+}
+
+// ===== Story Allies (persistent full-scale bot helpers) =====
+function spawnStoryAlly(owner, skin, offsetX = 0, scale = 1){
+  if(!owner) return;
+  const scaledRadius = owner.r * scale;
+  const ally = {
+    id: ++storyAllyCounter,
+    ownerSide: owner.side,
+    side: owner.side,
+    x: owner.x + offsetX,
+    y: owner.y,
+    vx: 0,
+    vy: 0,
+    r: scaledRadius,
+    stats: {
+      speed: (owner.stats?.speed ?? CONFIG.PLAYER_SPEED) * scale,
+      jump: (owner.stats?.jump ?? CONFIG.PLAYER_JUMP_V) * scale,
+      maxVx: (owner.stats?.maxVx ?? CONFIG.PLAYER_MAX_VX) * scale,
+      impulse: (owner.stats?.impulse ?? CONFIG.PLAYER_IMPULSE) * scale
+    },
+    hitboxScale: owner.hitboxScale,
+    hitboxScaleX: owner.hitboxScaleX,
+    hitboxScaleY: owner.hitboxScaleY,
+    onGround: true,
+    isAlly: true,
+    skin: skin || owner.skin,
+    darkTierUnlocked: false,
+    visualScale: { x: scale, y: scale },
+    wanderPhase: Math.random() * TAU
+  };
+  storyAllies.push(ally);
+}
+
+function updateStoryAllies(dt){
+  const gy = CONFIG.GROUND_Y;
+  const allowFreeCourt = isArcadeMode() && (arcadeContext.mode === ARCADE_MODES.DOMINADAS || arcadeContext.mode === ARCADE_MODES.TARGET || (arcadeContext.mode === ARCADE_MODES.BOSS && arcadeContext.freeCourt));
+  
+  // Calcular repulsión entre aliados para mantenerlos bien separados
+  const repulsionForce = 3.8;
+  const minDistance = (storyAllies[0]?.r || 132) * 4.8;
+  for(let i = 0; i < storyAllies.length; i++){
+    for(let j = i + 1; j < storyAllies.length; j++){
+      const a1 = storyAllies[i];
+      const a2 = storyAllies[j];
+      const dx = a2.x - a1.x;
+      const dy = a2.y - a1.y;
+      const dist = Math.hypot(dx, dy) || 1;
+      if(dist < minDistance){
+        const nx = dx / dist;
+        const ny = dy / dist;
+        const overlap = minDistance - dist;
+        a1.vx -= nx * overlap * repulsionForce * 0.5;
+        a2.vx += nx * overlap * repulsionForce * 0.5;
+      }
+    }
+  }
+  
+  for(let i = storyAllies.length - 1; i >= 0; i--){
+    const ally = storyAllies[i];
+    ally.wanderPhase += dt * 1.2;
+    const spread = Math.sin(ally.wanderPhase) * 18;
+    const clampMin = allowFreeCourt ? 60 : (ally.ownerSide === 'L' ? 60 : CONFIG.NET_X + 40);
+    const clampMax = allowFreeCourt ? W - 60 : (ally.ownerSide === 'L' ? CONFIG.NET_X - 40 : W - 60);
+    const baseTarget = clamp(ball.x + (ally.side === 'L' ? -40 : 40), clampMin, clampMax);
+    const targetX = baseTarget + spread;
+    const dir = targetX - ally.x;
+    // COMBINADO: mantener repulsión + atracción débil hacia la pelota
+    const pullForce = dir * 2.0;  // Reducido para dejar más espacio a la repulsión
+    ally.vx = clamp(ally.vx + pullForce * 0.1, -ally.stats.speed, ally.stats.speed);
+
+    if(ally.onGround && ball.y < ally.y - 24){
+      ally.vy = -ally.stats.jump * 0.85;
+      ally.onGround = false;
+    }
+
+    ally.vy += CONFIG.GRAVITY * dt;
+    ally.vx *= (1 - CONFIG.AIR_DRAG);
+    ally.vy *= (1 - CONFIG.AIR_DRAG*0.6);
+    ally.x += clamp(ally.vx, -ally.stats.maxVx, ally.stats.maxVx) * dt;
+    ally.y += ally.vy * dt;
+
+    ally.x = clamp(ally.x, clampMin, clampMax);
+
+    const gyAlly = gy - ally.r;
+    if(ally.y > gyAlly){
+      ally.y = gyAlly;
+      ally.vy = 0;
+      ally.onGround = true;
+    }
+    if(ally.y < 60){
+      ally.y = 60;
+      ally.vy = 20;
+    }
+  }
+}
+
+function drawStoryAllies(){
+  if(!storyAllies.length) return;
+  ctx.save();
+  ctx.globalAlpha = 0.98;
+  for(const ally of storyAllies){
+    ctx.save();
+    ctx.translate(ally.x, ally.y);
+    const vs = ally.visualScale || {x:1,y:1};
+    ctx.scale(vs.x, vs.y);
+    drawSkin(ctx, ally.skin, { r: ally.r, player: ally });
     ctx.restore();
   }
   ctx.restore();
@@ -11555,6 +13849,70 @@ function resolveDirectorCloneCollision(clone, enemy){
       enemy.vy = Math.min(enemy.vy, ny * maxPush * 0.3);
     }
   }
+}
+
+function updateDjFrozenClones(dt){
+  const now = performance.now();
+  for(let i = djFrozenClones.length - 1; i >= 0; i--){
+    const clone = djFrozenClones[i];
+    if(now > clone.expires){
+      // Clone expired, trigger ice explosion effect
+      triggerIceExplosion(clone.x, clone.y, clone.r);
+      djFrozenClones.splice(i,1);
+      continue;
+    }
+    // Check ball collision
+    const dx = ball.x - clone.x;
+    const dy = ball.y - clone.y;
+    const dist = Math.hypot(dx, dy) || 1e-6;
+    const minD = ball.r + clone.r;
+    if(dist < minD){
+      // Freeze ball in place for 3s
+      clearTimeout(ballFreezeTimeout);
+      ballFreezeTimeout = setTimeout(()=>{
+        try{ SFX.ballFreeze.currentTime = 0; SFX.ballFreeze.play(); }catch(e){}
+      }, 10);
+      ball.frozen = { timer: 3.0, x: ball.x, y: ball.y };
+      hitTracker = { lastHitter:null, p1Hits:0, p2Hits:0, lastHitTime:0 }; // reset foul counter on freeze
+      ball.vx = 0;
+      ball.vy = 0;
+      // Clone explodes
+      triggerIceExplosion(clone.x, clone.y, clone.r);
+      djFrozenClones.splice(i,1);
+      continue;
+    }
+
+    // Check flower-ball collision
+    for(let j = florFlowerBalls.length - 1; j >= 0; j--){
+      const fb = florFlowerBalls[j];
+      const dxf = fb.x - clone.x;
+      const dyf = fb.y - clone.y;
+      const distf = Math.hypot(dxf, dyf) || 1e-6;
+      const minDf = fb.r + clone.r;
+      if(distf < minDf){
+        // Freeze flower ball in place for 3s
+        clearTimeout(ballFreezeTimeout);
+        ballFreezeTimeout = setTimeout(()=>{
+          try{ SFX.ballFreeze.currentTime = 0; SFX.ballFreeze.play(); }catch(e){}
+        }, 10);
+        fb.frozen = { timer: 3.0, x: fb.x, y: fb.y };
+        fb.vx = 0;
+        fb.vy = 0;
+        // Clone explodes
+        triggerIceExplosion(clone.x, clone.y, clone.r);
+        djFrozenClones.splice(i,1);
+        break;
+      }
+    }
+  }
+}
+
+function triggerIceExplosion(x, y, r){
+  // Visual ice explosion (reuse existing explosion with cyan tint)
+  if(typeof triggerScreenShake === 'function'){
+    triggerScreenShake(10, 200);
+  }
+  // Could add particles here if system exists
 }
 
 function spawnMiniDirectors(player, count = 2){
@@ -11767,6 +14125,39 @@ function concludeDrumAbility(player){
   const abilityId = player.ability.def.id;
   if(abilityId !== 'drumDetonate' && abilityId !== 'drumDarkDetonate') return;
   player.ability.active = false;
+}
+
+function drawDjFrozenClones(){
+  ctx.save();
+  for(const clone of djFrozenClones){
+    ctx.save();
+    ctx.translate(clone.x, clone.y);
+    // Cyan frozen tint (more transparent)
+    ctx.fillStyle = 'rgba(100,200,255,0.15)';
+    ctx.shadowColor = '#00ffff';
+    ctx.shadowBlur = 20;
+    ctx.beginPath();
+    ctx.arc(0, 0, clone.r * 0.9, 0, TAU);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    // Draw the DJ skin with cyan overlay, more transparent
+    ctx.globalAlpha = 0.6;
+    drawSkin(ctx, clone.skin || 'dj', { r: clone.r * 0.9 });
+    // Ice crystals overlay
+    ctx.globalAlpha = 0.42;
+    ctx.strokeStyle = 'rgba(180,240,255,0.7)';
+    ctx.lineWidth = 2;
+    for(let i = 0; i < 6; i++){
+      const angle = (i / 6) * TAU;
+      const len = clone.r * 0.6;
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(Math.cos(angle) * len, Math.sin(angle) * len);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+  ctx.restore();
 }
 
 function handleMysteryCharge(player){
@@ -12077,6 +14468,30 @@ function updateStatusEffects(player, dt){
       delete player.status.theremin;
     }
   }
+  // DJ freeze status
+  const djFreeze = player.status.djFreeze;
+  if(djFreeze){
+    djFreeze.timer -= dt;
+    if(djFreeze.timer <= 0){
+      delete player.status.djFreeze;
+    }
+  }
+  // Cello wave lift effect timer
+  const celloWave = player.status.celloDarkWaveEffect;
+  if(celloWave){
+    celloWave.timer -= dt;
+    if(celloWave.timer <= 0){
+      delete player.status.celloDarkWaveEffect;
+    }
+  }
+  // Cello wet indigo debuff timer
+  const wetIndigo = player.status.celloDarkWetIndigo;
+  if(wetIndigo){
+    wetIndigo.timer -= dt;
+    if(wetIndigo.timer <= 0){
+      delete player.status.celloDarkWetIndigo;
+    }
+  }
   const dash = player.status.violinDash;
   if(dash){
     // Si está en fade-out, reducir multiplicador gradualmente
@@ -12123,6 +14538,22 @@ function emitAbilityEvent(player, kind, payload){
 
 function updatePlayerRuntime(player, dt){
   if(!player || !player.stamina) return;
+  // Handle frozenTimer for pull animation
+  if(player.frozenTimer){
+    player.frozenTimer -= dt * 1000;
+    if(player.frozenTimer <= 0){
+      player.frozenTimer = 0;
+      player.gravityScale = 1;
+    }
+  }
+  // Handle pullStunTimer (stunlock from Fire Dark spear)
+  if(player.pullStunTimer){
+    player.pullStunTimer -= dt * 1000;
+    if(player.pullStunTimer <= 0){
+      player.pullStunTimer = 0;
+      player.pullStunned = false;
+    }
+  }
   const regenBlocked = (player.status?.djNoRegen || 0) > 0;
   const regenBase = player.stamina.regen || 0;
   const regen = regenBlocked ? 0 : regenBase * STAMINA_REGEN_SCALE;
@@ -12250,6 +14681,7 @@ function resolveSkinPhotoCandidates(skinId, b){
   baseCandidates.push({ key: baseSkin, asset: normalAsset });
 
   const wantsStretch = player?.skinState === 'stretched';
+  const wantsBat = player?.skinState === 'bat';
   const stretchedCandidates = [];
   if(wantsStretch){
     if(darkAsset?.stretchedSpriteUrl){
@@ -12260,7 +14692,29 @@ function resolveSkinPhotoCandidates(skinId, b){
     }
   }
 
-  return { baseCandidates, stretchedCandidates, wantsStretch };
+  const batCandidates = [];
+  if(wantsBat){
+    // Piano Dark flap: usar sprite cerrado (wings closed) durante el salto
+    // Detectar si acaba de saltar (últimos 150ms)
+    const isFlapping = player && !player.onGround && (performance.now() - (player.lastJumpTime || 0)) < 150;
+    
+    if(darkAsset?.batSpriteClosedUrl && isFlapping){
+      // Mostrar alas cerradas durante flap
+      batCandidates.push({ key:`${baseSkin}_dark_bat_closed`, asset: darkAsset, bat:true, batClosed:true });
+    }
+    if(darkAsset?.batSpriteUrl){
+      // Mostrar alas abiertas por defecto
+      batCandidates.push({ key:`${baseSkin}_dark_bat`, asset: darkAsset, bat:true });
+    }
+    if(normalAsset.batSpriteClosedUrl && isFlapping){
+      batCandidates.push({ key:`${baseSkin}_bat_closed`, asset: normalAsset, bat:true, batClosed:true });
+    }
+    if(normalAsset.batSpriteUrl){
+      batCandidates.push({ key:`${baseSkin}_bat`, asset: normalAsset, bat:true });
+    }
+  }
+
+  return { baseCandidates, stretchedCandidates, batCandidates, wantsStretch, wantsBat };
 }
 
 function drawSkin(ctx, skin, b){
@@ -12361,6 +14815,9 @@ function drawSkin(ctx, skin, b){
   if (modernSkinsEnabled && !skipModernSkins) {
     try{
       const candidates = [];
+      if(skinPhotos.wantsBat && skinPhotos.batCandidates.length){
+        candidates.push(...skinPhotos.batCandidates);
+      }
       if(skinPhotos.wantsStretch && skinPhotos.stretchedCandidates.length){
         candidates.push(...skinPhotos.stretchedCandidates);
       }
@@ -12376,10 +14833,47 @@ function drawSkin(ctx, skin, b){
       }
 
       if (chosen){
+        // Flip horizontal según lado del jugador para coherencia visual (p2 espejado)
+        // Reglas especiales:
+        // - 'mystery': nunca flip
+        // - 'flor' y 'harp': base invertida (aplica flip adicional)
+        let flipX = 1;
+        try{
+          const side = b?.player?.side || b?.side; // permitir side directo en previews
+          const base = baseSkin; // ya normalizado sin sufijo _dark
+          const needsBaseFlip = (base === 'flor' || base === 'harp');
+          const skipFlip = (base === 'mystery' || base === 'piano');
+          if(!skipFlip){
+            if(side === 'R') flipX *= -1; // p2 espejado
+            if(needsBaseFlip) flipX *= -1; // corregir orientación base de flor/harp
+          }
+          ctx.scale(flipX, 1);
+        }catch(e){ /* noop */ }
+
         const baseAsset = chosen.asset || {};
         const isStretchedVariant = !!chosen.stretched;
-        const scale = isStretchedVariant ? (typeof baseAsset.stretchedSpriteScale === 'number' ? baseAsset.stretchedSpriteScale : (typeof baseAsset.spriteScale === 'number' ? baseAsset.spriteScale : 1.0)) : (typeof baseAsset.spriteScale === 'number' ? baseAsset.spriteScale : 1.0);
-        const widthMul = isStretchedVariant
+        const isBatVariant = !!chosen.bat;
+        const isBatClosed = !!chosen.batClosed; // Alas cerradas (flap)
+        
+        // Determinar escala: si es bat cerrado, usar batSpriteClosedScale; si es bat abierto, usar batSpriteOpenScale; si es stretched, usar stretchedSpriteScale
+        let scale = 1.0;
+        if(isBatVariant){
+          if(isBatClosed && typeof baseAsset.batSpriteClosedScale === 'number'){
+            scale = baseAsset.batSpriteClosedScale;
+          } else if(!isBatClosed && typeof baseAsset.batSpriteOpenScale === 'number'){
+            scale = baseAsset.batSpriteOpenScale;
+          } else if(typeof baseAsset.spriteScale === 'number'){
+            scale = baseAsset.spriteScale;
+          }
+        } else if(isStretchedVariant){
+          scale = typeof baseAsset.stretchedSpriteScale === 'number' ? baseAsset.stretchedSpriteScale : (typeof baseAsset.spriteScale === 'number' ? baseAsset.spriteScale : 1.0);
+        } else {
+          scale = typeof baseAsset.spriteScale === 'number' ? baseAsset.spriteScale : 1.0;
+        }
+        
+        const widthMul = isBatVariant && !isBatClosed && typeof baseAsset.batSpriteOpenWidth === 'number'
+          ? baseAsset.batSpriteOpenWidth
+          : isStretchedVariant
           ? (typeof baseAsset.stretchedSpriteWidth === 'number' ? baseAsset.stretchedSpriteWidth : (typeof baseAsset.spriteWidth === 'number' ? baseAsset.spriteWidth : 1.0))
           : (typeof baseAsset.spriteWidth === 'number' ? baseAsset.spriteWidth : 1.0);
         const offsetX = isStretchedVariant ? (typeof baseAsset.stretchedSpriteOffsetX === 'number' ? baseAsset.stretchedSpriteOffsetX : (typeof baseAsset.spriteOffsetX === 'number' ? baseAsset.spriteOffsetX : 0)) : (typeof baseAsset.spriteOffsetX === 'number' ? baseAsset.spriteOffsetX : 0);
@@ -12407,8 +14901,9 @@ function drawSkin(ctx, skin, b){
           const speedOscillation = 0.8 + 0.4 * Math.sin(t / 1200); // Velocidad varía entre 0.4 y 1.2
           ctx.rotate(-(t/1000) * baseAsset.spriteSpinSpeed * speedOscillation);
         }
-        // Centrar la imagen en el origen y aplicar offsets horizontal y vertical opcionales
-        ctx.drawImage(chosen.photo.img, -w/2 + offsetX, -h/2 + offsetY, w, h);
+        // Centrar la imagen en el origen y aplicar offsets; si hay flip X, invertimos offsetX para mantener posición visual
+        const drawOffsetX = (typeof flipX !== 'undefined' && flipX < 0) ? -offsetX : offsetX;
+        ctx.drawImage(chosen.photo.img, -w/2 + drawOffsetX, -h/2 + offsetY, w, h);
         
         // Si es DJ, agregar ondas de audio encima de la imagen
         if (skin === 'dj') {
@@ -12886,7 +15381,7 @@ case 'fire': {
   if(darkUnlocked){
     if(fireAsset.lightsDarkUrl){
       lightsKey = 'fire_lights_dark';
-      lightsScale = (fireAsset.darkLightsScale || 1.2) * 0.9; // Aplica factor 0.9 sobre la escala dark
+      lightsScale = (fireAsset.darkLightsScale || 1.2) * 0.73; // Aplica factor 0.9 sobre la escala dark
       lightsOffsetX = fireAsset.darkLightsOffsetX || 0;
       lightsOffsetY = fireAsset.darkLightsOffsetY || 0;
     }
@@ -13339,11 +15834,15 @@ function makePlayer(x, side, skin='violin'){
   applySkinProfile(player, skin);
   player.x = x;
   player.y = CONFIG.GROUND_Y - player.r;
+  player.spawnX = x;
+  player.spawnY = CONFIG.GROUND_Y - player.r;
 
   return player;
 }
 
 let botActive = false;
+// Lista de decoys de Piano por jugador (permite 1 por lado simultáneamente)
+let pianoBatDecoys = [];
 let p1 = makePlayer(W*0.25,'L', 'violin');
 let p2 = makePlayer(W*0.75,'R', 'theremin');
 
@@ -13363,6 +15862,7 @@ let scoreStreak = { p1:0, p2:0 };
 let suddenDeathActive = false;
 let finishState = createFinishState();
 const finishExplosions = [];
+const transformationExplosions = []; // Explosiones de transformación de Piano Dark
 const screenShake = { start: 0, duration: 0, magnitude: 0 };
 
 function sendFinishSync(action, payload = {}){
@@ -13391,11 +15891,16 @@ function resetRally(servingTo='L'){
   // cancelar timeouts previos relacionados con saque/punto en suelo
   if(serveTimeout){ clearTimeout(serveTimeout); serveTimeout = null; }
   if(ballGroundTimeout){ clearTimeout(ballGroundTimeout); ballGroundTimeout = null; }
+  if(ballFreezeTimeout){ clearTimeout(ballFreezeTimeout); ballFreezeTimeout = null; }
   // limpiar bandera
   ball.groundScheduled = false;
   ball.fireEffect = null;
+  delete ball.frozen;
+  delete ball.celloDarkWet;
   detachMysteryBomb();
   mysteryBomb.pulse = 0;
+  // Limpiar balones de flores
+  florFlowerBalls.length = 0;
   if(p1?.ability?.def?.id === 'mysteryCipher' && p1.ability.runtime){
     p1.ability.runtime.mysteryBombReady = false;
   }
@@ -13441,6 +15946,7 @@ function gameOver(who, options = {}){
     if(storyHandleGameOver(who)) return;
   }
   clearHazardProjectiles();
+  djFrozenClones.length = 0;
   if(matchMode === MATCH_MODE.ARCADE){
     endArcadeRun(options.reason || 'end');
     return;
@@ -13471,6 +15977,15 @@ function gameOver(who, options = {}){
     wasFatality: !!options.fatality,
     isLan: matchMode === MATCH_MODE.LAN
   });
+  
+  // FIXED: Save per-stage bot defeats when playing vs bot (regardless of win/loss)
+  if(matchMode === MATCH_MODE.BOT && botKills > 0){
+    for(let i = 0; i < botKills; i++){
+      incrementStageBotsDefeated(gameSelectedStageIndex);
+    }
+    console.log('[gameOver] Bot mode - incremented stage', gameSelectedStageIndex, 'by', botKills, 'bots. Winner:', who);
+    saveProgress(progress);
+  }
   recordCharacterOutcome(who, { fatality: !!options.fatality, finalScore });
   registerMatchPlayed();
   clearTouchKeys();
@@ -13551,6 +16066,7 @@ function spawnHazardProjectile(config = {}){
     knockback: config.knockback ?? 800,
     spriteKey: config.spriteKey || null,
     persistOnHit: !!config.persistOnHit,
+    onPlayerHit: config.onPlayerHit || null,
     rotation: config.rotation ?? Math.random()*Math.PI,
     spawnedAt: performance.now()
   };
@@ -13582,6 +16098,10 @@ function updateHazardProjectiles(dt){
       const dist = Math.hypot(proj.x - t.x, proj.y - t.y);
       const hitRadius = proj.r + Math.max(axes.rx, axes.ry);
       if(dist <= hitRadius){
+        // Call custom onPlayerHit if present (e.g., for iceball freeze)
+        if(typeof proj.onPlayerHit === 'function'){
+          proj.onPlayerHit(proj, t);
+        }
         const kb = proj.knockback || 800;
         const isBoulder = proj.type === 'boulder';
         const horizBoost = (isBoulder ? kb * 1.2 : kb * 1.35) * 5; // empuje horizontal alto
@@ -14407,6 +16927,22 @@ function spawnFinishExplosion(x, y, options = {}){
   });
 }
 
+function spawnTransformationExplosion(x, y){
+  // Explosión de transformación: 3 capas (negro opaco, morado, rojo sangre)
+  transformationExplosions.push({
+    x,
+    y,
+    start: performance.now(),
+    duration: 600,
+    maxRadius: 350, // Mucho más grande
+    layers: [
+      { color: 'rgba(10,5,15,1.0)', radiusPercent: 0.28 },     // Negro opaco interior (sin transparencia)
+      { color: 'rgba(80,20,100,0.9)', radiusPercent: 0.65 },   // Morado
+      { color: 'rgba(150,10,30,0.85)', radiusPercent: 1.0 }   // Rojo sangre exterior
+    ]
+  });
+}
+
 function triggerScreenShake(magnitude = 10, duration = 350){
   const now = performance.now();
   screenShake.start = now;
@@ -14491,6 +17027,8 @@ addEventListener('keydown', e=>{
   if(e.code === 'Escape' && matchMode === MATCH_MODE.STORY && storyContext.active){
     playUiBackSound();
     storyContext.active = false;
+    storyAllies.length = 0; // limpiar aliados al salir
+    if(typeof pianoBatDecoys !== 'undefined') pianoBatDecoys.length = 0; // limpiar decoys al salir
     openStoryMenu();
     e.preventDefault();
     return;
@@ -14570,6 +17108,40 @@ if(appScene === APP_SCENE.MENU && arcadeOpen && e.code === 'Escape'){
 
   if(e.code==='KeyM'){
     toggleMusicMute();
+  }
+
+  // Controles para selección de stages
+  if(appScene === APP_SCENE.STAGE && stageSelectionActive){
+    console.log('[keydown] Stage selection key:', e.code, 'selectedStageIndex:', selectedStageIndex, 'stageSelectionActive:', stageSelectionActive);
+    const isLeft = (e.code === 'KeyA' || e.code === 'ArrowLeft');
+    const isRight = (e.code === 'KeyD' || e.code === 'ArrowRight');
+    const isConfirm = (e.code === 'KeyW' || e.code === 'ArrowUp' || e.code === 'Enter' || e.code === 'NumpadEnter' || e.code === 'Space');
+    const isEscape = (e.code === 'Escape');
+    
+    if(isLeft){
+      console.log('[keydown] Moving LEFT in stage selection');
+      moveStageSelection(-1);
+      e.preventDefault();
+      return;
+    }
+    if(isRight){
+      console.log('[keydown] Moving RIGHT in stage selection');
+      moveStageSelection(1);
+      e.preventDefault();
+      return;
+    }
+    if(isConfirm){
+      console.log('[keydown] CONFIRMING stage selection, selectedStageIndex:', selectedStageIndex);
+      confirmStageSelection();
+      e.preventDefault();
+      return;
+    }
+    if(isEscape){
+      console.log('[keydown] CANCELING stage selection');
+      cancelStageSelection();
+      e.preventDefault();
+      return;
+    }
   }
 
 if(gameState === STATE.GAMEOVER && (e.code === 'Escape' || e.code === 'KeyS' || e.code === 'ArrowDown')){
@@ -15061,6 +17633,7 @@ function resetSelectionState(){
   selectionP1InputPreference = null;
   selectionP1GamepadIndex = null;
   selectionUsedTouch = false;
+  djFrozenClones.length = 0; // safety: purge leftover DJ clones when returning to selection
 }
 
 function setArcadeSelectionDefaults(){
@@ -15136,10 +17709,15 @@ function startArcadeMatchFromSelection(){
     botActive = false;
   }
   hydraClones.length = 0;
+  storyAllies.length = 0;
   directorClones.length = 0;
   miniDirectors.length = 0;
   ghostBarriers.length = 0;
+  pianoBatDecoys.length = 0;
   florBursts.length = 0;
+  fireColumns.length = 0;
+  fireFlames.length = 0;
+  fireSpears.length = 0;
 
   score.p1=0;
   score.p2=0;
@@ -15239,6 +17817,9 @@ function startArcadeMatchDirect(opts = {}){
   miniDirectors.length = 0;
   ghostBarriers.length = 0;
   florBursts.length = 0;
+  fireColumns.length = 0;
+  fireFlames.length = 0;
+  fireSpears.length = 0;
 
   score.p1=0;
   score.p2=0;
@@ -15299,24 +17880,28 @@ function handleSelection(){
   // -- P1 movimiento WASD --
   if(allowP1Input && keys['KeyA']){
     const next = (sel.p1Index - 1 + ROSTER.length) % ROSTER.length;
+    console.log('[handleSelection] P1 move LEFT: sel.p1Index:', sel.p1Index, '-> next:', next);
     requestSelectionIndex('p1', next, { source:'keyboard' });
     p1Moved = true;
     keys['KeyA']=false;
   }
   if(allowP1Input && keys['KeyD']){
     const next = (sel.p1Index + 1) % ROSTER.length;
+    console.log('[handleSelection] P1 move RIGHT: sel.p1Index:', sel.p1Index, '-> next:', next);
     requestSelectionIndex('p1', next, { source:'keyboard' });
     p1Moved = true;
     keys['KeyD']=false;
   }
   if(allowP1Input && keys['KeyW']){
     const next = (sel.p1Index - GRID_COLS + ROSTER.length) % ROSTER.length;
+    console.log('[handleSelection] P1 move UP: sel.p1Index:', sel.p1Index, '-> next:', next);
     requestSelectionIndex('p1', next, { source:'keyboard' });
     p1Moved = true;
     keys['KeyW']=false;
   }
   if(allowP1Input && keys['KeyS']){
     const next = (sel.p1Index + GRID_COLS) % ROSTER.length;
+    console.log('[handleSelection] P1 move DOWN: sel.p1Index:', sel.p1Index, '-> next:', next);
     requestSelectionIndex('p1', next, { source:'keyboard' });
     p1Moved = true;
     keys['KeyS']=false;
@@ -15366,23 +17951,28 @@ function handleSelection(){
     if(p1Moved){
       sel.p1Locked = false;
       sel.p1ConfirmTimer = 0;
+      console.log('[handleSelection] P1 movió: p1Locked = false');
     } else if(!sel.p1Locked && sel.p1HasMovedOnce){
       sel.p1ConfirmTimer += dt;
       if(sel.p1ConfirmTimer >= CONFIRM_HOLD_TIME){
         sel.p1Locked = true;
+        console.log('[handleSelection] P1 LOCKED! Timer:', sel.p1ConfirmTimer, '>=', CONFIRM_HOLD_TIME);
       }
     }
 
     if(useBot){
       sel.p2Locked = true;
+      console.log('[handleSelection] useBot=true, P2 auto-locked');
     } else {
       if(p2Moved){
         sel.p2Locked = false;
         sel.p2ConfirmTimer = 0;
+        console.log('[handleSelection] P2 movió: p2Locked = false');
       } else if(!sel.p2Locked && sel.p2HasMovedOnce){
         sel.p2ConfirmTimer += dt;
         if(sel.p2ConfirmTimer >= CONFIRM_HOLD_TIME){
           sel.p2Locked = true;
+          console.log('[handleSelection] P2 LOCKED! Timer:', sel.p2ConfirmTimer, '>=', CONFIRM_HOLD_TIME);
         }
       }
     }
@@ -15426,18 +18016,29 @@ function handleSelection(){
 
   const readyToStart = sel.p1Locked && (sel.p2Locked || arcadeSingle);
   if(readyToStart){
+    console.log('[handleSelection] READY TO START! p1Locked:', sel.p1Locked, 'p2Locked:', sel.p2Locked, 'arcadeSingle:', arcadeSingle);
+    console.log('[handleSelection] sel.p1Index:', sel.p1Index, 'sel.p2Index:', sel.p2Index);
+    console.log('[handleSelection] matchMode:', matchMode, 'currentSelectedStage:', currentSelectedStage?.name, 'gameSelectedStageIndex:', gameSelectedStageIndex);
     if(isArcadeMode()){
+      console.log('[handleSelection] Iniciando modo arcade');
       startArcadeMatchFromSelection();
       return;
     }
     if(matchMode === MATCH_MODE.LAN){
+      console.log('[handleSelection] Modo LAN, netRole:', netRole);
       if(netRole === 'host'){
         startLanMatchFromSelection();
       }
       return;
     }
     suddenDeathActive = false;
-    currentBackground = pickWeighted(BACKGROUNDS, 'weight');
+    // Si estamos en modo bot o local y se seleccionó un stage, usarlo
+    if((matchMode === MATCH_MODE.BOT || matchMode === MATCH_MODE.LOCAL) && currentSelectedStage){
+      currentBackground = { isPhoto: true, imageKey: `stage_${gameSelectedStageIndex}` };
+      loadBackgroundImage(`stage_${gameSelectedStageIndex}`, currentSelectedStage.imageUrl);
+    } else {
+      currentBackground = pickWeighted(BACKGROUNDS, 'weight');
+    }
     currentBallType = pickWeighted(BALL_TYPES, 'weight');
 
     function resolveSkin(index){
@@ -15459,12 +18060,18 @@ function handleSelection(){
     directorClones.length = 0;
     miniDirectors.length = 0;
     ghostBarriers.length = 0;
+    pianoBatDecoys.length = 0;
     florBursts.length = 0;
     violinDarkRockets.length = 0;
     thereminSwordsOrbit.length = 0;
     thereminSwordProjectiles.length = 0;
+    fireColumns.length = 0;
+    fireFlames.length = 0;
+    fireSpears.length = 0;
     hydraDarkHeads.length = 0;
     hydraDarkProjectiles.length = 0;
+    celloDarkWaves.length = 0;
+    celloDarkTorpedos.length = 0;
     if(Array.isArray(hydraCloneSpawnTimeouts)){
       while(hydraCloneSpawnTimeouts.length){
         const t = hydraCloneSpawnTimeouts.pop();
@@ -15645,10 +18252,20 @@ function drawBackground(){
   // Si es foto, dibujar imagen y salir
   if(bg.isPhoto && bg.imageKey && bgImages[bg.imageKey]){
     const img = bgImages[bg.imageKey];
-    if(img.complete){
-      ctx.drawImage(img, 0, 0, W, H);
+    // Revisar si la imagen se cargó correctamente
+    // img.complete && img.naturalWidth > 0 = imagen cargada exitosamente
+    // img.complete && img.naturalWidth === 0 = imagen rota/404
+    if(img.complete && img.naturalWidth > 0){
+      try {
+        ctx.drawImage(img, 0, 0, W, H);
+      } catch(e) {
+        console.error('[drawBackground] Error dibujando imagen:', e.message);
+        ctx.fillStyle = '#87ceeb';
+        ctx.fillRect(0, 0, W, H);
+      }
     } else {
-      // mientras carga, mostrar color de fallback
+      // Imagen no cargada o rota
+      console.warn('[drawBackground] Imagen rota o no cargada:', bg.imageKey, 'naturalWidth:', img.naturalWidth);
       ctx.fillStyle = '#87ceeb';
       ctx.fillRect(0, 0, W, H);
     }
@@ -15755,13 +18372,17 @@ function handleInput(){
   const thereminP = p.status?.theremin;
   const dashP = p.status?.violinDash;
   const darkAccelP = p.status?.violinDarkAccel;
+  const pianoBatP = p.status?.pianoBat;
+  const djFreezeP = p.status?.djFreeze;
   const stunnedP = thereminP && thereminP.stun > 0;
+  const frozenByDjP = djFreezeP && djFreezeP.timer > 0;
   const slowFactorP = (thereminP && thereminP.slow > 0 && !stunnedP) ? 0.5 : 1;
   const dashFactorP = dashP ? dashP.mult : 1;
   const darkAccelFactorP = darkAccelP?.active ? (darkAccelP.speedMult || 2.0) : 1;
-  const speedP = (p.stats?.speed ?? CONFIG.PLAYER_SPEED) * slowFactorP * dashFactorP * darkAccelFactorP;
+  const pianoBatSpeed = pianoBatP?.speedMult || 1;
+  const speedP = (p.stats?.speed ?? CONFIG.PLAYER_SPEED) * slowFactorP * dashFactorP * darkAccelFactorP * pianoBatSpeed;
   const jumpFactorP = darkAccelP?.active ? (darkAccelP.jumpMult || 1.3) : 1;
-  const jumpP = (p.stats?.jump ?? CONFIG.PLAYER_JUMP_V) * (stunnedP ? 0 : slowFactorP) * jumpFactorP;
+  const jumpP = (p.stats?.jump ?? CONFIG.PLAYER_JUMP_V) * (stunnedP ? 0 : slowFactorP) * jumpFactorP * getCelloJumpFactor(p);
   const abilityIdP = p.ability?.def?.id;
   const harpP = abilityIdP === 'harpAria' || abilityIdP === 'harpDarkProbe';
   const harpCostRatioP = harpP ? ((p.ability?.def?.doubleJumpCostPercent ?? 50) / 100) : 0;
@@ -15783,12 +18404,12 @@ function handleInput(){
       p.gravityScale = 1;
     }
     p.isJumping = false;
-  } else if(stunnedP){
-    p.vx = 0;
-    p.vy = 0;
-    p.gravityScale = 0;
-    p.isJumping = false;
-  } else {
+    } else if(stunnedP || frozenByDjP || p.pullStunned){
+      p.vx = 0;
+      p.vy = 0;
+      p.gravityScale = 0;
+      p.isJumping = false;
+    } else {
     if(leftP) p.vx = -speedP;
     else if(rightP) p.vx = speedP;
     else p.vx = playerDrag * p.vx; // fricción cuando no se pulsa
@@ -15797,10 +18418,20 @@ function handleInput(){
       p.vy = -jumpP;
       p.onGround = false;
       p.jumpStartTime = performance.now();
+      p.lastJumpTime = performance.now(); // Para efecto de flap del murciélago
       p.isJumping = true;
       p.jumpCount = 1;
       p.hasDoubleJumped = false;
       consumePlayerKeyTap(p, ctrlP.up);
+      
+      // Piano bat: reproducir wing SFX al saltar
+      if(pianoBatP){
+        try{
+          const wing = new Audio(SFX.pianoVampireWing);
+          wing.volume = 0.95;
+          wing.play();
+        }catch(e){}
+      }
     }
 
     if(p.isJumping && upP){
@@ -15819,6 +18450,8 @@ function handleInput(){
       p.gravityScale = 1.0;
     }
 
+    const batUnlimitedJump = pianoBatP?.infiniteJumps && !p.onGround && consumePlayerKeyTap(p, ctrlP.up);
+
     if(harpP && !p.onGround && harpCostRatioP > 0 && consumePlayerKeyTap(p, ctrlP.up)){
       const stamina = p.stamina;
       const cost = (stamina?.max || 0) * harpCostRatioP;
@@ -15835,6 +18468,19 @@ function handleInput(){
         }, 5);
 
       }
+    } else if(batUnlimitedJump){
+      p.vy = -jumpP;
+      p.lastJumpTime = performance.now(); // Para efecto de flap del murciélago
+      p.gravityScale = 1.0;
+      p.hasDoubleJumped = false;
+      p.jumpCount = (p.jumpCount || 0) + 1;
+      
+      // Piano bat: reproducir wing SFX al saltar en el aire
+      try{
+        const wing = new Audio(SFX.pianoVampireWing);
+        wing.volume = 0.95;
+        wing.play();
+      }catch(e){}
     }
   }
 
@@ -15844,6 +18490,12 @@ function handleInput(){
 
   const skipP2 = isArcadeMode() && arcadeContext.singlePlayer && arcadeContext.mode !== ARCADE_MODES.BOSS;
   if(skipP2){
+    // Aun en arcade single, ejecutar IA de los decoys de Piano
+    if(pianoBatDecoys && pianoBatDecoys.length){
+      for(const d of pianoBatDecoys){
+        if(!d.finishFrozen){ botAIForDecoy(d); }
+      }
+    }
     return;
   }
 
@@ -15863,9 +18515,7 @@ function handleInput(){
       p2.isJumping = false;
     }
   } else {
-    if(matchMode === MATCH_MODE.LAN && netRole === 'client'){
-      botActive = false;
-    }
+    // Controles manuales de P2 (no bot)
     const q = p2;
     const ctrlQ = q.controls || PLAYER_CONTROLS.R;
     if(matchMode === MATCH_MODE.LAN && netRole === 'host'){
@@ -15881,13 +18531,17 @@ function handleInput(){
     const thereminQ = q.status?.theremin;
     const dashQ = q.status?.violinDash;
     const darkAccelQ = q.status?.violinDarkAccel;
+    const pianoBatQ = q.status?.pianoBat;
+    const djFreezeQ = q.status?.djFreeze;
     const stunnedQ = thereminQ && thereminQ.stun > 0;
+    const frozenByDjQ = djFreezeQ && djFreezeQ.timer > 0;
     const slowFactorQ = (thereminQ && thereminQ.slow > 0 && !stunnedQ) ? 0.5 : 1;
     const dashFactorQ = dashQ ? dashQ.mult : 1;
     const darkAccelFactorQ = darkAccelQ?.active ? (darkAccelQ.speedMult || 2.0) : 1;
-    const speedQ = (q.stats?.speed ?? CONFIG.PLAYER_SPEED) * slowFactorQ * dashFactorQ * darkAccelFactorQ;
+    const pianoBatSpeedQ = pianoBatQ?.speedMult || 1;
+    const speedQ = (q.stats?.speed ?? CONFIG.PLAYER_SPEED) * slowFactorQ * dashFactorQ * darkAccelFactorQ * pianoBatSpeedQ;
     const jumpFactorQ = darkAccelQ?.active ? (darkAccelQ.jumpMult || 1.3) : 1;
-    const jumpQ = (q.stats?.jump ?? CONFIG.PLAYER_JUMP_V) * (stunnedQ ? 0 : slowFactorQ) * jumpFactorQ;
+    const jumpQ = (q.stats?.jump ?? CONFIG.PLAYER_JUMP_V) * (stunnedQ ? 0 : slowFactorQ) * jumpFactorQ * getCelloJumpFactor(q);
     const abilityIdQ = q.ability?.def?.id;
     const harpQ = abilityIdQ === 'harpAria' || abilityIdQ === 'harpDarkProbe';
     const harpCostRatioQ = harpQ ? ((q.ability?.def?.doubleJumpCostPercent ?? 50) / 100) : 0;
@@ -15909,7 +18563,7 @@ function handleInput(){
         q.gravityScale = 1;
       }
       q.isJumping = false;
-    } else if(stunnedQ){
+    } else if(stunnedQ || frozenByDjQ || q.pullStunned){
       q.vx = 0;
       q.vy = 0;
       q.gravityScale = 0;
@@ -15924,10 +18578,21 @@ function handleInput(){
         q.vy = -jumpQ;
         q.onGround = false;
         q.jumpStartTime = performance.now();
+        q.lastJumpTime = performance.now(); // Para efecto de flap del murciélago
         q.isJumping = true;
         q.jumpCount = 1;
         q.hasDoubleJumped = false;
         consumePlayerKeyTap(q, ctrlQ.up);
+        
+        // Piano bat: reproducir wing SFX al saltar
+        const pianoBatQ = q.status?.pianoBat;
+        if(pianoBatQ){
+          try{
+            const wing = new Audio(SFX.pianoVampireWing);
+            wing.volume = 0.95;
+            wing.play();
+          }catch(e){}
+        }
       }
 
         if(q.isJumping && keys[ctrlQ.up]){
@@ -15962,10 +18627,35 @@ function handleInput(){
 
           }
         }
+        
+        // Piano bat: saltos ilimitados en el aire
+        const batUnlimitedJumpQ = pianoBatQ?.infiniteJumps && !q.onGround && consumePlayerKeyTap(q, ctrlQ.up);
+        if(batUnlimitedJumpQ){
+          q.vy = -jumpQ;
+          q.gravityScale = 1.0;
+          q.hasDoubleJumped = false;
+          q.jumpCount = (q.jumpCount || 0) + 1;
+          
+          // Piano bat: reproducir wing SFX al saltar en el aire
+          try{
+            const wing = new Audio(SFX.pianoVampireWing);
+            wing.volume = 0.95;
+            wing.play();
+          }catch(e){}
+        }
       }
     }
 
     handleAbilityInput(q);
+  } // Fin del else de controles manuales de P2
+  
+  // Ejecutar IA de todos los decoys de Piano, independiente del modo
+  if(pianoBatDecoys && pianoBatDecoys.length){
+    for(const d of pianoBatDecoys){
+      if(!d.finishFrozen){
+        botAIForDecoy(d);
+      }
+    }
   }
 }
 
@@ -15974,14 +18664,55 @@ function handleAbilityInput(player){
   if(matchMode === MATCH_MODE.LAN && netRole === 'client' && player.side === 'L'){
     return; // cliente no intenta activar habilidad del host
   }
+  
+  // Block ability input if frozen or stunned
+  const djFreeze = player.status?.djFreeze;
+  const thereminStun = player.status?.theremin;
+  if((djFreeze && djFreeze.timer > 0) || (thereminStun && thereminStun.stun > 0)){
+    return; // Can't use ability while frozen or stunned
+  }
+  
   if(player.ability?.def?.id === 'mysteryCipher'){
     processMysteryAbilityInput(player);
+    return;
+  }
+  if(player.ability?.def?.id === 'djDarkFreeze'){
+    // Procesar combos de DJ Dark de forma continua
+    processDjDarkAbilityInput(player);
+    return;
+  }
+  if(player.ability?.def?.id === 'fireDarkSpear'){
+    // Procesar combos de Fire Dark de forma continua
+    processFireDarkAbilityInput(player);
+    return;
+  }
+  if(player.ability?.def?.id === 'celloDarkFortissimo'){
+    // Procesar combos de Cello Dark de forma continua
+    processCelloDarkAbilityInput(player);
     return;
   }
   if(player.ability?.def?.id === 'harpDarkProbe'){
     // Para harpDarkProbe, controla la dirección de la sonda mientras se mantiene presionado
     if(player.harpProbe){
       player.harpProbe.controlActive = !!keys[player.controls.ability];
+    }
+    return;
+  }
+  if(player.ability?.def?.id === 'pianoStretch' || player.ability?.def?.id === 'pianoDarkBat'){
+    if(consumePlayerKeyTap(player, player.controls.ability)){
+      // Si ya está activa, revisa si es fase 2 (bat)
+      if(player.ability.active){
+        const rt = player.ability.runtime || {};
+        if(rt.phase2Active){
+          // Si está en fase murciélago, desactiva la habilidad
+          player.ability.remainingMs = 0;
+        } else {
+          // Si está en fase 1 (stretch), intenta fase murciélago
+          attemptPianoBatPhase2(player);
+        }
+      } else {
+        activatePlayerAbility(player);
+      }
     }
     return;
   }
@@ -16017,6 +18748,206 @@ function processMysteryAbilityInput(player){
   return triggered;
 }
 
+function processDjDarkAbilityInput(player){
+  if(!player || player.ability?.def?.id !== 'djDarkFreeze') return false;
+  const ability = player.ability;
+  const stamina = player.stamina;
+  if(!stamina) return false;
+
+  ability.runtime = ability.runtime || {};
+  const buffer = ability.runtime.mysteryBuffer || (ability.runtime.mysteryBuffer = []);
+  const queue = ability.runtime.mysteryInputQueue;
+  if(!queue || !queue.length) return false;
+
+  let triggered = false;
+
+  while(queue.length){
+    const dir = queue.shift();
+    buffer.push(dir);
+    if(buffer.length > 8) buffer.shift();
+    const matched = getMysteryCommandFromBuffer(buffer);
+
+    if(matched){
+      buffer.length = 0;
+
+      // Verificar si la habilidad está disponible
+      if(ability.active) break;
+      if(ability.cooldownMs > 0) break;
+      if(stamina.value < ability.def.staminaCost) break;
+
+      // Consumir stamina
+      stamina.value = Math.max(0, stamina.value - ability.def.staminaCost);
+
+      // Ejecutar combo directamente según categoría
+      if(matched === 'attack'){
+        // Forward forward down: ice projectile
+        shootDjIceball(player);
+        ability.cooldownMs = ability.def.cooldown;
+      } else if(matched === 'defense'){
+        // Back back down: frozen clone
+        spawnDjFrozenClone(player);
+        ability.cooldownMs = ability.def.cooldown;
+      } else if(matched === 'strategy'){
+        // Up up down: normal field
+        activateDjField(player, ability);
+        ability.active = true;
+        ability.remainingMs = 1000;
+        ability.cooldownMs = ability.def.cooldown;
+        setTimeout(()=>{
+          deactivateDjField(player, ability);
+          concludeAbility(player);
+        }, 14000);
+      }
+
+      triggered = true;
+      storyHandleAbility(player);
+      if(!(botActive && player === p2)){
+        addCharStat(player.skin, 'abilityUses', 1);
+        saveProgress(progress);
+      }
+      break;
+    }
+  }
+  return triggered;
+}
+
+function processFireDarkAbilityInput(player){
+  if(!player || player.ability?.def?.id !== 'fireDarkSpear') return false;
+  const ability = player.ability;
+  const stamina = player.stamina;
+  if(!stamina) return false;
+
+  ability.runtime = ability.runtime || {};
+  const buffer = ability.runtime.mysteryBuffer || (ability.runtime.mysteryBuffer = []);
+  const queue = ability.runtime.mysteryInputQueue;
+  if(!queue || !queue.length) return false;
+
+  let triggered = false;
+
+  while(queue.length){
+    const dir = queue.shift();
+    buffer.push(dir);
+    if(buffer.length > 8) buffer.shift();
+    const matched = getMysteryCommandFromBuffer(buffer);
+
+    if(matched){
+      buffer.length = 0;
+
+      // Verificar si la habilidad está disponible
+      if(ability.active) break;
+      if(ability.cooldownMs > 0) break;
+      if(stamina.value < ability.def.staminaCost) break;
+
+      // Consumir stamina
+      stamina.value = Math.max(0, stamina.value - ability.def.staminaCost);
+
+      // Ejecutar combo según categoría
+      if(matched === 'attack'){
+        // Forward forward down: 5 columnas de fuego en ola
+        fireLaunchFireWave(player);
+        ability.cooldownMs = ability.def.cooldown;
+      } else if(matched === 'defense'){
+        // Back back down: spear "Get Over Here"
+        fireLaunchSpearPull(player);
+        ability.cooldownMs = ability.def.cooldown;
+      } else if(matched === 'strategy'){
+        // Up up down: habilidad normal (columna + llamita)
+        fireIgnitionActivate(player, ability);
+        ability.cooldownMs = ability.def.cooldown;
+      }
+
+      triggered = true;
+      storyHandleAbility(player);
+      if(!(botActive && player === p2)){
+        addCharStat(player.skin, 'abilityUses', 1);
+        saveProgress(progress);
+      }
+      break;
+    }
+  }
+  return triggered;
+}
+
+function processCelloDarkAbilityInput(player){
+  if(!player || player.ability?.def?.id !== 'celloDarkFortissimo') return false;
+  const ability = player.ability;
+  const stamina = player.stamina;
+  if(!stamina) return false;
+
+  ability.runtime = ability.runtime || {};
+  const buffer = ability.runtime.mysteryBuffer || (ability.runtime.mysteryBuffer = []);
+  const queue = ability.runtime.mysteryInputQueue;
+  if(!queue || !queue.length) return false;
+
+  let triggered = false;
+
+  while(queue.length){
+    const dir = queue.shift();
+    buffer.push(dir);
+    if(buffer.length > 8) buffer.shift();
+    const matched = getMysteryCommandFromBuffer(buffer);
+
+    if(matched){
+      buffer.length = 0;
+
+      // Verificar si la habilidad está disponible
+      if(ability.active) break;
+      if(ability.cooldownMs > 0) break;
+      if(stamina.value < ability.def.staminaCost) break;
+
+      // Consumir stamina
+      stamina.value = Math.max(0, stamina.value - ability.def.staminaCost);
+
+      // Ejecutar combo según categoría
+      if(matched === 'strategy'){
+        // Up up down: spawn wave que empuja arriba
+        spawnCelloDarkWave(player);
+        ability.cooldownMs = ability.def.cooldown;
+      } else if(matched === 'defense'){
+        // Back back down: crecer temporalmente
+        activateCelloPower(player, ability);
+        ability.active = true;
+        ability.remainingMs = ability.def.duration;
+        ability.cooldownMs = ability.def.cooldown;
+        setTimeout(()=>{
+          deactivateCelloPower(player);
+          concludeAbility(player);
+        }, ability.def.duration);
+      } else if(matched === 'attack'){
+        // Forward forward down: torpedo (bloquea salto 10s)
+        spawnCelloDarkTorpedo(player);
+        ability.cooldownMs = ability.def.cooldown;
+      }
+
+      triggered = true;
+      storyHandleAbility(player);
+      if(!(botActive && player === p2)){
+        addCharStat(player.skin, 'abilityUses', 1);
+        saveProgress(progress);
+      }
+      break;
+    }
+  }
+  return triggered;
+}
+
+function getCelloJumpFactor(player){
+  const st = player?.status;
+  let factor = 1;
+  if(st?.celloDarkWaveEffect?.timer > 0){
+    factor *= (1 - st.celloDarkWaveEffect.heightReduction);
+  }
+  if(st?.celloDarkTorpedoEffect?.timer > 0){
+    factor *= (1 - st.celloDarkTorpedoEffect.jumpReduction);
+  }
+  // Wet indigo halves jump while active
+  if(st?.celloDarkWetIndigo?.timer > 0){
+    const jr = st.celloDarkWetIndigo.jumpReduction ?? 0.3;
+    factor *= (1 - jr);
+  }
+  return factor;
+}
+
 function getMysteryCommandFromBuffer(buffer){
   for(const key of Object.keys(MYSTERY_COMMAND_PATTERNS)){
     if(patternMatchesCommand(buffer, MYSTERY_COMMAND_PATTERNS[key])){
@@ -16040,7 +18971,8 @@ function queueMysteryInputFromCode(code){
   if(gameState !== STATE.PLAY && gameState !== STATE.FINISH) return;
   const players = [p1, p2];
   for(const player of players){
-    if(!player || player.ability?.def?.id !== 'mysteryCipher') continue;
+    const abilityId = player?.ability?.def?.id;
+    if(!player || (abilityId !== 'mysteryCipher' && abilityId !== 'djDarkFreeze' && abilityId !== 'fireDarkSpear' && abilityId !== 'celloDarkFortissimo')) continue;
     if(matchMode === MATCH_MODE.LAN && netRole === 'client' && player.side === 'L'){
       continue; // el cliente no alimenta comandos del host
     }
@@ -16069,73 +19001,135 @@ function queueMysteryInputFromCode(code){
 function botAI(){
   const p = p2;
   
-  // Si el bot está congelado por theremin, no procesa input
+  // Check all status effects that can freeze/stun the bot
   const thereminStatus = p?.status?.theremin;
-  if(thereminStatus && thereminStatus.stun > 0){
+  const djFreezeStatus = p?.status?.djFreeze;
+  const celloDarkWet = p?.status?.celloDarkWetIndigo;
+  const stunnedByTheremin = thereminStatus && thereminStatus.stun > 0;
+  const frozenByDj = djFreezeStatus && djFreezeStatus.timer > 0;
+  
+  // Early exit if completely frozen/stunned
+  if(stunnedByTheremin || frozenByDj || p.pullStunned){
     p.vx = 0;
-    return; // Congelado completamente
+    if(frozenByDj || p.pullStunned){
+      p.vy = 0;
+      p.gravityScale = 0;
+    }
+    return;
   }
   
-  const g = CONFIG.GRAVITY;
-  const botSpeed = p.stats?.speed ?? CONFIG.PLAYER_SPEED;
-  const botJump = p.stats?.jump ?? CONFIG.PLAYER_JUMP_V;
+  // Calculate speed multipliers from all active status effects
+  const slowFactor = (thereminStatus && thereminStatus.slow > 0 && !stunnedByTheremin) ? 0.5 : 1;
+  const dashFactor = p.status?.violinDash ? (p.status.violinDash.mult || 1) : 1;
+  const darkAccelFactor = p.status?.violinDarkAccel?.active ? (p.status.violinDarkAccel.speedMult || 2.0) : 1;
+  const pianoBatFactor = p.status?.pianoBat?.speedMult || 1;
+  
+  // Base stats with all multipliers applied (like the decoy does)
+  const botSpeed = (p.stats?.speed ?? CONFIG.PLAYER_SPEED) * slowFactor * dashFactor * darkAccelFactor * pianoBatFactor;
+  const botJump = (p.stats?.jump ?? CONFIG.PLAYER_JUMP_V) * (stunnedByTheremin ? 0 : slowFactor) * getCelloJumpFactor(p);
+  
   const bossFreeCourt = isBossFightMode() && arcadeContext.freeCourt;
-
-  // Parámetros ajustables
-  const anticipation = 0.35;   // anticipa mejor la caída
-  const moveSpeedFactor = 0.99;
+  
+  // Bot parameters (balanced between decoy's aggression and old bot's prediction)
+  const reactionDistance = 240;
+  const perfectTiming = 0.3;
   const jumpHeightFactor = 0.99;
-  const jumpOffsetX = 18;     // dónde quiere golpear la pelota (ligeramente derecha)
-  const reactionDistance = 280; // rango de reacción cuando la pelota entra a su zona
-  const perfectTiming = 0.14;   // segundos antes de llegar la pelota para saltar
-
-  // --- 1. Predicción de trayectoria (dónde caerá la pelota)
-  let predictedLanding = p.predictedLanding || (W * 0.75);
-  if(ball.vy > 0){ // solo si va cayendo
-    const timeToGround = Math.sqrt(Math.max(0, (2 * (CONFIG.GROUND_Y - ball.y - ball.r)) / g));
-    predictedLanding = ball.x + ball.vx * timeToGround * anticipation;
-  }
-  predictedLanding = clamp(predictedLanding, bossFreeCourt ? 50 : (CONFIG.NET_X + 50), W - 50);
-  p.predictedLanding = predictedLanding;
-
-  // --- 2. Posicionamiento: se mueve para interceptar la caída
-  const dx = predictedLanding - p.x;
-  const slowFactor = (thereminStatus && thereminStatus.slow > 0) ? 0.5 : 1; // Aplicar ralentización si hay slow
-  if(Math.abs(dx) > 10){
-    const dir = Math.sign(dx);
-    p.vx = dir * botSpeed * moveSpeedFactor * slowFactor;
+  
+  // Determine bot's defensive zone
+  const minX = bossFreeCourt ? 60 : CONFIG.NET_X + 40;
+  const maxX = W - 60;
+  const inDefZone = bossFreeCourt ? (ball.x > W * 0.45) : (ball.x > CONFIG.NET_X);
+  
+  // --- 1. Movement: follow ball in own zone or return to center ---
+  if(inDefZone){
+    // Ball is in bot's zone: track it
+    const diff = ball.x - p.x;
+    if(Math.abs(diff) > 30){
+      p.vx = clamp(diff * 4, -botSpeed, botSpeed);
+    } else {
+      p.vx = 0;
+    }
   } else {
-    p.vx = 0;
+    // Ball is on opponent's side: return to defensive center
+    const homeX = (minX + maxX) / 2;
+    const diff = homeX - p.x;
+    if(Math.abs(diff) > 20){
+      p.vx = clamp(diff * 3, -botSpeed, botSpeed);
+    } else {
+      p.vx = 0;
+    }
   }
-
-  // --- 3. Defensa y salto de reacción ---
-  // Si la pelota está bajando cerca de su mitad, intenta interceptar
+  
+  // --- 2. Jumping: react when ball is coming down ---
   const distX = Math.abs(ball.x - p.x);
   const distY = ball.y - p.y;
   const ballGoingDown = ball.vy > 50;
-  const inDefZone = bossFreeCourt ? (ball.x > W * 0.45) : (ball.x > CONFIG.NET_X + 40);
-
+  
   if(inDefZone && ballGoingDown && distX < reactionDistance){
-    // Predice cuándo pasará la pelota por su altura
     const tImpact = Math.abs(distY / (ball.vy || 1));
     if(p.onGround && tImpact < perfectTiming){
-      p.vy = -botJump * jumpHeightFactor;
+      p.vy = -botJump * jumpHeightFactor * getCelloJumpFactor(p);
       p.onGround = false;
     }
   }
+  
+  // --- 3. Court bounds ---
+  p.x = clamp(p.x, minX, maxX);
+  
+  maybeBotUseAbility();
+}
 
-  // --- 4. Ajuste fino del golpe ---
-  // Si la pelota está muy cerca, ajusta posición para golpearla en el lado derecho
-  if(inDefZone && Math.abs(ball.x - p.x) < p.r * 1.4 && ball.y < p.y - 10){
-    // Ajusta levemente su posición para impactar el lado derecho del balón
-    const desiredX = ball.x + jumpOffsetX;
-    const offset = desiredX - p.x;
-    p.vx = clamp(offset * 8 * slowFactor, -botSpeed * slowFactor, botSpeed * slowFactor);
+function botAIForDecoy(decoyBot){
+  if(!decoyBot) {
+    console.log('[botAIForDecoy] ❌ Decoy es nulo');
+    return;
   }
-
-  // --- 5. Vuelta al centro defensivo cuando la pelota va al otro lado ---
-  if(!bossFreeCourt && ball.x < CONFIG.NET_X - 60){
-    const homeX = (CONFIG.NET_X + W) / 2.05;
+  console.log('[botAIForDecoy] ✓ IA ejecutándose, pos:', {x: Math.round(decoyBot.x), vx: decoyBot.vx});
+  
+  // Usar la misma lógica del bot pero para el decoy
+  const p = decoyBot;
+  const thereminP = p.status?.theremin;
+  const dashP = p.status?.violinDash;
+  const darkAccelP = p.status?.violinDarkAccel;
+  const djFreezeP = p.status?.djFreeze;
+  const stunnedP = thereminP && thereminP.stun > 0;
+  const frozenByDjP = djFreezeP && djFreezeP.timer > 0;
+  const slowFactor = (thereminP && thereminP.slow > 0 && !stunnedP) ? 0.5 : 1;
+  const dashFactor = dashP ? dashP.mult : 1;
+  const darkAccelFactor = darkAccelP?.active ? (darkAccelP.speedMult || 2.0) : 1;
+  const botSpeed = (p.stats?.speed ?? CONFIG.PLAYER_SPEED) * slowFactor * dashFactor * darkAccelFactor;
+  const botJump = (p.stats?.jump ?? CONFIG.PLAYER_JUMP_V) * (stunnedP ? 0 : slowFactor) * getCelloJumpFactor(p);
+  
+  if(stunnedP || frozenByDjP || p.pullStunned){
+    p.vx = 0;
+    p.vy = 0;
+    p.gravityScale = 0;
+    return;
+  }
+  
+  const bossFreeCourt = isArcadeMode() && arcadeContext.mode === ARCADE_MODES.BOSS && arcadeContext.freeCourt;
+  const reactionDistance = 200;
+  const perfectTiming = 0.5;
+  const jumpHeightFactor = 1.0;
+  const jumpOffsetX = 0;
+  
+  // Determinar su lado y l\u00edmites
+  const isLeft = (p.ownerSide === 'L');
+  const minX = isLeft ? 60 : CONFIG.NET_X + 10;
+  const maxX = isLeft ? CONFIG.NET_X - 10 : W - 60;
+  
+  // --- 1. Seguir la pelota en su lado ---
+  const inOwnSide = isLeft ? (ball.x < CONFIG.NET_X) : (ball.x > CONFIG.NET_X);
+  if(inOwnSide){
+    const diff = ball.x - p.x;
+    if(Math.abs(diff) > 40){
+      p.vx = clamp(diff * 4 * slowFactor, -botSpeed * slowFactor, botSpeed * slowFactor);
+    } else {
+      p.vx = 0;
+    }
+  } else {
+    // Volver al centro de su lado
+    const homeX = isLeft ? (minX + (CONFIG.NET_X - 10 - minX) / 2) : (CONFIG.NET_X + 10 + (maxX - CONFIG.NET_X - 10) / 2);
     const diff = homeX - p.x;
     if(Math.abs(diff) > 20){
       p.vx = clamp(diff * 3 * slowFactor, -botSpeed * slowFactor, botSpeed * slowFactor);
@@ -16143,9 +19137,33 @@ function botAI(){
       p.vx = 0;
     }
   }
-
-  maybeBotUseAbility();
+  
+  // --- 2. L\u00edmites de cancha ---
+  if(p.x < minX) p.x = minX;
+  if(p.x > maxX) p.x = maxX;
+  
+  // --- 3. Defensa y salto de reacci\u00f3n ---
+  const distX = Math.abs(ball.x - p.x);
+  const distY = ball.y - p.y;
+  const ballGoingDown = ball.vy > 50;
+  
+  if(inOwnSide && ballGoingDown && distX < reactionDistance){
+    const tImpact = Math.abs(distY / (ball.vy || 1));
+    if(p.onGround && tImpact < perfectTiming){
+      p.vy = -botJump * jumpHeightFactor * getCelloJumpFactor(p);
+      p.onGround = false;
+    }
+  }
+  
+  // --- 4. Ajuste fino del golpe ---
+  if(inOwnSide && Math.abs(ball.x - p.x) < p.r * 1.4 && ball.y < p.y - 10){
+    const desiredX = ball.x + jumpOffsetX;
+    const offset = desiredX - p.x;
+    p.vx = clamp(offset * 8 * slowFactor, -botSpeed * slowFactor, botSpeed * slowFactor);
+  }
+  console.log('[botAIForDecoy] FIN - vx final:', p.vx, 'inOwnSide:', inOwnSide);
 }
+
 
 function maybeBotUseAbility(){
   if(isBossFightMode()) return;
@@ -16155,9 +19173,46 @@ function maybeBotUseAbility(){
   const ability = player.ability;
   const def = ability.def;
   if(!def || def.type === 'passive') return;
-  if(ability.active || ability.cooldownMs > 0) return;
-  if((player.stamina?.value || 0) < (def.staminaCost || 0)) return;
+  
+  // Restricciones de lado para ciertas habilidades de bot
+  const ballOnOwnSide = player.side === 'L' ? (ball.x < CONFIG.NET_X) : (ball.x > CONFIG.NET_X);
+  const ballOnRivalSide = !ballOnOwnSide;
+  const rivalSideOnly = new Set(['drumDetonate','drumDarkDetonate','ghostWall','thereminPulse','thereminDarkPulse']);
+  const ownSideOnly = new Set(['queenMajesty','queenDarkMajesty']);
+  
+  // Verificar si NO se cumplen las restricciones de lado
+  if(rivalSideOnly.has(def.id) && !ballOnRivalSide){
+    player.abilityReadyTime = null;
+    return;
+  }
+  if(ownSideOnly.has(def.id) && !ballOnOwnSide){
+    player.abilityReadyTime = null;
+    return;
+  }
+  
+  // Verificar otras condiciones básicas
+  if(ability.active || ability.cooldownMs > 0){
+    player.abilityReadyTime = null;
+    return;
+  }
+  if((player.stamina?.value || 0) < (def.staminaCost || 0)){
+    player.abilityReadyTime = null;
+    return;
+  }
+  
+  // Todas las condiciones se cumplen: iniciar o verificar el delay
+  if(!player.abilityReadyTime){
+    player.abilityReadyTime = performance.now();
+    return;
+  }
+  
+  // Esperar 0.9 segundos desde que las condiciones se cumplieron
+  const timeSinceReady = performance.now() - player.abilityReadyTime;
+  if(timeSinceReady < 900) return;
+  
+  // Activar la habilidad y resetear el tiempo
   activatePlayerAbility(player);
+  player.abilityReadyTime = null;
 }
 
 /* Integración y límites */
@@ -16167,13 +19222,20 @@ function stepPhysics(dt){
   updateMysteryBombPulse(dt);
   updateFireEffect();
   applyDjFieldsToBall(dt);
-  // Jugadores
+  // Jugadores (+ decoy del Piano si está activo)
   const players = [p1, p2];
+  // Integrar todos los decoys de piano en la física
+  if(pianoBatDecoys && pianoBatDecoys.length){
+    for(const d of pianoBatDecoys){
+      players.push(d);
+    }
+  }
   for(const p of players){
     if(!p) continue;
-    const isHostPlayerOnClient = (matchMode === MATCH_MODE.LAN && netRole === 'client' && p.side === 'L');
+    const isHostPlayerOnClient = (matchMode === MATCH_MODE.LAN && netRole === 'client' && p.side === 'L' && !p.isPianoDecoy);
     if(isHostPlayerOnClient){
       // el cliente no integra al host; usa los snapshots recibidos para evitar jitter
+      // PERO el decoy del Piano SIEMPRE se integra localmente
       continue;
     }
     updateStatusEffects(p, dt);
@@ -16196,10 +19258,13 @@ function stepPhysics(dt){
     const hydraSlow = p.hydraDarkSlow?.mult || 1;
     const maxVx = baseMaxVx * dashCap * darkAccelCap * kbBoost * hydraSlow;
     p.x += clamp(p.vx, -maxVx, maxVx)*dt;
+    // Decoys se integran como jugadores estándar
     p.y += p.vy*dt;
     const freeCourt = isArcadeMode() && arcadeContext.freeCourt;
-    const minX = freeCourt ? 60 : (p.side==='L' ? 60 : CONFIG.NET_X+40);
-    const maxX = freeCourt ? W-60 : (p.side==='L' ? CONFIG.NET_X-40 : W-60);
+    const ghostNet = !!p.status?.pianoGhostNet;
+    const allowFullCourt = freeCourt || ghostNet;
+    const minX = allowFullCourt ? 60 : (p.side==='L' ? 60 : CONFIG.NET_X+40);
+    const maxX = allowFullCourt ? W-60 : (p.side==='L' ? CONFIG.NET_X-40 : W-60);
     p.x = clamp(p.x, minX, maxX);
     const gy = CONFIG.GROUND_Y - p.r;
     if(p.y > gy){
@@ -16211,20 +19276,50 @@ function stepPhysics(dt){
     }
     if(p.y < 60) { p.y = 60; p.vy = 20; }
   }
+  // Campo de fuerza de ola base del cello (puede alcanzar al otro lado)
+  applyCelloBaseWaveField(dt);
   updateHydraClones(dt);
+  updateStoryAllies(dt);
   updateHydraDarkHeads(dt);
   updateHydraDarkProjectiles(dt);
   updateDirectorClones(dt);
+  updatePianoBatDecoys(dt);
+  updateDjFrozenClones(dt);
   updateMiniDirectors(dt);
   updateThereminSwords(dt);
   updateViolinDarkRockets(dt);
+  updateFireFlames(dt);
+  updateFireColumns(dt);
+  updateFireSpears(dt);
+  updateCelloDarkWaves(dt);
+  updateCelloDarkTorpedos(dt);
   if(p1 && p1.harpProbe) updateHarpDarkProbe(p1);
   if(p2 && p2.harpProbe) updateHarpDarkProbe(p2);
 
   // Pelota (si está en espera de saque, dejamos la integración normal pero waitServe evita movimiento)
   const prevBallX = ball.x;
   const prevBallY = ball.y;
-  if(!ball.waitServe){
+  // Update ball wet effect timer
+  if(ball.celloDarkWet){
+    ball.celloDarkWet.timer -= dt;
+    if(ball.celloDarkWet.timer <= 0){
+      delete ball.celloDarkWet;
+    }
+  }
+  // Handle ball frozen status
+  if(ball.frozen){
+    ball.frozen.timer -= dt;
+    if(ball.frozen.timer <= 0){
+      delete ball.frozen;
+    } else {
+      // Keep ball frozen in place
+      ball.x = ball.frozen.x;
+      ball.y = ball.frozen.y;
+      ball.vx = 0;
+      ball.vy = 0;
+    }
+  }
+  if(!ball.waitServe && !ball.frozen){
     ball.vy += CONFIG.GRAVITY*dt;
     ball.x += ball.vx*dt;
     ball.y += ball.vy*dt;
@@ -16345,8 +19440,15 @@ function stepPhysics(dt){
   // Colisiones pelota-jugador (seguir aplicando aunque haya timeout pendiente)
   handlePlayerHit(p1);
   handlePlayerHit(p2);
+  // Colisiones con todos los decoys
+  for(const d of pianoBatDecoys){
+    handlePlayerHit(d);
+  }
   for(const clone of hydraClones){
     handlePlayerHit(clone);
+  }
+  for(const ally of storyAllies){
+    handlePlayerHit(ally);
   }
   for(const clone of directorClones){
     handlePlayerHit(clone);
@@ -16357,6 +19459,7 @@ function stepPhysics(dt){
   checkArcadeTargetHit();
   updateBossFight(dt);
   updateHazardProjectiles(dt);
+  updateFlowerBalls(dt);
 }
 
 function getHitboxAxes(entity){
@@ -16387,6 +19490,9 @@ function handlePlayerHit(p){
   const minD = ball.r + support;
 
   if(dist < minD){
+    if(ball.frozen){
+      delete ball.frozen;
+    }
     const currentTime = performance.now();
     const arcadeActive = isArcadeMode();
     clearTimeout(ballhitTimeout);
@@ -16395,7 +19501,13 @@ function handlePlayerHit(p){
     }, 1);
 
     if(handleFireTouch(p.side)) return;
-    if((p.ability?.def?.id === 'metalSpike' || p.ability?.def?.id === 'metalDarkSpike') && p.ability.active){
+    
+    // Metal spike check (but not if frozen or stunned)
+    const ownerDjFreeze = ownerPlayer?.status?.djFreeze;
+    const ownerThereminStun = ownerPlayer?.status?.theremin;
+    const canMetalSpike = !((ownerDjFreeze && ownerDjFreeze.timer > 0) || (ownerThereminStun && ownerThereminStun.stun > 0));
+    
+    if((p.ability?.def?.id === 'metalSpike' || p.ability?.def?.id === 'metalDarkSpike') && p.ability.active && canMetalSpike){
       if(attemptMetalSpike(p)) return;
     }
 
@@ -16403,7 +19515,11 @@ function handlePlayerHit(p){
     if(isClone){
       p.touchesLeft = (typeof p.touchesLeft === 'number' ? p.touchesLeft : 3) - 1;
     }
-    const countsForFoul = !isClone; // hydra mini-clones can touch sin sumar para foul
+    // Piano Dark Bat: excusar fouls SOLO en Phase 2 (forma de murciélago, no en Phase 1 stretch)
+    const isPianoBatAbility = p.ability?.def?.id === 'pianoDarkBat';
+    const isPhase2Active = isPianoBatAbility && p.ability?.runtime?.phase2Active;
+    const pianoNoFoul = isPhase2Active; // Solo excusar cuando está en forma de murciélago (phase2)
+    const countsForFoul = !isClone && !pianoNoFoul; // hydra mini-clones y piano dark phase 2 no suman para foul
     if(countsForFoul && !arcadeActive && currentTime - hitTracker.lastHitTime > 100){
       hitTracker.lastHitTime = currentTime;
       if(hitTracker.lastHitter === p.side){
@@ -16466,8 +19582,44 @@ function handlePlayerHit(p){
     ball.x += nx*2;
     ball.y += ny*2;
 
+    // Flor Dark: cuando la stamina está llena, crear balón de flores adicional
+    if(ownerPlayer && (ownerPlayer.ability?.def?.id === 'florDarkPulse') && p === ownerPlayer){
+      const st = ownerPlayer.stamina;
+      if(st && st.value >= (st.max || 0)){
+        // Spawnar balón de flores con las velocidades del golpe
+        spawnFlowerBall(ownerPlayer, ball.vx, ball.vy);
+        // Consumir toda la stamina al usar la habilidad
+        st.value = 67;
+      }
+    }
+
+    // Transfer ball wet effect to opponent (removes wet from ball)
+    if(ball.celloDarkWet && ball.celloDarkWet.timer > 0){
+      const wetOwnerSide = ball.celloDarkWet.ownerSide;
+      // Apply to the other player (not the owner), but Cello Dark is immune
+      if(p.side !== wetOwnerSide && ownerPlayer?.ability?.def?.id !== 'celloDarkFortissimo'){
+        p.status = p.status || {};
+        p.status.celloDarkWetIndigo = { timer: 5, jumpReduction: 0.3, tint: true };
+        // Remove wet effect from ball after transfer
+        delete ball.celloDarkWet;
+      }
+    }
+
     if(ownerPlayer){
       grantAbilityChargeFromHit(ownerPlayer);
+      // Cello Dark: cuando la stamina está llena, aplica efecto mojado a la pelota (solo cuando el cello la toca)
+      if(ownerPlayer.ability?.def?.id === 'celloDarkFortissimo' && p === ownerPlayer){
+        const st = ownerPlayer.stamina;
+        if(st && st.value >= (st.max || 0)){
+          const now = performance.now();
+          ownerPlayer.status = ownerPlayer.status || {};
+          const cd = ownerPlayer.status.celloWetBallCooldown || 0;
+          if(now >= cd){
+            ball.celloDarkWet = { timer: 60, ownerSide: ownerPlayer.side };
+            ownerPlayer.status.celloWetBallCooldown = now + 8000; // 15s cooldown
+          }
+        }
+      }
     }
     if(arcadeActive){
       handleArcadeHit(ownerPlayer);
@@ -16694,20 +19846,31 @@ function drawGame(){
   // Jugadores
   // Tentáculos detrás de los jugadores
   drawHydraDarkTentacles();
+  drawCelloBaseWave(p1);
+  drawCelloBaseWave(p2);
   drawPlayer(p1);
   drawPlayer(p2);
+  drawStoryAllies();
   drawHydraClones();
   drawDirectorClones();
+  drawPianoBatDecoys();
+  drawDjFrozenClones();
   drawMiniDirectors();
   drawHydraDarkHeads();
   drawHydraDarkProjectiles();
   drawThereminSwords();
   drawViolinDarkRockets();
+  drawFireFlames();
+  drawFireColumns();
+  drawFireSpears();
+  drawCelloDarkWaves();
+  drawCelloDarkTorpedos();
   if(p1 && p1.harpProbe) drawHarpDarkProbe(p1);
   if(p2 && p2.harpProbe) drawHarpDarkProbe(p2);
 
   // Pelota
   drawBall();
+  drawFlowerBalls();
   drawFlorBursts();
   drawHazardProjectiles();
 
@@ -16726,6 +19889,7 @@ function drawGame(){
   // HUD
   drawHUD();
   drawFinishEffects();
+  drawTransformationExplosions(); // Explosiones de transformación de Piano Dark
   drawFinishOverlay();
   drawStoryOverlay();
 
@@ -16761,6 +19925,31 @@ function drawFinishEffects(){
   if(finishState?.fatality?.def?.onDraw){
     finishState.fatality.def.onDraw(ctx, finishState.fatality);
   }
+}
+
+function drawTransformationExplosions(){
+  ctx.save();
+  for(let i = transformationExplosions.length - 1; i >= 0; i--){
+    const fx = transformationExplosions[i];
+    const elapsed = performance.now() - fx.start;
+    if(elapsed > fx.duration){
+      transformationExplosions.splice(i, 1);
+      continue;
+    }
+    const progress = clamp(elapsed / fx.duration, 0, 1);
+    
+    // Dibujar 3 capas concéntricas
+    for(const layer of fx.layers){
+      const radius = fx.maxRadius * layer.radiusPercent * progress;
+      const alpha = Math.max(0, 1 - progress * 1.2); // Desvanece más rápido
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = layer.color;
+      ctx.beginPath();
+      ctx.arc(fx.x, fx.y, radius, 0, TAU);
+      ctx.fill();
+    }
+  }
+  ctx.restore();
 }
 
 function drawFinishOverlay(){
@@ -16919,6 +20108,41 @@ function drawPlayer(p){
     ctx.restore();
   }
   drawSkin(ctx, p.skin, {r:p.r, player:p});
+  // DJ freeze: apply cyan tint to skin + white glow
+  const djFreeze = p.status?.djFreeze;
+  if(djFreeze && djFreeze.timer > 0){
+    ctx.save();
+    // Apply cyan tint overlay to skin
+    ctx.globalAlpha = 0.35;
+    ctx.fillStyle = '#40d9ff';
+    ctx.beginPath();
+    ctx.arc(0, 0, p.r, 0, TAU);
+    ctx.fill();
+    ctx.restore();
+    
+    // White glow outline
+    ctx.save();
+    ctx.globalAlpha = 0.5;
+    const pulse = 0.85 + 0.15*Math.sin(performance.now()/100);
+    ctx.fillStyle = 'rgba(220,240,255,0.7)';
+    ctx.shadowColor = '#ffffff';
+    ctx.shadowBlur = 20;
+    ctx.beginPath();
+    ctx.arc(0, 0, p.r * (1.18 + 0.06 * pulse), 0, TAU);
+    ctx.fill();
+    ctx.restore();
+  }
+  // Cello wet indigo tint overlay
+  const wetIndigo = p.status?.celloDarkWetIndigo;
+  if(wetIndigo && wetIndigo.timer > 0){
+    ctx.save();
+    ctx.globalAlpha = 0.32;
+    ctx.fillStyle = 'rgba(40, 60, 160, 0.9)'; // índigo
+    ctx.beginPath();
+    ctx.arc(0, 0, p.r * 1.02, 0, TAU);
+    ctx.fill();
+    ctx.restore();
+  }
   const theremin = p.status?.theremin;
   if(theremin){
     const alpha = theremin.stun > 0 ? 0.7 : 0.4;
@@ -16966,6 +20190,44 @@ function drawBall(){
   ctx.lineWidth = 2;
   ctx.beginPath(); ctx.arc(0,0, r*0.65, 0.4, TAU-0.4); ctx.stroke();
   ctx.beginPath(); ctx.arc(0,0, r*0.55, -0.8, TAU+0.8); ctx.stroke();
+
+  // Frozen ball overlay
+  if(ball.frozen && ball.frozen.timer > 0){
+    ctx.save();
+    ctx.globalAlpha = 0.7;
+    ctx.fillStyle = 'rgba(120,230,255,0.6)';
+    ctx.shadowColor = '#00ffff';
+    ctx.shadowBlur = 16;
+    ctx.beginPath();
+    ctx.arc(0, 0, r * 1.15, 0, TAU);
+    ctx.fill();
+    // Ice crystal pattern
+    ctx.strokeStyle = 'rgba(200,250,255,0.9)';
+    ctx.lineWidth = 2;
+    for(let i = 0; i < 4; i++){
+      const angle = (i / 4) * TAU;
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(Math.cos(angle) * r * 0.7, Math.sin(angle) * r * 0.7);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  // Wet ball overlay (Cello Dark)
+  if(ball.celloDarkWet && ball.celloDarkWet.timer > 0){
+    ctx.save();
+    ctx.globalAlpha = 0.5;
+    const wetGrad = ctx.createRadialGradient(0, 0, r * 0.2, 0, 0, r * 1.1);
+    wetGrad.addColorStop(0, 'rgba(40,100,220,0.6)');
+    wetGrad.addColorStop(0.7, 'rgba(40,100,220,0.4)');
+    wetGrad.addColorStop(1, 'rgba(40,100,220,0.15)');
+    ctx.fillStyle = wetGrad;
+    ctx.beginPath();
+    ctx.arc(0, 0, r * 1.08, 0, TAU);
+    ctx.fill();
+    ctx.restore();
+  }
 
   // Bomba de drum - p1 a la izquierda, p2/bot a la derecha
   if(drumMineL.attached){
@@ -17246,13 +20508,39 @@ function drawHazardProjectiles(){
     if(img && img.complete){
       ctx.drawImage(img, -proj.r, -proj.r, proj.r*2, proj.r*2);
     } else {
-      ctx.fillStyle = proj.type === 'boulder' ? '#7a5740' : '#d96b2c';
-      ctx.beginPath();
-      ctx.arc(0, 0, proj.r, 0, TAU);
-      ctx.fill();
-      ctx.strokeStyle = '#5c3b2c';
-      ctx.lineWidth = 2;
-      ctx.stroke();
+      // Special rendering for iceball
+      if(proj.type === 'iceball' || proj.isIceball){
+        // White snowball with cyan ice
+        ctx.shadowColor = '#80ddff';
+        ctx.shadowBlur = 12;
+        const iceGradient = ctx.createRadialGradient(-proj.r*0.3, -proj.r*0.3, 0, 0, 0, proj.r);
+        iceGradient.addColorStop(0, '#ffffff');
+        iceGradient.addColorStop(0.5, '#e8f8ff');
+        iceGradient.addColorStop(1, '#40d9ff');
+        ctx.fillStyle = iceGradient;
+        ctx.beginPath();
+        ctx.arc(0, 0, proj.r, 0, TAU);
+        ctx.fill();
+        // Ice crystals outline
+        ctx.shadowBlur = 0;
+        ctx.strokeStyle = '#40d9ff';
+        ctx.lineWidth = 1.5;
+        for(let i = 0; i < 4; i++){
+          const angle = (i / 4) * TAU + (performance.now() / 500);
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(Math.cos(angle) * proj.r * 0.75, Math.sin(angle) * proj.r * 0.75);
+          ctx.stroke();
+        }
+      } else {
+        ctx.fillStyle = proj.type === 'boulder' ? '#7a5740' : '#d96b2c';
+        ctx.beginPath();
+        ctx.arc(0, 0, proj.r, 0, TAU);
+        ctx.fill();
+        ctx.strokeStyle = '#5c3b2c';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
     }
     ctx.restore();
   }
@@ -17891,7 +21179,10 @@ function loop(){
 
   switch(gameState){
     case STATE.SELECT:
-      handleSelection();
+      // Only handle character selection input if we're NOT in stage selection screen
+      if(appScene === APP_SCENE.SELECT){
+        handleSelection();
+      }
       break;
 
     case STATE.PLAY:
